@@ -13,7 +13,7 @@ const (
 )
 
 type ParamNewQrcode struct {
-	Expire int64  `json:"expire"`
+	Expire int64  `json:"expire,omitempty"`
 	Type   QrType `json:"type"` // 1永久2临时
 	Scene  string `json:"scene"`
 }
