@@ -60,5 +60,5 @@ func (ctx *Context) Qrcode(p ParamNewQrcode) (string, error) {
 	if res.Errcode != 0 {
 		return "", fmt.Errorf("微信：获取二维码失败（%d-%s）", res.Errcode, res.Errmsg)
 	}
-	return fmt.Sprintf("%s/showqrcode?ticket=%s", wx.ApiMp, res.Ticket), nil
+	return fmt.Sprintf("%s/showqrcode?ticket=%s", wx.ApiQr, res.Ticket), nil
 }

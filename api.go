@@ -6,5 +6,6 @@ package wx
 
 const (
 	ApiMp   = "https://api.weixin.qq.com/cgi-bin"
+	ApiQr   = "https://mp.weixin.qq.com/cgi-bin"
 	ApiWork = "https://qyapi.weixin.qq.com/cgi-bin"
 )
