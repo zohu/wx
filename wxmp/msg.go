@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/hhcool/gtls/log"
 	"github.com/hhcool/wx"
-	"github.com/hhcool/wx/crypto"
 )
 
 type Message struct {
@@ -42,8 +41,8 @@ type Message struct {
 // @param data
 // @return error
 func (ctx *Context) DecodeMessage(p *wx.ParamNotify, encpt *wx.NotifyEncrypt) (*Message, error) {
-	cpt := crypto.NewWXBizMsgCrypt(ctx.App.Token, ctx.App.EncodingAesKey, ctx.App.Appid, crypto.JsonType)
-	if cptByte, err := cpt.DecryptMsg(p.MsgSignature, p.Timestamp, p.Nonce, &crypto.BizJsonMsg4Recv{
+	cpt := wx.NewWXBizMsgCrypt(ctx.App.Token, ctx.App.EncodingAesKey, ctx.App.Appid, wx.JsonType)
+	if cptByte, err := cpt.DecryptMsg(p.MsgSignature, p.Timestamp, p.Nonce, &wx.BizJsonMsg4Recv{
 		Tousername: encpt.ToUserName,
 		Encrypt:    encpt.Encrypt,
 	}); err != nil {
