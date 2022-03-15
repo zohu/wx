@@ -1,5 +1,12 @@
 package wxmp
 
+import (
+	"encoding/xml"
+	"fmt"
+	"github.com/hhcool/log"
+	"github.com/hhcool/wx"
+)
+
 type Message struct {
 	ToUserName   string `json:"ToUserName" xml:"ToUserName"`
 	FromUserName string `json:"FromUserName" xml:"FromUserName"`
@@ -27,5 +34,27 @@ type Message struct {
 	Precision    int64  `json:"Precision,omitempty" xml:"Precision,omitempty"`       // 事件，地理位置，精度
 }
 
-func (ctx *Context) DecodeMessage() {}
-func (ctx *Context) ReplayMessage() {}
+// DecodeMessage
+// @Description: 接收并解析消息
+// @receiver ctx
+// @param data
+// @return error
+func (ctx *Context) DecodeMessage(data string) (Message, error) {
+	var msg Message
+	err := xml.Unmarshal([]byte(data), &msg)
+	if err != nil {
+		return msg, fmt.Errorf("解析消息失败：%s", err.Error())
+	}
+	log.Info(wx.StructToMap(msg))
+	return msg, nil
+}
+
+// ReplayMessage
+// @Description: 被动回复消息
+// @receiver ctx
+// @return {}
+func (ctx *Context) ReplayMessage() string {
+	var msg Message
+	m, _ := xml.Marshal(msg)
+	return string(m)
+}
