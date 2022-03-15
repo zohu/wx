@@ -11,10 +11,8 @@ import (
 应用实体
 */
 
-type AppType int
-
 const (
-	TypeMpServe AppType = iota + 1
+	TypeMpServe = iota + 1
 	TypeMpSubscribe
 	TypeWork
 	TypeApp
@@ -27,7 +25,7 @@ type App struct {
 	AppSecret      string    `json:"app_secret"`
 	Token          string    `json:"token"`
 	EncodingAesKey string    `json:"encoding_aes_key"`
-	AppType        AppType   `json:"app_type"`
+	AppType        int       `json:"app_type"`
 	AccessToken    string    `json:"access_token"`
 	ExpireTime     time.Time `json:"expire_time"`
 	Retry          string    `json:"retry"`
