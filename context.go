@@ -12,12 +12,12 @@ import (
 */
 
 const (
-	TypeMpServe = iota + 1
-	TypeMpSubscribe
-	TypeWork
-	TypeApp
-	TypeMiniApp
-	TypeH5
+	TypeMpServe     = "1"
+	TypeMpSubscribe = "2"
+	TypeWork        = "3"
+	TypeApp         = "4"
+	TypeMiniApp     = "5"
+	TypeH5          = "6"
 )
 
 type App struct {
@@ -25,7 +25,7 @@ type App struct {
 	AppSecret      string    `json:"app_secret"`
 	Token          string    `json:"token"`
 	EncodingAesKey string    `json:"encoding_aes_key"`
-	AppType        int       `json:"app_type"`
+	AppType        string    `json:"app_type"`
 	AccessToken    string    `json:"access_token"`
 	ExpireTime     time.Time `json:"expire_time"`
 	Retry          string    `json:"retry"`
