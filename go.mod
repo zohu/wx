@@ -11,9 +11,7 @@ require (
 	github.com/go-playground/validator/v10 v10.4.1 // indirect
 	github.com/go-redis/redis/v8 v8.11.4 // indirect
 	github.com/guonaihong/gout v0.2.11 // indirect
-	github.com/hhcool/log v1.0.0 // indirect
-	github.com/hhcool/rds v1.0.0 // indirect
-	github.com/hhcool/structs v1.1.1 // indirect
+	github.com/hhcool/gtls v0.0.1 // indirect
 	github.com/leodido/go-urn v1.2.0 // indirect
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible // indirect
 	github.com/lestrrat-go/strftime v1.0.5 // indirect

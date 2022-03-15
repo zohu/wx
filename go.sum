@@ -39,6 +39,8 @@ github.com/google/gofuzz v1.0.0/go.mod h1:dBl0BpW6vV/+mYPU4Po3pmUjxk6FQPldtuIdl/
 github.com/google/uuid v1.1.1/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/guonaihong/gout v0.2.11 h1:+lxjVuChcwL8nSyK8lr6o313XjFl7p0pk4NKGCRF644=
 github.com/guonaihong/gout v0.2.11/go.mod h1:C7mZzrmDVZwkY84MnGcUttJv7UQocJRs8aUw3kViXJU=
+github.com/hhcool/gtls v0.0.1 h1:piUzVyOKwgfRw/pA1R1yThQjNDW/51tCAq7hAUbg0sg=
+github.com/hhcool/gtls v0.0.1/go.mod h1:nKJJZQ8oc1UZQAlYOimAS0thMueK/HhbTVMVW5Kw4Jo=
 github.com/hhcool/log v1.0.0 h1:ahxMXgj3KC/CSTivuP4UHrroZZTUYzoowsxuli2BIkQ=
 github.com/hhcool/log v1.0.0/go.mod h1:ddAtYFYdCEb2wL1iS2kRfs4iFEwGDNtEDZlfEQrJeZE=
 github.com/hhcool/rds v1.0.0 h1:V8UQ0+BZ/Sb1rpYMypq6+WZOiaoeWxQECGmvb8EmJUM=

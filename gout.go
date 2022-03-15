@@ -3,7 +3,7 @@ package wx
 import (
 	"github.com/guonaihong/gout"
 	"github.com/guonaihong/gout/dataflow"
-	"github.com/hhcool/log"
+	"github.com/hhcool/gtls/log"
 )
 
 func debug() gout.DebugFunc {

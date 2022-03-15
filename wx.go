@@ -4,23 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/go-redis/redis/v8"
-	"github.com/hhcool/log"
-	"github.com/hhcool/rds"
+	"github.com/hhcool/gtls/log"
+	"github.com/hhcool/gtls/rds"
 	"time"
 )
 
 const (
 	RdsAppPrefix     = "WX_APP:"
 	RdsAppListPrefix = "WX_APP_LIST"
-)
-
-const (
-	TypeMpServe = iota + 1
-	TypeMpSubscribe
-	TypeWork
-	TypeApp
-	TypeMiniApp
-	TypeH5
 )
 
 type Option struct {

@@ -1,7 +1,7 @@
 package wx
 
 import (
-	"github.com/hhcool/log"
+	"github.com/hhcool/gtls/log"
 	"strings"
 	"time"
 )

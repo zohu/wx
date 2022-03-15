@@ -2,7 +2,7 @@ package wxwork
 
 import (
 	"encoding/json"
-	"github.com/hhcool/log"
+	"github.com/hhcool/gtls/log"
 	"github.com/hhcool/wx"
 )
 

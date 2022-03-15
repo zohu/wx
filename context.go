@@ -1,8 +1,8 @@
 package wx
 
 import (
-	"github.com/hhcool/log"
-	"github.com/hhcool/structs"
+	"github.com/hhcool/gtls/log"
+	"github.com/hhcool/gtls/structs"
 	"sync"
 	"time"
 )
@@ -11,12 +11,23 @@ import (
 应用实体
 */
 
+type AppType int
+
+const (
+	TypeMpServe AppType = iota + 1
+	TypeMpSubscribe
+	TypeWork
+	TypeApp
+	TypeMiniApp
+	TypeH5
+)
+
 type App struct {
 	Appid          string    `json:"appid"`
 	AppSecret      string    `json:"app_secret"`
 	Token          string    `json:"token"`
 	EncodingAesKey string    `json:"encoding_aes_key"`
-	AppType        int       `json:"app_type"`
+	AppType        AppType   `json:"app_type"`
 	AccessToken    string    `json:"access_token"`
 	ExpireTime     time.Time `json:"expire_time"`
 	Retry          string    `json:"retry"`
