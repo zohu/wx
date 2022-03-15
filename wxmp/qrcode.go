@@ -5,9 +5,16 @@ import (
 	"github.com/hhcool/wx"
 )
 
+type QrType int
+
+const (
+	QrTypeForever   QrType = 1 // 永久
+	QrTypeTemporary QrType = 2 // 临时
+)
+
 type ParamNewQrcode struct {
 	Expire int64  `json:"expire"`
-	Type   int    `json:"type"` // 1永久2临时
+	Type   QrType `json:"type"` // 1永久2临时
 	Scene  string `json:"scene"`
 }
 type ParamQrcode struct {

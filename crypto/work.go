@@ -1,4 +1,4 @@
-package wx
+package crypto
 
 import (
 	"bytes"
@@ -17,8 +17,6 @@ import (
 /**
 微信加解密
 */
-
-const letterBytes = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 const (
 	ValidateSignatureError int = -40001
@@ -110,6 +108,7 @@ func NewWXBizMsgCrypt(token, encodingAeskey, receiverId string, protocolType Pro
 
 func (jp *BizMsgCrypt) randString(n int) string {
 	b := make([]byte, n)
+	letterBytes := "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	for i := range b {
 		b[i] = letterBytes[rand.Int63()%int64(len(letterBytes))]
 	}
