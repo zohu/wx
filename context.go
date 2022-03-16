@@ -66,7 +66,7 @@ func (c *Context) NewAccessToken() string {
 	if token != "" {
 		c.App.Retry = "0"
 		c.App.AccessToken = token
-		c.App.ExpireTime = time.Now().Add(time.Second * 7200)
+		c.App.ExpireTime = time.Now().Add(time.Second * 7000)
 		wechat.HSet(RdsAppPrefix+c.App.Appid, StructToMap(c.App))
 	} else {
 		wechat.HIncrBy(RdsAppPrefix+c.App.Appid, "retry", 1)
