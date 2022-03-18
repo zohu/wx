@@ -39,12 +39,9 @@ type Message struct {
 // @receiver ctx
 // @param data
 // @return error
-func (ctx *Context) DecodeMessage(p *wx.ParamNotify, encpt *wx.NotifyEncrypt) (*Message, error) {
+func (ctx *Context) DecodeMessage(p *wx.ParamNotify, encpt *wxcpt.BizMsg4Recv) (*Message, error) {
 	cpt := wxcpt.NewBizMsgCrypt(ctx.App.Token, ctx.App.EncodingAesKey, ctx.App.Appid)
-	if cptByte, err := cpt.DecryptMsg(p.MsgSignature, p.Timestamp, p.Nonce, &wxcpt.BizMsg4Recv{
-		Tousername: encpt.ToUserName,
-		Encrypt:    encpt.Encrypt,
-	}); err != nil {
+	if cptByte, err := cpt.DecryptMsg(p.MsgSignature, p.Timestamp, p.Nonce, encpt); err != nil {
 		return nil, err
 	} else {
 		event := new(Message)
