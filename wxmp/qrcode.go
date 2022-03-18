@@ -37,7 +37,7 @@ type ResQrcode struct {
 
 func (ctx *Context) Qrcode(p ParamNewQrcode) (string, error) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return "", fmt.Errorf("企业微信：应用 %s 非企业号", ctx.App.Appid)
+		return "", fmt.Errorf("应用 %s 非公众号", ctx.App.Appid)
 	}
 	var param ParamQrcode
 	param.ActionInfo.Scene.SceneStr = p.Scene

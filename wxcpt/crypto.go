@@ -23,14 +23,14 @@ type BizMsg4Recv struct {
 type BizMsgCrypt struct {
 	token          string
 	encodingAeskey string
-	receiverId     string
+	appid          string
 }
 
-func NewBizMsgCrypt(token, encodingAeskey, receiverId string) *BizMsgCrypt {
+func NewBizMsgCrypt(token, encodingAeskey, appid string) *BizMsgCrypt {
 	return &BizMsgCrypt{
 		token:          token,
 		encodingAeskey: encodingAeskey + "=",
-		receiverId:     receiverId,
+		appid:          appid,
 	}
 }
 
@@ -133,8 +133,8 @@ func (cpt *BizMsgCrypt) ParsePlainText(plaintext []byte) ([]byte, uint32, []byte
 		return nil, 0, nil, nil, errors.New("plain is to small 2")
 	}
 	msg := plaintext[20 : 20+msgLen]
-	receiverId := plaintext[20+msgLen:]
-	return random, msgLen, msg, receiverId, nil
+	appid := plaintext[20+msgLen:]
+	return random, msgLen, msg, appid, nil
 }
 
 func (cpt *BizMsgCrypt) VerifyURL(msgSignature, timestamp, nonce, echostr string) ([]byte, error) {
@@ -146,13 +146,13 @@ func (cpt *BizMsgCrypt) VerifyURL(msgSignature, timestamp, nonce, echostr string
 	if nil != err {
 		return nil, err
 	}
-	_, _, msg, receiverId, err := cpt.ParsePlainText(plaintext)
+	_, _, msg, appid, err := cpt.ParsePlainText(plaintext)
 	if nil != err {
 		return nil, err
 	}
-	if len(cpt.receiverId) > 0 && strings.Compare(string(receiverId), cpt.receiverId) != 0 {
-		fmt.Println(string(receiverId), cpt.receiverId, len(receiverId), len(cpt.receiverId))
-		return nil, errors.New("receiverId is not equal")
+	if len(cpt.appid) > 0 && strings.Compare(string(appid), cpt.appid) != 0 {
+		fmt.Println(string(appid), cpt.appid, len(appid), len(cpt.appid))
+		return nil, errors.New("appid is not equal")
 	}
 	return msg, nil
 }
@@ -174,7 +174,7 @@ func (cpt *BizMsgCrypt) EncryptJsonMsg(replyMsg, timestamp, nonce string) (*Json
 	binary.BigEndian.PutUint32(msgLenBuf, uint32(len(replyMsg)))
 	buffer.Write(msgLenBuf)
 	buffer.WriteString(replyMsg)
-	buffer.WriteString(cpt.receiverId)
+	buffer.WriteString(cpt.appid)
 
 	tmpCiphertext, err := cpt.cbcEncrypt(buffer.String())
 	if nil != err {
@@ -202,7 +202,7 @@ func (cpt *BizMsgCrypt) EncryptXmlMsg(replyMsg, timestamp, nonce string) (*XmlBi
 	binary.BigEndian.PutUint32(msgLenBuf, uint32(len(replyMsg)))
 	buffer.Write(msgLenBuf)
 	buffer.WriteString(replyMsg)
-	buffer.WriteString(cpt.receiverId)
+	buffer.WriteString(cpt.appid)
 
 	tmpCiphertext, err := cpt.cbcEncrypt(buffer.String())
 	if nil != err {
@@ -232,12 +232,12 @@ func (cpt *BizMsgCrypt) DecryptMsg(msgSignature, timestamp, nonce string, msg4Re
 	if nil != err {
 		return nil, err
 	}
-	_, _, msg, receiverId, err := cpt.ParsePlainText(plaintext)
+	_, _, msg, appid, err := cpt.ParsePlainText(plaintext)
 	if nil != err {
 		return nil, err
 	}
-	if len(cpt.receiverId) > 0 && strings.Compare(string(receiverId), cpt.receiverId) != 0 {
-		return nil, errors.New("receiver_id is not equal")
+	if len(cpt.appid) > 0 && strings.Compare(string(appid), cpt.appid) != 0 {
+		return nil, errors.New("appid is not equal")
 	}
 	return msg, nil
 }
