@@ -2,9 +2,9 @@ package wxmp
 
 import (
 	"encoding/xml"
-	"fmt"
 	"github.com/hhcool/gtls/log"
 	"github.com/hhcool/wx"
+	"github.com/hhcool/wx/wxcpt"
 )
 
 type Message struct {
@@ -40,12 +40,12 @@ type Message struct {
 // @param data
 // @return error
 func (ctx *Context) DecodeMessage(p *wx.ParamNotify, encpt *wx.NotifyEncrypt) (*Message, error) {
-	cpt := wx.NewWXBizMsgCrypt(ctx.App.Token, ctx.App.EncodingAesKey, ctx.App.Appid, wx.JsonType)
-	if cptByte, err := cpt.DecryptMsg(p.MsgSignature, p.Timestamp, p.Nonce, &wx.BizJsonMsg4Recv{
+	cpt := wxcpt.NewBizMsgCrypt(ctx.App.Token, ctx.App.EncodingAesKey, ctx.App.Appid)
+	if cptByte, err := cpt.DecryptMsg(p.MsgSignature, p.Timestamp, p.Nonce, &wxcpt.BizMsg4Recv{
 		Tousername: encpt.ToUserName,
 		Encrypt:    encpt.Encrypt,
 	}); err != nil {
-		return nil, fmt.Errorf("%d-%s", err.ErrCode, err.ErrMsg)
+		return nil, err
 	} else {
 		event := new(Message)
 		if err := xml.Unmarshal(cptByte, event); err != nil {
