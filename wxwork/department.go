@@ -20,7 +20,7 @@ type ResponseDepartmentCreat struct {
 
 func (ctx *Context) DepartmentCreat(p Department) (int64, error) {
 	if !ctx.IsWork() {
-		return -1, fmt.Errorf("企业微信：应用 %s 非企业号", ctx.App.Appid)
+		return -1, fmt.Errorf("企业微信：应用 %s 非企业号", ctx.Appid())
 	}
 	wechat := wx.NewWechat()
 	var res ResponseDepartmentCreat
@@ -40,7 +40,7 @@ func (ctx *Context) DepartmentCreat(p Department) (int64, error) {
 
 func (ctx *Context) DepartmentUpdate(p Department) error {
 	if !ctx.IsWork() {
-		return fmt.Errorf("企业微信：应用 %s 非企业号", ctx.App.Appid)
+		return fmt.Errorf("企业微信：应用 %s 非企业号", ctx.Appid())
 	}
 	wechat := wx.NewWechat()
 	var res Response
@@ -65,7 +65,7 @@ type ParamDepartmentDelete struct {
 
 func (ctx *Context) DepartmentDelete(p ParamDepartmentDelete) error {
 	if !ctx.IsWork() {
-		return fmt.Errorf("企业微信：应用 %s 非企业号", ctx.App.Appid)
+		return fmt.Errorf("企业微信：应用 %s 非企业号", ctx.Appid())
 	}
 	p.AccessToken = ctx.GetAccessToken()
 	wechat := wx.NewWechat()
@@ -94,7 +94,7 @@ type ResponseDepartmentList struct {
 
 func (ctx *Context) DepartmentList(p ParamDepartmentList) ([]Department, error) {
 	if !ctx.IsWork() {
-		return nil, fmt.Errorf("企业微信：应用 %s 非企业号", ctx.App.Appid)
+		return nil, fmt.Errorf("企业微信：应用 %s 非企业号", ctx.Appid())
 	}
 	p.AccessToken = ctx.GetAccessToken()
 	wechat := wx.NewWechat()

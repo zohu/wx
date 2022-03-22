@@ -38,10 +38,43 @@ func (ctx *Context) MediaTemporaryAdd(mediaType MediaType, file *multipart.FileH
 // @return {}
 func (ctx *Context) MediaTemporaryQuery(mediaId string) {}
 
-func (ctx *Context) MediaForeverAdd()    {}
-func (ctx *Context) MediaForeverQuery()  {}
-func (ctx *Context) MediaForeverDelete() {}
+type ParamMediaForeverAdd struct {
+	Title              string `json:"title"`
+	ThumbMediaId       string `json:"thumb_media_id"`
+	Content            string `json:"content"`
+	ContentSourceUrl   string `json:"content_source_url"`
+	Author             string `json:"author,omitempty"`
+	Digest             string `json:"digest,omitempty"`
+	NeedOpenComment    int    `json:"need_open_comment"`
+	OnlyFansCanComment int    `json:"only_fans_can_comment"`
+}
+type ResMediaForeverAdd struct {
+	Response
+	MediaID string `json:"media_id"`
+}
+
+// MediaForeverAdd
+// @Description: 新增永久素材
+// @receiver ctx
+// @param param
+// @return *ResMediaForeverAdd
+// @return error
+func (ctx *Context) MediaForeverAdd(param *ParamMediaForeverAdd) (*ResMediaForeverAdd, error) {
+	return nil, nil
+}
+
+func (ctx *Context) MediaForeverQuery(mediaID string) {
+
+}
+
+func (ctx *Context) MediaForeverDelete(mediaID string) {
+
+}
 func (ctx *Context) MediaForeverUpdate() {}
 
 func (ctx *Context) MediaCount() {}
 func (ctx *Context) MediaList()  {}
+
+func (ctx *Context) MediaFileUpload() {
+
+}

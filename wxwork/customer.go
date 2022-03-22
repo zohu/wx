@@ -70,7 +70,7 @@ type ResponseCustomerList struct {
 
 func (ctx *Context) FindCustomerList(p ParamCustomerList) ([]string, error) {
 	if !ctx.IsWork() {
-		return nil, fmt.Errorf("企业微信：应用 %s 非企业号", ctx.App.Appid)
+		return nil, fmt.Errorf("企业微信：应用 %s 非企业号", ctx.Appid())
 	}
 	p.AccessToken = ctx.GetAccessToken()
 	wechat := wx.NewWechat()
@@ -161,7 +161,7 @@ type FollowUser struct {
 func (ctx *Context) FindCustomerDetailWithExternalUserid(p ParamCustomerDetailWithExternalUserid) (ResponseCustomerDetailWithExternalUserid, error) {
 	var cus ResponseCustomerDetailWithExternalUserid
 	if !ctx.IsWork() {
-		return cus, fmt.Errorf("企业微信：应用 %s 非企业号", ctx.App.Appid)
+		return cus, fmt.Errorf("企业微信：应用 %s 非企业号", ctx.Appid())
 	}
 	p.AccessToken = ctx.GetAccessToken()
 	wechat := wx.NewWechat()
@@ -201,7 +201,7 @@ type ResponseCustomerDetail struct {
 // @return error
 func (ctx *Context) FindCustomerDetail(p ParamCustomerDetail, list []Customer) ([]Customer, error) {
 	if !ctx.IsWork() {
-		return nil, fmt.Errorf("企业微信：应用 %s 非企业号", ctx.App.Appid)
+		return nil, fmt.Errorf("企业微信：应用 %s 非企业号", ctx.Appid())
 	}
 	if list == nil {
 		list = []Customer{}

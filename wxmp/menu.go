@@ -1,5 +1,10 @@
 package wxmp
 
+import (
+	"fmt"
+	"github.com/hhcool/wx"
+)
+
 /**
 自定义菜单
 */
@@ -27,9 +32,9 @@ const (
 )
 
 type MenuButtonItem struct {
-	Type      string           `json:"type"`
+	Type      MenuType         `json:"type"`
 	Name      string           `json:"name"`
-	Key       string           `json:"key,omitempty"`
+	Key       MenuKey          `json:"key,omitempty"`
 	Url       string           `json:"url,omitempty"`
 	Appid     string           `json:"appid,omitempty"`
 	MediaId   string           `json:"media_id,omitempty"`
@@ -57,17 +62,37 @@ type MenuDiy struct {
 // @param button
 // @return *Response
 // @return error
-func (ctx *Context) MenuAdd(menu *Menu) (*Response, error) {
-	return nil, nil
+func (ctx *Context) MenuAdd(menu *Menu) error {
+	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
+		return fmt.Errorf("%s 非公众号", ctx.Appid())
+	}
+	var res Response
+	wechat := wx.NewWechat()
+	if err := wechat.Post(wx.ApiMp + "/menu/create").
+		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
+		SetJSON(&menu).
+		BindJSON(&res).
+		Do(); err != nil {
+		return fmt.Errorf("%s 创建菜单失败（%s）", ctx.Appid(), err.Error())
+	}
+	if res.Errcode != 0 {
+		if ctx.RetryAccessToken(res.Errcode) {
+			return ctx.MenuAdd(menu)
+		}
+		return fmt.Errorf("%s 创建菜单失败（%d-%s）", ctx.Appid(), res.Errcode, res.Errmsg)
+	}
+	return nil
 }
 
 type ResMenuQuery struct {
+	Response
 	IsMenuOpen   int `json:"is_menu_open"`
 	SelfmenuInfo struct {
 		Button []struct {
 			Type      string `json:"type,omitempty"`
 			Name      string `json:"name"`
 			Key       string `json:"key,omitempty"`
+			Url       string `json:"url,omitempty"`
 			SubButton struct {
 				List []MenuButtonItem `json:"list"`
 			} `json:"sub_button,omitempty"`
@@ -75,10 +100,53 @@ type ResMenuQuery struct {
 	} `json:"selfmenu_info"`
 }
 
+// MenuQuery
+// @Description: 查询公众号菜单
+// @receiver ctx
+// @return *ResMenuQuery
+// @return error
 func (ctx *Context) MenuQuery() (*ResMenuQuery, error) {
-	return nil, nil
+	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
+		return nil, fmt.Errorf("%s 非公众号", ctx.Appid())
+	}
+	var res ResMenuQuery
+	wechat := wx.NewWechat()
+	if err := wechat.Get(wx.ApiMp + "/get_current_selfmenu_info").
+		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
+		BindJSON(&res).
+		Do(); err != nil {
+		return nil, fmt.Errorf("%s 查询菜单失败 %s", ctx.Appid(), err.Error())
+	}
+	if res.Errcode != 0 {
+		if ctx.RetryAccessToken(res.Errcode) {
+			return ctx.MenuQuery()
+		}
+		return nil, fmt.Errorf("%s 查询菜单失败（%d-%s）", ctx.Appid(), res.Errcode, res.Errmsg)
+	}
+	return &res, nil
 }
 
-func (ctx *Context) MenuDelete() (*Response, error) {
-	return nil, nil
+// MenuDelete
+// @Description: 删除公众号菜单
+// @receiver ctx
+// @return error
+func (ctx *Context) MenuDelete() error {
+	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
+		return fmt.Errorf("%s 非公众号", ctx.Appid())
+	}
+	var res Response
+	wechat := wx.NewWechat()
+	if err := wechat.Get(wx.ApiMp + "/menu/delete").
+		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
+		BindJSON(&res).
+		Do(); err != nil {
+		return fmt.Errorf("%s 删除菜单失败 %s", ctx.Appid(), err.Error())
+	}
+	if res.Errcode != 0 {
+		if ctx.RetryAccessToken(res.Errcode) {
+			return ctx.MenuDelete()
+		}
+		return fmt.Errorf("%s 删除菜单失败（%d-%s）", ctx.Appid(), res.Errcode, res.Errmsg)
+	}
+	return nil
 }

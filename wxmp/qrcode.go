@@ -35,9 +35,9 @@ type ResQrcode struct {
 	Url           string `json:"url"`
 }
 
-func (ctx *Context) Qrcode(p ParamNewQrcode) (string, error) {
+func (ctx *Context) Qrcode(p *ParamNewQrcode) (string, error) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return "", fmt.Errorf("应用 %s 非公众号", ctx.App.Appid)
+		return "", fmt.Errorf("%s 非公众号", ctx.Appid())
 	}
 	var param ParamQrcode
 	param.ActionInfo.Scene.SceneStr = p.Scene
@@ -55,10 +55,13 @@ func (ctx *Context) Qrcode(p ParamNewQrcode) (string, error) {
 		BindJSON(&res).
 		Do()
 	if err != nil {
-		return "", fmt.Errorf("微信：获取二维码失败（%s）", err.Error())
+		return "", fmt.Errorf("%s 获取二维码失败（%s）", ctx.Appid(), err.Error())
 	}
 	if res.Errcode != 0 {
-		return "", fmt.Errorf("微信：获取二维码失败（%d-%s）", res.Errcode, res.Errmsg)
+		if ctx.RetryAccessToken(res.Errcode) {
+			return ctx.Qrcode(p)
+		}
+		return "", fmt.Errorf("%s 获取二维码失败（%d-%s）", ctx.Appid(), res.Errcode, res.Errmsg)
 	}
 	return fmt.Sprintf("%s/showqrcode?ticket=%s", wx.ApiQr, res.Ticket), nil
 }

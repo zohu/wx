@@ -79,7 +79,7 @@ func (c *Context) NewAccessToken() string {
 // @receiver c
 // @return string
 func (c *Context) GetAccessToken() string {
-	newCtx := FindApp(c.App.Appid)
+	newCtx, _ := FindApp(c.App.Appid)
 	c.App = newCtx.App
 	if !c.IsExists() {
 		return ""
@@ -169,4 +169,27 @@ func (c *Context) IsH5() bool {
 		return true
 	}
 	return false
+}
+
+// RetryAccessToken
+// @Description: 是否可以刷新token并重试(每个app每2分钟只能重试一次)
+// @receiver c
+// @param errcode
+// @return bool
+func (c *Context) RetryAccessToken(errcode int64) bool {
+	switch errcode {
+	case 40014, 41001, 42001, 42007:
+		if wechat.SetNX(RdsAppRetryPrefix+c.App.Appid, 1, time.Minute*2).Val() {
+			if t := c.NewAccessToken(); t != "" {
+				return true
+			}
+		}
+		return false
+	default:
+		return false
+	}
+}
+
+func (c *Context) Appid() string {
+	return c.App.Appid
 }
