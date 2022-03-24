@@ -1,6 +1,9 @@
 package wxmp
 
-import "mime/multipart"
+import (
+	"github.com/hhcool/wx"
+	"mime/multipart"
+)
 
 /**
 素材管理
@@ -16,7 +19,7 @@ const (
 )
 
 type ResMediaTemporaryAdd struct {
-	Response
+	wx.Response
 	Type      string `json:"type"`
 	MediaId   string `json:"media_id"`
 	CreatedAt int    `json:"created_at"`
@@ -49,7 +52,7 @@ type ParamMediaForeverAdd struct {
 	OnlyFansCanComment int    `json:"only_fans_can_comment"`
 }
 type ResMediaForeverAdd struct {
-	Response
+	wx.Response
 	MediaID string `json:"media_id"`
 }
 

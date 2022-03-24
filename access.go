@@ -99,8 +99,9 @@ func (w *Wechat) refreshAccessToken() {
 			log.Infof("refreshAccessToken 刷新Token [%s]", strings.Join(apps, ","))
 			for i := range apps {
 				appid := apps[i]
-				ctx := FindApp(appid)
-				ctx.NewAccessToken()
+				if ctx, err := FindApp(appid); err == nil {
+					ctx.NewAccessToken()
+				}
 			}
 		}
 	}

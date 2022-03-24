@@ -36,7 +36,7 @@ type ParamUserList struct {
 	FetchChild   int   `json:"fetch_child" query:"fetch_child" desc:"0只获取本部门，1递归获取"`
 }
 type ResponseUserList struct {
-	Response
+	wx.Response
 	Userlist []User `json:"userlist"`
 }
 

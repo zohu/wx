@@ -23,7 +23,7 @@ type ParamUserFromOpenid struct {
 	Openid string `query:"openid"`
 }
 type ResUserFromOpenid struct {
-	Response
+	wx.Response
 	Userinfo
 }
 
@@ -71,7 +71,7 @@ type ParamQueryUserList struct {
 	NextOpenid string `query:"next_openid,omitempty"`
 }
 type ResQueryUserList struct {
-	Response
+	wx.Response
 	Total int `json:"total"`
 	Count int `json:"count"`
 	Data  struct {

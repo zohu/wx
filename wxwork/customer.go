@@ -64,7 +64,7 @@ type ParamCustomerList struct {
 	Userid string `json:"userid" query:"userid" desc:"员工ID"`
 }
 type ResponseCustomerList struct {
-	Response
+	wx.Response
 	ExternalUserid []string `json:"external_userid"`
 }
 
@@ -187,7 +187,7 @@ type ParamCustomerDetail struct {
 	Limit      int      `json:"limit"`
 }
 type ResponseCustomerDetail struct {
-	Response
+	wx.Response
 	ExternalContactList []Customer `json:"external_contact_list"`
 	NextCursor          string     `json:"next_cursor"`
 }

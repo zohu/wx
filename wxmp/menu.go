@@ -60,13 +60,13 @@ type MenuDiy struct {
 // @Description: 新增菜单
 // @receiver ctx
 // @param button
-// @return *Response
+// @return *wx.Response
 // @return error
 func (ctx *Context) MenuAdd(menu *Menu) error {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
 		return fmt.Errorf("%s 非公众号", ctx.Appid())
 	}
-	var res Response
+	var res wx.Response
 	wechat := wx.NewWechat()
 	if err := wechat.Post(wx.ApiMp + "/menu/create").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
@@ -85,7 +85,7 @@ func (ctx *Context) MenuAdd(menu *Menu) error {
 }
 
 type ResMenuQuery struct {
-	Response
+	wx.Response
 	IsMenuOpen   int `json:"is_menu_open"`
 	SelfmenuInfo struct {
 		Button []struct {
@@ -134,7 +134,7 @@ func (ctx *Context) MenuDelete() error {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
 		return fmt.Errorf("%s 非公众号", ctx.Appid())
 	}
-	var res Response
+	var res wx.Response
 	wechat := wx.NewWechat()
 	if err := wechat.Get(wx.ApiMp + "/menu/delete").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).

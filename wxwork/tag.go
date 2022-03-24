@@ -17,7 +17,7 @@ type ParamTagList struct {
 	GroupId string `json:"group_id,omitempty"`
 }
 type ResponseTagList struct {
-	Response
+	wx.Response
 	TagGroup []ResponseTagListItem `json:"tag_group"`
 }
 type ResponseTagListItem struct {

@@ -14,7 +14,7 @@ type Department struct {
 }
 
 type ResponseDepartmentCreat struct {
-	Response
+	wx.Response
 	Id int64 `json:"id" desc:"创建的部门ID"`
 }
 
@@ -43,7 +43,7 @@ func (ctx *Context) DepartmentUpdate(p Department) error {
 		return fmt.Errorf("企业微信：应用 %s 非企业号", ctx.Appid())
 	}
 	wechat := wx.NewWechat()
-	var res Response
+	var res wx.Response
 	err := wechat.Post(wx.ApiWork + "/department/update").
 		SetQuery(wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		SetJSON(p).
@@ -69,7 +69,7 @@ func (ctx *Context) DepartmentDelete(p ParamDepartmentDelete) error {
 	}
 	p.AccessToken = ctx.GetAccessToken()
 	wechat := wx.NewWechat()
-	var res Response
+	var res wx.Response
 	err := wechat.Get(wx.ApiWork + "/department/delete").
 		SetQuery(p).
 		BindJSON(&res).
@@ -88,7 +88,7 @@ type ParamDepartmentList struct {
 	Id int64 `json:"id" query:"id"`
 }
 type ResponseDepartmentList struct {
-	Response
+	wx.Response
 	Department []Department `json:"department"`
 }
 

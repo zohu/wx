@@ -29,7 +29,7 @@ type ParamQrcode struct {
 }
 
 type ResQrcode struct {
-	Response
+	wx.Response
 	Ticket        string `json:"ticket"`
 	ExpireSeconds int64  `json:"expire_seconds"`
 	Url           string `json:"url"`
