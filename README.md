@@ -22,270 +22,374 @@
 - 本项目属于自用且尚在完善中，更新频繁，在1.0版本未发布之前，请勿直接使用；
 - 暂时只支持Redis管理模式，覆盖率未达到80%之前，暂不打算提供自定义；
 
-### 目录
-- [微信SDK（Go）]
-    * [一、开始](#1)
-        + [（一）初始化](#1-1)
-        + [（二）多账号管理方案（例）](#1-2)
-        + [（三）调用api之前，需要获取对应的app实例](#1-3)
-        + [（四）微信消息的加解密](#1-4)
-    * [二、微信公众号](#2)
-        + [（一）自定义菜单](#2-1)
-        + [（二）基础消息能力](#2-2)
-        + [（三）订阅通知](#2-3)
-        + [（四）客服消息](#2-4)
-        + [（五）微信网页](#2-5)
-        + [（六）素材管理](#2-6)
-        + [（七）草稿箱](#2-7)
-        + [（八）发布能力](#2-8)
-        + [（九）图文消息留言管理](#2-9)
-        + [（十）用户管理](#2-10)
-        + [（十一）账号管理](#2-11)
-        + [（十二）数据统计](#2-12)
-        + [（十三）微信卡券](#2-13)
-        + [（十四）微信门店](#2-14)
-        + [（十五）微信小店](#2-15)
-        + [（十六）智能接口](#2-16)
-        + [（十七）微信设备功能](#2-17)
-        + [（十八）微信一物一码](#2-18)
-        + [（十九）微信发票](#2-19)
-        + [（二十）微信非税缴纳](#2-20)
-        + [（二十一）扫服务号二维码打开小程序](#2-21)
-    * [三、微信小程序](#3)
-    * [四、企业微信](#4)
-    * [五、微信商户](#5)
-    * [CHANGELOG](#changelog)
-        + [v0.0.10](#v0.0.10)
-        
-### 一、开始<a id="1"/>
-#### （一）初始化<a id="1-1"/>
-```
-// 本段代码全局唯一即可，可以放到main或者自定义的bootstrap
-import "github.com/hhcool/wx"
-// 初始化微信服务
-wx.Init(&wx.Option{
-    Host:     Config.Redis.Host,// []string, 一个host列表，支持Client和Cluster；
-    Password: Config.Redis.Password,
-    Mode:     gin.Mode(), // 非必选，如果非gin框架，可以直接给字符串"debug"/"prod"
-})
-```
-
-#### （二）多账号管理方案（例）<a id="1-2"/>
-- 下面的例子是用数据库管理多账号，如果只有单账号，也可以只用配置实现。
-```
-// 定义数据库表存储多账号
-type WxApp struct {
-	Id                int    `json:"id" gorm:"primarykey;autoIncrement"`
-	Appid             string `json:"appid" gorm:"uniqueIndex;comment:唯一标识"`
-	Appsecret         string `json:"appsecret" gorm:"comment:秘钥"`
-	AppName           string `json:"app_name" gorm:"comment:app名称"`
-	AppParent         string `json:"app_parent" gorm:"comment:绑定的服务号"`
-	AppWork           string `json:"app_work" gorm:"comment:绑定的企业号"`
-	AppToken          string `json:"app_token" gorm:"comment:消息token"`
-	AppEncodingAesKey string `json:"app_encoding_aes_key" gorm:"comment:消息秘钥"`
-	AppStatus         int    `json:"app_status" gorm:"default:1;comment:状态，1启用2停用"`
-	AppType           string `json:"app_type" gorm:"comment:APP类型：1服务号、2订阅号、3企业号、4app、5小程序、6H5"`
-	CreateTime        *Time  `json:"create_time" gorm:"type:datetime;autoCreateTime;comment:创建时间"`
-	UpdateTime        *Time  `json:"update_time" gorm:"type:datetime;autoUpdateTime;comment:更新时间"`
-}
-
-// 服务启动时，遍历库表进行初始化，业务接口动态的增删参照循环体内逻辑实现
-// 如果需要强制覆盖更新，可以不用判断FindApp，直接PutApp即可；
-func AppInit() {
-	var apps []repo.WxApp
-	db.Where("app_status=1").Find(&apps)
-	for i := range apps {
-		wp := apps[i]
-		if ctx, err := wx.FindApp(wp.Appid); err != nil {
-			_ = wx.PutApp(wx.App{
-				Appid:          wp.Appid,
-				AppSecret:      wp.Appsecret,
-				Token:          wp.AppToken,
-				EncodingAesKey: wp.AppEncodingAesKey,
-				AppType:        wp.AppType,
-			})
-			log.Infof("初始化应用（%s）", wp.Appid)
-		} else {
-			if ctx.App.ExpireTime.Before(time.Now()) {
-				log.Infof("应用Token过期，刷新Token（%s）", ctx.App.Appid)
-				_ = ctx.GetAccessToken()
-			} else {
-				log.Infof("应用正常 %s", ctx.App.Appid)
-			}
-		}
-	}
-}
-```
-
-#### （三）调用api之前，需要获取对应的app实例<a id="1-3"/>
-```
-import "github.com/hhcool/wx/wxmp"
-import "github.com/hhcool/wx/wxwork"
-// 获取公众号实例
-app, err := wxmp.FindApp(appid)
-if err != nil {
-    return
-}
-// 获取企业微信实例
-app, err := wxwork.FindApp(appid)
-if err != nil {
-    return
-}
-// 其他类似……
-```
-#### (四) 微信消息的加解密<a id="1-4"/>
-```
-// 参考官方java-sdk改写的go版本，支持xml和json
-
-import "github.com/hhcool/wx/wxcpt"
-
-// 微信公众号
-// p *wx.ParamNotify, encpt *wxcpt.BizMsg4Recv
-cpt := wxcpt.NewBizMsgCrypt(ctx.App.Token, ctx.App.EncodingAesKey, ctx.Appid())
-if cptByte, err := cpt.DecryptMsg(p.MsgSignature, p.Timestamp, p.Nonce, encpt); err != nil {
-    return nil, err
-} else {
-    event := new(wxmp.Message)
-    if err := xml.Unmarshal(cptByte, event); err != nil {
-        log.Error(err)
-        return nil, err
-    }
-    return event, nil
-}
-
-// 企业微信
-if wp, err := wxwork.FindApp(appid); err == nil {
-    cpt := wxcpt.NewBizMsgCrypt(wp.App.Token, wp.App.EncodingAesKey, appid)
-    if cptByte, err := cpt.DecryptMsg(p.MsgSignature, p.Timestamp, p.Nonce, encpt); err != nil {
-        log.Error(err)
-    } else {
-        event := new(wxwork.NotifyEvent)
-        if err := xml.Unmarshal(cptByte, event); err != nil {
-            log.Error(err)
-            return ""
-        }
-        switch event.Event {
-        case "change_external_contact": // customer
-            w.changeExternalContact(event, wp)
-        case "change_external_chat": // 客户群
-        case "change_external_tag": // 标签
-        }
-    }
-}
-return "ok"
-```
-#### (五) AccessToken的共享<a id="1-5"/>
-```
-// 可以获取对应app的token，用于外部程序共享或自定义接口
-token := app.GetAccessToken()
-```
-
-### 二、微信公众号<a id="2"/>
-#### （一）自定义菜单<a id="2-1"/>
-- [x] 创建菜单
-```
-err := app.MenuAdd(&wxmp.Menu{})
-```
-- [x] 查询菜单
-```
-menu,err := app.MenuQuery()
-```
-- [x] 删除菜单
-```
-err := app.MenuDelete()
-```
-- [ ] 个性化菜单
-- [ ] 获取自定义菜单配置
-#### （二）基础消息能力<a id="2-2"/>
-- [x] 接收普通消息
-- [x] 接收事件消息
-- [ ] 被动回复用户消息
-- [ ] 模板消息
-- [x] 消息解密
-```
-// p *wx.ParamNotify, msg *wxcpt.BizMsg4Recv
-m, e := app.DecodeMessage(p, msg)
-```
-- [ ] 公众号一次性订阅消息
-- [ ] 群发和原创校验
-#### （三）订阅通知<a id="2-3"/>
-#### （四）客服消息<a id="2-4"/>
-#### （五）微信网页<a id="2-5"/>
-#### （六）素材管理<a id="2-6"/>
-- [ ] 新增临时素材
-- [ ] 获取临时素材
-- [ ] 新增永久素材
-- [ ] 获取永久素材
-- [ ] 删除永久素材
-- [ ] 修改永久图文素材
-- [ ] 获取素材总数
-- [ ] 获取素材列表
-- [ ] 上传素材文件
-#### （七）草稿箱<a id="2-7"/>
-#### （八）发布能力<a id="2-8"/>
-#### （九）图文消息留言管理<a id="2-9"/>
-#### （十）用户管理<a id="2-10"/>
-- [ ] 用户标签管理
-- [ ] 设置用户备注名
-- [x] 获取用户基本信息（含unionID）
-``` 
-userinfo, err := app.UserFromOpenid(openID)
-```
-- [x] 获取用户列表
-``` 
-res, err := app.QueryUserList(nextOpenID)
-```
-- [x] 获取用户地理位置
-```
-// 参考：接收事件消息
-```
-- [ ] 黑名单管理
-#### （十一）账号管理<a id="2-11"/>
-- [x] 生成带参数的二维码
-- [ ] 长链接转短链接
-- [ ] 短key托管
-#### （十二）数据统计<a id="2-12"/>
-#### （十三）微信卡券<a id="2-13"/>
-#### （十四）微信门店<a id="2-14"/>
-#### （十五）微信小店<a id="2-15"/>
-#### （十六）智能接口<a id="2-16"/>
-#### （十七）微信设备功能<a id="2-17"/>
-#### （十八）微信一物一码<a id="2-18"/>
-#### （十九）微信发票<a id="2-19"/>
-#### （二十）微信非税缴纳<a id="2-20"/>
-#### （二十一）扫服务号二维码打开小程序<a id="2-21"/>
-
-### 三、微信小程序<a id="3"/>
-#### （一）登录<a id="3-1"/>
-#### （二）用户信息<a id="3-2"/>
-#### （三）接口调用凭证<a id="3-3"/>
-#### （四）数据分析<a id="3-4"/>
-#### （五）客服消息<a id="3-5"/>
-#### （六）统一服务消息<a id="3-6"/>
-#### （七）动态消息<a id="3-7"/>
-#### （八）插件管理<a id="3-8"/>
-#### （九）附近的小程序<a id="3-9"/>
-#### （十）小程序码<a id="3-10"/>
-#### （十一）URL Scheme<a id="3-11"/>
-#### （十二）URL Link<a id="3-12"/>
-#### （十三）内容安全<a id="3-13"/>
-#### （十四）微信红包封面<a id="3-14"/>
-
-### 四、企业微信<a id="4"/>
-#### （一）通讯录管理<a id="4-1"/>
-#### （二）客户联系<a id="4-2"/>
-#### （三）微信客服<a id="4-3"/>
-#### （四）身份验证<a id="4-4"/>
-#### （五）应用管理<a id="4-5"/>
-#### （六）消息推送<a id="4-6"/>
-#### （七）素材管理<a id="4-7"/>
-#### （八）OA<a id="4-8"/>
-#### （九）效率工具<a id="4-9"/>
-
-### 五、微信商户<a id="5"/>
-
-### CHANGELOG<a id="changelog"/>
-#### v0.0.10<a id="v0.0.10"/>
-- feat：创建菜单
-- feat：查询菜单
-- feat：删除菜单
+### 文档目录
+- [开始](./doc/init.md#%E5%BC%80%E5%A7%8B)
+  - [初始化](./doc/init.md#%E5%88%9D%E5%A7%8B%E5%8C%96)
+  - [多账号管理](./doc/init.md#%E5%A4%9A%E8%B4%A6%E5%8F%B7%E7%AE%A1%E7%90%86)
+  - [获取实例](./doc/init.md#%E8%8E%B7%E5%8F%96%E5%AE%9E%E4%BE%8B)
+  - [消息加解密](./doc/init.md#%E6%B6%88%E6%81%AF%E5%8A%A0%E8%A7%A3%E5%AF%86)
+  - [AccessToken的共享](./doc/init.md#accesstoken%E7%9A%84%E5%85%B1%E4%BA%AB)
+- [微信公众号](./doc/wxmp.md#%E5%BE%AE%E4%BF%A1%E5%85%AC%E4%BC%97%E5%8F%B7)
+  - [自定义菜单](./doc/wxmp.md#%E8%87%AA%E5%AE%9A%E4%B9%89%E8%8F%9C%E5%8D%95)
+    - [x] 创建菜单
+    - [x] 查询菜单
+    - [x] 删除菜单
+    - [x] 新增个性化菜单
+    - [x] 删除个性化菜单
+    - [x] 测试个性化菜单匹配结果
+    - [x] 获取自定义菜单配置
+  - [基础消息能力](./doc/wxmp.md#%E5%9F%BA%E7%A1%80%E6%B6%88%E6%81%AF%E8%83%BD%E5%8A%9B)
+    - [x] 接收普通消息
+    - [x] 接收事件消息
+    - [x] 被动回复用户消息
+    - [ ] 模板消息
+    - [ ] 公众号一次性订阅消息
+    - [ ] 群发接口和原创校验
+    - [ ] 获取公众号的自动回复规则
+  - [订阅通知](./doc/wxmp.md#%E8%AE%A2%E9%98%85%E9%80%9A%E7%9F%A5)
+    - [ ] 选用模板
+    - [ ] 删除模板
+    - [ ] 获取公众号类目
+    - [ ] 获取模板中的关键词
+    - [ ] 获取所属类目的公共模板
+    - [ ] 获取私有模板列表
+    - [ ] 发送订阅通知
+  - [客服消息](./doc/wxmp.md#%E5%AE%A2%E6%9C%8D%E6%B6%88%E6%81%AF)
+    - [ ] 获取客服基本信息
+    - [ ] 添加客服账号
+    - [ ] 邀请绑定客服账号
+    - [ ] 设置客服信息
+    - [ ] 上传客服头像
+    - [ ] 删除客服账号
+    - [ ] 创建会话
+    - [ ] 关闭会话
+    - [ ] 获取客户会话状态
+    - [ ] 获取客服会话列表
+    - [ ] 获取未接入会话列表
+    - [ ] 获取聊天记录
+    - [ ] 添加顾问
+    - [ ] 获取顾问信息
+    - [ ] 修改顾问信息
+    - [ ] 删除顾问
+    - [ ] 获取服务号顾问列表
+    - [ ] 生成顾问二维码
+    - [ ] 扫顾问二维码后的事件推送
+    - [ ] 获取顾问聊天记录
+    - [ ] 设置快捷回复与关注自动回复
+    - [ ] 获取快捷回复与关注自动回复
+    - [ ] 设置离线自动回复与敏感词
+    - [ ] 获取离线自动回复与敏感词
+    - [ ] 允许微信用户复制小程序页面路径
+    - [ ] 新建顾问分组
+    - [ ] 获取顾问分组列表
+    - [ ] 获取顾问分组信息
+    - [ ] 分组内添加顾问
+    - [ ] 分组内删除顾问
+    - [ ] 获取顾问所在分组
+    - [ ] 删除顾问分组
+    - [ ] 为顾问分配客户
+    - [ ] 为顾问移除客户
+    - [ ] 获取顾问的客户列表
+    - [ ] 为客户更换顾问
+    - [ ] 修改客户昵称
+    - [ ] 查询客户所属顾问
+    - [ ] 查询指定顾问和客户的关系
+    - [ ] 新建标签类型
+    - [ ] 删除标签类型
+    - [ ] 为标签添加可选值
+    - [ ] 获取标签和可选值
+    - [ ] 为客户设置标签
+    - [ ] 查询客户标签
+    - [ ] 根据标签值筛选客户
+    - [ ] 删除客户标签
+    - [ ] 设置自定义客户信息
+    - [ ] 获取自定义客户信息
+    - [ ] 添加小程序卡片素材
+    - [ ] 查询小程序卡片素材
+    - [ ] 删除小程序卡片素材
+    - [ ] 添加图片素材
+    - [ ] 查询图片素材
+    - [ ] 删除图片素材
+    - [ ] 添加文字素材
+    - [ ] 查询文字素材
+    - [ ] 删除文字素材
+    - [ ] 添加群发任务
+    - [ ] 获取群发任务列表
+    - [ ] 获取指定群发任务信息
+    - [ ] 修改群发任务
+    - [ ] 取消群发任务
+  - [微信网页](./doc/wxmp.md#%E5%BE%AE%E4%BF%A1%E7%BD%91%E9%A1%B5)
+    - [ ] 网页授权
+    - [ ] 用户授权信息变更事件推送
+  - [素材管理](./doc/wxmp.md#%E7%B4%A0%E6%9D%90%E7%AE%A1%E7%90%86)
+    - [ ] 新增临时素材
+    - [ ] 获取临时素材
+    - [ ] 新增永久素材
+    - [ ] 获取永久素材
+    - [ ] 删除永久素材
+    - [ ] 修改永久图文素材
+    - [ ] 获取素材总数
+    - [ ] 获取素材列表
+  - [草稿箱](./doc/wxmp.md#%E8%8D%89%E7%A8%BF%E7%AE%B1)
+    - [ ] 新建草稿
+    - [ ] 获取草稿
+    - [ ] 删除草稿
+    - [ ] 修改草稿
+    - [ ] 获取草稿总数
+    - [ ] 获取草稿列表
+  - [发布能力](./doc/wxmp.md#%E5%8F%91%E5%B8%83%E8%83%BD%E5%8A%9B)
+    - [ ] 发布
+    - [ ] 发布状态轮询
+    - [ ] 事件推送发布结果
+    - [ ] 删除发布
+    - [ ] 通过article_id获取已发布文章
+    - [ ] 获取成功发布列表
+  - [图文消息留言管理](./doc/wxmp.md#%E5%9B%BE%E6%96%87%E6%B6%88%E6%81%AF%E7%95%99%E8%A8%80%E7%AE%A1%E7%90%86)
+    - [ ] 打开已群发文章评论
+    - [ ] 关闭已群发文章评论
+    - [ ] 查看指定文章的评论数据
+    - [ ] 将评论标记精选
+    - [ ] 将评论取消精选
+    - [ ] 删除评论
+    - [ ] 回复评论
+    - [ ] 删除回复
+  - [用户管理](./doc/wxmp.md#%E7%94%A8%E6%88%B7%E7%AE%A1%E7%90%86)
+    - [ ] 用户标签管理
+    - [ ] 设置用户备注名
+    - [ ] 获取用户基本信息（含unionid）
+    - [ ] 获取用户列表
+    - [ ] 获取用户地理位置
+    - [ ] 黑名单管理
+  - [账号管理](./doc/wxmp.md#%E8%B4%A6%E5%8F%B7%E7%AE%A1%E7%90%86)
+    - [ ] 生成带参数的二维码
+    - [ ] 长链接转短链接
+    - [ ] 短key托管
+    - [ ] 微信认证事件推送
+  - [数据统计](./doc/wxmp.md#%E6%95%B0%E6%8D%AE%E7%BB%9F%E8%AE%A1)
+    - [ ] 用户分析
+    - [ ] 图文分析
+    - [ ] 消息分析
+    - [ ] 广告分析
+    - [ ] 接口分析
+  - [微信卡券](./doc/wxmp.md#%E5%BE%AE%E4%BF%A1%E5%8D%A1%E5%88%B8)
+    - [ ] 创建卡券
+    - [ ] 投放卡券
+    - [ ] 核销卡券
+    - [ ] 管理卡券
+    - [ ] 卡券事件推送
+    - [ ] 卡券小程序打通
+    - [ ] 微信礼品卡
+    - [ ] 会员卡
+    - [ ] 特殊票券
+  - [微信门店](./doc/wxmp.md#%E5%BE%AE%E4%BF%A1%E9%97%A8%E5%BA%97)
+    - [ ] 创建门店
+    - [ ] 上传图片
+    - [ ] 创建门店
+    - [ ] 审核事件推送
+    - [ ] 查询门店信息
+    - [ ] 查询门店列表
+    - [ ] 修改门店服务信息
+    - [ ] 删除门店
+    - [ ] 拉取门店小程序类目
+    - [ ] 创建门店小程序
+    - [ ] 查询门店小程序审核结果
+    - [ ] 修改门店小程序信息
+    - [ ] 从腾讯地图拉取省市区信息
+    - [ ] 在腾讯地图中搜索门店
+    - [ ] 在腾讯地图中创建门店
+    - [ ] 添加门店
+    - [ ] 更新门店信息
+    - [ ] 获取单个门店信息
+    - [ ] 获取门店信息列表
+    - [ ] 删除门店
+    - [ ] 从门店管理迁移到门店小程序
+    - [ ] 门店小程序卡券
+  - [微信一物一码](./doc/wxmp.md#%E5%BE%AE%E4%BF%A1%E4%B8%80%E7%89%A9%E4%B8%80%E7%A0%81)
+    - [ ] 申请二维码
+    - [ ] 查询二维码申请单
+    - [ ] 下载二维码包
+    - [ ] 激活二维码
+    - [ ] 查询二维码激活状态
+    - [ ] code_ticket换code
+  - [微信发票](./doc/wxmp.md#%E5%BE%AE%E4%BF%A1%E5%8F%91%E7%A5%A8)
+    - [ ] 获取授权页ticket（商户接口列表）
+    - [ ] 获取授权页链接（商户接口列表）
+    - [ ] 小程序打开授权页（商户接口列表）
+    - [ ] ios客户端打开授权页（商户接口列表）
+    - [ ] android客户端打开授权页（商户接口列表）
+    - [ ] 收取授权完成事件推送（商户接口列表）
+    - [ ] 查询授权完成状态（商户接口列表）
+    - [ ] 拒绝开票（商户接口列表）
+    - [ ] 设置授权页字段信息（商户接口列表）
+    - [ ] 查询授权页字段信息（商户接口列表）
+    - [ ] 关联商户号与开票平台（商户接口列表）
+    - [ ] 查询商户号与开票平台关联情况（商户接口列表）
+    - [ ] 指定单笔交易支持支付后开票（商户接口列表）
+    - [ ] 设置商户联系方式（商户接口列表）
+    - [ ] 查询商户联系方式（商户接口列表）
+    - [ ] 获取自身的开票平台识别码（开票平台接口列表）
+    - [ ] 创建发票卡券模板（开票平台接口列表）
+    - [ ] 上传PDF（开票平台接口列表）
+    - [ ] 查询已上传的PDF文件（开票平台接口列表）
+    - [ ] 将电子发票卡券插入用户卡包（开票平台接口列表）
+    - [ ] 更新发票卡券状态（开票平台接口列表）
+    - [ ] 发票状态更新事件推送（开票平台接口列表）
+    - [ ] 解码code接口（开票平台接口列表）
+    - [ ] 微信公众号拉起发票列表（报销方接口）
+    - [ ] 微信小程序拉起发票列表（报销方接口）
+    - [ ] 企业微信拉起发票列表（报销方接口）
+    - [ ] 外部App拉起发票列表（报销方接口）
+    - [ ] 查询报销发票信息（报销方接口）
+    - [ ] 批量查询报销发票信息（报销方接口）
+    - [ ] 报销方更新发票状态（报销方接口）
+    - [ ] 报销方批量更新发票状态（报销方接口）
+    - [ ] 将发票抬头信息录入到用户微信中（急速开票）
+    - [ ] 获取用户抬头，获取商户专属二维码立在收银台（急速开票）
+    - [ ] 获取用户抬头，商户扫描用户的发票抬头二维码（急速开票）
+    - [ ] 获取用户抬头，通过jsapi接口（急速开票）
+    - [ ] 接收用户提交的抬头（急速开票）
+    - [ ] 查询发票信息并获取PDF文档（电子发票自助打印）
+  - [扫服务号二维码打开小程序](./doc/wxmp.md#%E6%89%AB%E6%9C%8D%E5%8A%A1%E5%8F%B7%E4%BA%8C%E7%BB%B4%E7%A0%81%E6%89%93%E5%BC%80%E5%B0%8F%E7%A8%8B%E5%BA%8F)
+    - [ ] 增加或修改规则
+    - [ ] 删除已设置的规则
+    - [ ] 获取已设置的规则
+    - [ ] 发布已设置的规则
+- [企业微信](./doc/wxwork.md#%E4%BC%81%E4%B8%9A%E5%BE%AE%E4%BF%A1)
+  - [通讯录管理](./doc/wxwork.md#%E9%80%9A%E8%AE%AF%E5%BD%95%E7%AE%A1%E7%90%86)
+    - [ ] 成员管理
+    - [ ] 部门管理
+    - [ ] 标签管理
+    - [ ] 异步批量接口
+    - [ ] 通讯录回调通知
+    - [ ] 互联企业
+    - [ ] 异步导出接口
+  - [客户联系](./doc/wxwork.md#%E5%AE%A2%E6%88%B7%E8%81%94%E7%B3%BB)
+    - [ ] 企业服务人员管理
+    - [ ] 客户管理
+    - [ ] 客户标签管理
+    - [ ] 在职继承
+    - [ ] 离职继承
+    - [ ] 客户群管理
+    - [ ] 联系我与客户入群方式
+    - [ ] 客户朋友圈
+    - [ ] 消息推送
+    - [ ] 统计管理
+    - [ ] 变更回调
+    - [ ] 管理商品图册
+    - [ ] 管理聊天敏感词
+    - [ ] 上传附件资源
+  - [微信客服](./doc/wxwork.md#%E5%BE%AE%E4%BF%A1%E5%AE%A2%E6%9C%8D)
+    - [ ] 客服账号管理
+    - [ ] 接待人员管理
+    - [ ] 会话分配与消息收发
+    - [ ] 其他基础信息获取
+    - [ ] 统计管理
+  - [身份验证](./doc/wxwork.md#%E8%BA%AB%E4%BB%BD%E9%AA%8C%E8%AF%81)
+    - [ ] 网页授权登录
+    - [ ] 扫码授权登录
+  - [应用管理](./doc/wxwork.md#%E5%BA%94%E7%94%A8%E7%AE%A1%E7%90%86)
+    - [ ] 获取应用
+    - [ ] 设置应用
+    - [ ] 自定义菜单
+    - [ ] 设置工作台自定义展示
+  - [消息推送](./doc/wxwork.md#%E6%B6%88%E6%81%AF%E6%8E%A8%E9%80%81)
+    - [ ] 发送应用消息
+    - [ ] 更新模板卡片消息
+    - [ ] 撤回应用消息
+    - [ ] 接收消息与事件
+    - [ ] 发送消息到群聊会话
+    - [ ] 互联企业消息推送
+    - [ ] 家校消息推送
+  - [素材管理](./doc/wxwork.md#%E7%B4%A0%E6%9D%90%E7%AE%A1%E7%90%86)
+    - [ ] 上传临时素材
+    - [ ] 上传图片
+    - [ ] 获取临时素材
+    - [ ] 获取高清语音素材
+  - [OA](./doc/wxwork.md#oa)
+    - [ ] 打卡
+    - [ ] 审批
+    - [ ] 汇报
+    - [ ] 自建应用
+    - [ ] 会议室
+    - [ ] 紧急通知应用
+  - [效率工具](./doc/wxwork.md#%E6%95%88%E7%8E%87%E5%B7%A5%E5%85%B7)
+    - [ ] 企业邮箱
+    - [ ] 日程
+    - [ ] 直播
+    - [ ] 微盘
+    - [ ] 公费电话
+  - [企业支付](./doc/wxwork.md#%E4%BC%81%E4%B8%9A%E6%94%AF%E4%BB%98)
+    - [ ] 企业红包
+    - [ ] 向员工付款
+    - [ ] 向员工收款
+    - [ ] 对外收款
+  - [企业互联](./doc/wxwork.md#%E4%BC%81%E4%B8%9A%E4%BA%92%E8%81%94)
+    - [ ] 获取应用共享信息
+    - [ ] 获取下游access_token
+    - [ ] 获取下游session
+  - [上下游](./doc/wxwork.md#%E4%B8%8A%E4%B8%8B%E6%B8%B8)
+    - [ ] 获取应用共享信息
+    - [ ] 获取下游access_token
+    - [ ] 获取下游session
+    - [ ] 获取上下游信息
+    - [ ] 上下游企业应用获取微信用户的external_userid
+  - [会话内容存档](./doc/wxwork.md#%E4%BC%9A%E8%AF%9D%E5%86%85%E5%AE%B9%E5%AD%98%E6%A1%A3)
+  - [电子发票](./doc/wxwork.md#%E7%94%B5%E5%AD%90%E5%8F%91%E7%A5%A8)
+  - [家校沟通](./doc/wxwork.md#%E5%AE%B6%E6%A0%A1%E6%B2%9F%E9%80%9A)
+  - [家校应用](./doc/wxwork.md#%E5%AE%B6%E6%A0%A1%E5%BA%94%E7%94%A8)
+  - [政民沟通](./doc/wxwork.md#%E6%94%BF%E6%B0%91%E6%B2%9F%E9%80%9A)
+- [微信小程序](./doc/wxprogram.md#%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F)
+  - [登录](./doc/wxprogram.md#%E7%99%BB%E5%BD%95)
+  - [用户信息](./doc/wxprogram.md#%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF)
+  - [接口调用凭证](./doc/wxprogram.md#%E6%8E%A5%E5%8F%A3%E8%B0%83%E7%94%A8%E5%87%AD%E8%AF%81)
+  - [数据分析](./doc/wxprogram.md#%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90)
+  - [客服消息](./doc/wxprogram.md#%E5%AE%A2%E6%9C%8D%E6%B6%88%E6%81%AF)
+  - [统一服务消息](./doc/wxprogram.md#%E7%BB%9F%E4%B8%80%E6%9C%8D%E5%8A%A1%E6%B6%88%E6%81%AF)
+  - [动态消息](./doc/wxprogram.md#%E5%8A%A8%E6%80%81%E6%B6%88%E6%81%AF)
+  - [插件管理](./doc/wxprogram.md#%E6%8F%92%E4%BB%B6%E7%AE%A1%E7%90%86)
+  - [附近的小程序](./doc/wxprogram.md#%E9%99%84%E8%BF%91%E7%9A%84%E5%B0%8F%E7%A8%8B%E5%BA%8F)
+  - [小程序码](./doc/wxprogram.md#%E5%B0%8F%E7%A8%8B%E5%BA%8F%E7%A0%81)
+  - [URL Scheme](./doc/wxprogram.md#url-scheme)
+  - [URL Link](./doc/wxprogram.md#url-link)
+  - [内容安全](./doc/wxprogram.md#%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8)
+  - [微信红包封面](./doc/wxprogram.md#%E5%BE%AE%E4%BF%A1%E7%BA%A2%E5%8C%85%E5%B0%81%E9%9D%A2)
+  - [广告](./doc/wxprogram.md#%E5%B9%BF%E5%91%8A)
+  - [云开发](./doc/wxprogram.md#%E4%BA%91%E5%BC%80%E5%8F%91)
+  - [硬件设备](./doc/wxprogram.md#%E7%A1%AC%E4%BB%B6%E8%AE%BE%E5%A4%87)
+  - [图像处理](./doc/wxprogram.md#%E5%9B%BE%E5%83%8F%E5%A4%84%E7%90%86)
+  - [即时配送](./doc/wxprogram.md#%E5%8D%B3%E6%97%B6%E9%85%8D%E9%80%81)
+  - [网络](./doc/wxprogram.md#%E7%BD%91%E7%BB%9C)
+  - [直播](./doc/wxprogram.md#%E7%9B%B4%E6%92%AD)
+  - [物流助手](./doc/wxprogram.md#%E7%89%A9%E6%B5%81%E5%8A%A9%E6%89%8B)
+  - [OCR](./doc/wxprogram.md#ocr)
+  - [运维中心](./doc/wxprogram.md#%E8%BF%90%E7%BB%B4%E4%B8%AD%E5%BF%83)
+  - [手机号](./doc/wxprogram.md#%E6%89%8B%E6%9C%BA%E5%8F%B7)
+  - [安全风控](./doc/wxprogram.md#%E5%AE%89%E5%85%A8%E9%A3%8E%E6%8E%A7)
+  - [服务市场](./doc/wxprogram.md#%E6%9C%8D%E5%8A%A1%E5%B8%82%E5%9C%BA)
+  - [Short Link](./doc/wxprogram.md#short-link)
+  - [生物认证](./doc/wxprogram.md#%E7%94%9F%E7%89%A9%E8%AE%A4%E8%AF%81)
+  - [订阅消息](./doc/wxprogram.md#%E8%AE%A2%E9%98%85%E6%B6%88%E6%81%AF)
+- [微信小游戏](./doc/wxgame.md#%E5%B0%8F%E6%B8%B8%E6%88%8F)
+  - [虚拟支付](./doc/wxgame.md#%E8%99%9A%E6%8B%9F%E6%94%AF%E4%BB%98)
+  - [登录](./doc/wxgame.md#%E7%99%BB%E5%BD%95)
+  - [内容安全](./doc/wxgame.md#%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8)
+  - [开放数据](./doc/wxgame.md#%E5%BC%80%E6%94%BE%E6%95%B0%E6%8D%AE)
+  - [动态消息](./doc/wxgame.md#%E5%8A%A8%E6%80%81%E6%B6%88%E6%81%AF)
+  - [小程序码](./doc/wxgame.md#%E5%B0%8F%E7%A8%8B%E5%BA%8F%E7%A0%81)
+  - [URL Scheme](./doc/wxgame.md#url-scheme)
+  - [URL Link](./doc/wxgame.md#url-link)
+  - [数据分析](./doc/wxgame.md#%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90)
+  - [用户信息](./doc/wxgame.md#%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF)
+  - [云开发](./doc/wxgame.md#%E4%BA%91%E5%BC%80%E5%8F%91)
+  - [对局匹配](./doc/wxgame.md#%E5%AF%B9%E5%B1%80%E5%8C%B9%E9%85%8D)
+  - [硬件设备](./doc/wxgame.md#%E7%A1%AC%E4%BB%B6%E8%AE%BE%E5%A4%87)
+  - [网络](./doc/wxgame.md#%E7%BD%91%E7%BB%9C)
+  - [帧同步](./doc/wxgame.md#%E5%B8%A7%E5%90%8C%E6%AD%A5)
+  - [手机号](./doc/wxgame.md#%E6%89%8B%E6%9C%BA%E5%8F%B7)
+  - [安全风控](./doc/wxgame.md#%E5%AE%89%E5%85%A8%E9%A3%8E%E6%8E%A7)
+  - [Short Link](./doc/wxgame.md#short-link)
+  - [订阅消息](./doc/wxgame.md#%E8%AE%A2%E9%98%85%E6%B6%88%E6%81%AF)
+- [微信商户](./doc/wxpay.md)
+- [开放平台](./doc/wxopen.md)
+- [CHANGELOG](./doc/CHANGELOG.md#changelog)
+  - [v0.0.10](./doc/CHANGELOG.md#v0010)

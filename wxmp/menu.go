@@ -1,6 +1,7 @@
 package wxmp
 
 import (
+	"errors"
 	"fmt"
 	"github.com/hhcool/wx"
 )
@@ -46,14 +47,16 @@ type Menu struct {
 	Button []MenuButtonItem `json:"button"`
 }
 
+// MenuDiyMatchRule
+// @Description: 性别、国家、省市区、语言 官方已经废除，不再支持
+type MenuDiyMatchRule struct {
+	TagId              string `json:"tag_id,omitempty"`
+	ClientPlatformType string `json:"client_platform_type,omitempty"`
+}
+
 type MenuDiy struct {
-	TagId              string `json:"tag_id"`
-	Sex                string `json:"sex"`
-	Country            string `json:"country"`
-	Province           string `json:"province"`
-	City               string `json:"city"`
-	ClientPlatformType string `json:"client_platform_type"`
-	Language           string `json:"language"`
+	Button    []MenuButtonItem `json:"button"`
+	Matchrule MenuDiyMatchRule `json:"matchrule"`
 }
 
 // MenuAdd
@@ -149,4 +152,144 @@ func (ctx *Context) MenuDelete() error {
 		return fmt.Errorf("%s 删除菜单失败（%d-%s）", ctx.Appid(), res.Errcode, res.Errmsg)
 	}
 	return nil
+}
+
+type ResMenuDiyAdd struct {
+	wx.Response
+	Menuid string `json:"menuid"`
+}
+
+// MenuDiyAdd
+// @Description: 新增个性化菜单
+// @receiver ctx
+// @param menu
+// @return *ResMenuDiyAdd
+// @return error
+func (ctx *Context) MenuDiyAdd(menu MenuDiy) (*ResMenuDiyAdd, error) {
+	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
+		return nil, fmt.Errorf("%s 非公众号", ctx.Appid())
+	}
+	var res ResMenuDiyAdd
+	wechat := wx.NewWechat()
+	if err := wechat.Post(wx.ApiMp + "/menu/addconditional").
+		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
+		SetJSON(&menu).
+		BindJSON(&res).
+		Do(); err != nil {
+		return nil, fmt.Errorf("%s 新增个性化菜单失败 %s", ctx.Appid(), err.Error())
+	}
+	if res.Errcode != 0 {
+		if ctx.RetryAccessToken(res.Errcode) {
+			return ctx.MenuDiyAdd(menu)
+		}
+		return nil, fmt.Errorf("%s 新增个性化菜单失败 %s", ctx.Appid(), res.Errmsg)
+	}
+	return &res, nil
+}
+
+// MenuDiyDelete
+// @Description: 删除个性化菜单
+// @receiver ctx
+// @param menuid
+// @return *wx.Response
+// @return error
+func (ctx *Context) MenuDiyDelete(menuid string) (*wx.Response, error) {
+	if menuid == "" {
+		return nil, errors.New("menuid不能为空")
+	}
+	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
+		return nil, fmt.Errorf("%s 非公众号", ctx.Appid())
+	}
+	var res wx.Response
+	wechat := wx.NewWechat()
+	if err := wechat.Post(wx.ApiMp + "/menu/delconditional").
+		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
+		SetJSON(&struct {
+			Menuid string `json:"menuid"`
+		}{Menuid: menuid}).
+		BindJSON(&res).Do(); err != nil {
+		return nil, fmt.Errorf("%s 删除个性化菜单失败 %s", ctx.Appid(), err.Error())
+	}
+	if res.Errcode != 0 {
+		if ctx.RetryAccessToken(res.Errcode) {
+			return ctx.MenuDiyDelete(menuid)
+		}
+		return nil, fmt.Errorf("%s 删除个性化菜单失败 %s", ctx.Appid(), res.Errmsg)
+	}
+	return &res, nil
+}
+
+type ResMenuDiyTest struct {
+	wx.Response
+	Button []MenuButtonItem `json:"button"`
+}
+
+// MenuDiyTest
+// @Description: 测试个性化菜单匹配结果
+// @receiver ctx
+// @param userID 可以是粉丝的OpenID，也可以是粉丝的微信号
+// @return *ResMenuDiyTest
+// @return error
+func (ctx *Context) MenuDiyTest(userID string) (*ResMenuDiyTest, error) {
+	if userID == "" {
+		return nil, errors.New("userID不能为空")
+	}
+	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
+		return nil, fmt.Errorf("%s 非公众号", ctx.Appid())
+	}
+	var res ResMenuDiyTest
+	wechat := wx.NewWechat()
+	if err := wechat.Post(wx.ApiMp + "/menu/trymatch").
+		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
+		SetJSON(&struct {
+			UserID string `json:"user_id"`
+		}{UserID: userID}).
+		BindJSON(&res).Do(); err != nil {
+		return nil, fmt.Errorf("%s 测试个性化菜单失败 %s", ctx.Appid(), err.Error())
+	}
+	if res.Errcode != 0 {
+		if ctx.RetryAccessToken(res.Errcode) {
+			return ctx.MenuDiyTest(userID)
+		}
+		return nil, fmt.Errorf("%s 测试个性化菜单失败 %s", ctx.Appid(), res.Errmsg)
+	}
+	return &res, nil
+}
+
+type ResMenuQueryAll struct {
+	wx.Response
+	Menu struct {
+		Button []MenuButtonItem `json:"button"`
+		Menuid string           `json:"menuid"`
+	} `json:"menu"`
+	Conditionalmenu struct {
+		MenuDiy
+		Menuid string `json:"menuid"`
+	} `json:"conditionalmenu"`
+}
+
+// MenuQueryAll
+// @Description: 查询所有菜单（包含个性化菜单）
+// @receiver ctx
+// @return *ResMenuQueryAll
+// @return error
+func (ctx *Context) MenuQueryAll() (*ResMenuQueryAll, error) {
+	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
+		return nil, fmt.Errorf("%s 非公众号", ctx.Appid())
+	}
+	var res ResMenuQueryAll
+	wechat := wx.NewWechat()
+	if err := wechat.Get(wx.ApiMp + "menu/get").
+		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
+		BindJSON(&res).
+		Do(); err != nil {
+		return nil, fmt.Errorf("%s 查询菜单失败 %s", ctx.Appid(), err.Error())
+	}
+	if res.Errcode != 0 {
+		if ctx.RetryAccessToken(res.Errcode) {
+			return ctx.MenuQueryAll()
+		}
+		return nil, fmt.Errorf("%s 查询菜单失败 %s", ctx.Appid(), res.Errmsg)
+	}
+	return &res, nil
 }
