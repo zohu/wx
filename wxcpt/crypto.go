@@ -7,6 +7,7 @@ import (
 	"crypto/sha1"
 	"encoding/base64"
 	"encoding/binary"
+	"encoding/xml"
 	"errors"
 	"fmt"
 	"github.com/hhcool/gtls/utils"
@@ -240,4 +241,21 @@ func (cpt *BizMsgCrypt) DecryptMsg(msgSignature, timestamp, nonce string, msg4Re
 		return nil, errors.New("appid is not equal")
 	}
 	return msg, nil
+}
+
+// DecryptMsgFromBinary
+// @Description: 从二进制解密消息
+// @receiver cpt
+// @param msgSignature
+// @param timestamp
+// @param nonce
+// @param msg
+// @return []byte
+// @return error
+func (cpt *BizMsgCrypt) DecryptMsgFromBinary(msgSignature, timestamp, nonce string, msg []byte) ([]byte, error) {
+	recv := new(BizMsg4Recv)
+	if err := xml.Unmarshal(msg, recv); err != nil {
+		return nil, err
+	}
+	return cpt.DecryptMsg(msgSignature, timestamp, nonce, recv)
 }

@@ -52,13 +52,20 @@ menu, err := app.MenuQueryAll()
 ```
 ### 基础消息能力
 - [x] 接收普通消息
+```
+// p *wx.ParamNotify, msg *wxcpt.BizMsg4Recv
+// 返回值message的类型 见 wxmp.Message{}
+message, err := app.DecodeMessage(p, msg)
+```
 - [x] 接收事件消息
+```
+// 见【接收普通消息】
+```
 - [ ] 被动回复用户消息
 - [ ] 模板消息
 - [x] 消息解密
 ```
-// p *wx.ParamNotify, msg *wxcpt.BizMsg4Recv
-m, e := app.DecodeMessage(p, msg)
+// 见【接收普通消息】
 ```
 - [ ] 公众号一次性订阅消息
 - [ ] 群发和原创校验
