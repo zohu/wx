@@ -40,25 +40,29 @@ type WxApp struct {
 // 如果需要强制覆盖更新，可以不用判断FindApp，直接PutApp即可；
 func AppInit() {
 	var apps []repo.WxApp
-	db.Where("app_status=1").Find(&apps)
+	db.Find(&apps)
 	for i := range apps {
 		wp := apps[i]
-		if ctx, err := wx.FindApp(wp.Appid); err != nil {
-			_ = wx.PutApp(wx.App{
-				Appid:          wp.Appid,
-				AppSecret:      wp.Appsecret,
-				Token:          wp.AppToken,
-				EncodingAesKey: wp.AppEncodingAesKey,
-				AppType:        wp.AppType,
-			})
-			log.Infof("初始化应用（%s）", wp.Appid)
+		if wp.AppStatus == 1 {
+            if ctx, err := wx.FindApp(wp.Appid); err != nil {
+                _ = wx.PutApp(wx.App{
+                    Appid:          wp.Appid,
+                    AppSecret:      wp.Appsecret,
+                    Token:          wp.AppToken,
+                    EncodingAesKey: wp.AppEncodingAesKey,
+                    AppType:        wp.AppType,
+                })
+                log.Infof("初始化应用（%s）", wp.Appid)
+            } else {
+                if ctx.App.ExpireTime.Before(time.Now()) {
+                    log.Infof("应用Token过期，刷新Token（%s）", ctx.App.Appid)
+                    _ = ctx.GetAccessToken()
+                } else {
+                    log.Infof("应用正常 %s", ctx.App.Appid)
+                }
+            }
 		} else {
-			if ctx.App.ExpireTime.Before(time.Now()) {
-				log.Infof("应用Token过期，刷新Token（%s）", ctx.App.Appid)
-				_ = ctx.GetAccessToken()
-			} else {
-				log.Infof("应用正常 %s", ctx.App.Appid)
-			}
+		    wx.DelApp(wp.Appid)
 		}
 	}
 }

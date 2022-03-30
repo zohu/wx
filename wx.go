@@ -23,8 +23,10 @@ type Option struct {
 type Wechat struct {
 	debug    bool
 	ctx      context.Context
+	Del      func(k string) *redis.IntCmd
 	SetNX    func(k string, v interface{}, t time.Duration) *redis.BoolCmd
 	SAdd     func(key string, member ...interface{}) *redis.IntCmd
+	SRem     func(key string, member ...interface{}) *redis.IntCmd
 	SMembers func(key string) *redis.StringSliceCmd
 	HSet     func(key string, value ...interface{}) *redis.IntCmd
 	HGetAll  func(key string) *redis.StringStringMapCmd
@@ -36,8 +38,10 @@ var wechat = new(Wechat)
 
 func Init(op *Option) {
 	rds.NewRedis(&rds.Option{Host: op.Host, Password: op.Password})
+	wechat.Del = rds.Client.Del
 	wechat.SetNX = rds.Client.SetNX
 	wechat.SAdd = rds.Client.SAdd
+	wechat.SRem = rds.Client.SRem
 	wechat.SMembers = rds.Client.SMembers
 	wechat.HSet = rds.Client.HSet
 	wechat.HGetAll = rds.Client.HGetAll
@@ -52,6 +56,12 @@ func NewWechat() *Wechat {
 	wechat.Cancel = cc
 	return wechat
 }
+
+// FindApp
+// @Description: 获取APP实例
+// @param appid
+// @return *Context
+// @return error
 func FindApp(appid string) (*Context, error) {
 	if m := wechat.HGetAll(RdsAppPrefix + appid).Val(); len(m) == 0 {
 		return nil, fmt.Errorf("[wechat:FindApp] 应用不存在 %s", appid)
@@ -62,6 +72,11 @@ func FindApp(appid string) (*Context, error) {
 		return &Context{App: app}, nil
 	}
 }
+
+// PutApp
+// @Description: 托管APP
+// @param app
+// @return error
 func PutApp(app App) error {
 	app.Retry = "0"
 	app.ExpireTime = time.Now()
@@ -75,4 +90,19 @@ func PutApp(app App) error {
 		ctx.NewAccessToken()
 	}
 	return nil
+}
+
+// DelApp
+// @Description: 停止APP
+// @param appid
+func DelApp(appid string) {
+	_ = wechat.SRem(RdsAppListPrefix, appid).Err()
+	_ = wechat.Del(RdsAppPrefix + appid).Err()
+}
+
+// FindAllApp
+// @Description: 查询所有托管的APP
+// @return []string
+func FindAllApp() []string {
+	return wechat.SMembers(RdsAppListPrefix).Val()
 }
