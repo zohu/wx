@@ -10,8 +10,8 @@ type ParamNotify struct {
 }
 
 type Response struct {
-	Errcode int64  `json:"errcode"`
-	Errmsg  string `json:"errmsg"`
+	Errcode int64  `json:"errcode,omitempty"`
+	Errmsg  string `json:"errmsg,omitempty"`
 }
 
 // CDATA  使用该类型,在序列化为 xml 文本时文本会被解析器忽略
