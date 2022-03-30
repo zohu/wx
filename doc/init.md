@@ -62,6 +62,7 @@ func AppInit() {
                 }
             }
 		} else {
+		    // 状态非启用的，取消托管
 		    wx.DelApp(wp.Appid)
 		}
 	}
