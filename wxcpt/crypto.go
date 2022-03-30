@@ -18,7 +18,7 @@ import (
 type BizMsg4Recv struct {
 	Tousername string `json:"tousername" xml:"ToUserName"`
 	Encrypt    string `json:"encrypt" xml:"Encrypt"`
-	Agentid    string `json:"agentid" xml:"AgentID"`
+	Agentid    string `json:"agentid,omitempty" xml:"AgentID,omitempty"`
 }
 
 type BizMsgCrypt struct {
