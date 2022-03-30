@@ -1,4 +1,4 @@
-package wxmp
+package wxnotify
 
 import (
 	"encoding/xml"

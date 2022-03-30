@@ -49,7 +49,7 @@ func (ctx *Context) UserFromOpenid(openid string) (*Userinfo, error) {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.UserFromOpenid(openid)
 		}
-		return nil, fmt.Errorf("%s 查询用户信息失败，%d-%s", ctx.Appid(), res.Errcode, res.Errmsg)
+		return nil, fmt.Errorf("%s 查询用户信息失败，%s，%d-%s", ctx.Appid(), openid, res.Errcode, res.Errmsg)
 	}
 	return &Userinfo{
 		Subscribe:      res.Subscribe,

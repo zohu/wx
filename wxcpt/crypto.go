@@ -152,7 +152,6 @@ func (cpt *BizMsgCrypt) VerifyURL(msgSignature, timestamp, nonce, echostr string
 		return nil, err
 	}
 	if len(cpt.appid) > 0 && strings.Compare(string(appid), cpt.appid) != 0 {
-		fmt.Println(string(appid), cpt.appid, len(appid), len(cpt.appid))
 		return nil, errors.New("appid is not equal")
 	}
 	return msg, nil
