@@ -16,7 +16,7 @@ func StructToMap(data interface{}) map[string]interface{} {
 func debug() gout.DebugFunc {
 	return func(o *gout.DebugOption) {
 		o.Debug = true
-		o.Write = log.SafeWriterLevel(log.Logger, 4)
+		o.Write = log.SafeWriter()
 	}
 }
 func (w *Wechat) Post(url string) *dataflow.DataFlow {

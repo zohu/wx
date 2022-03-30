@@ -60,6 +60,7 @@ type CommonMessage struct {
 	FromUserName wxcpt.CDATA `json:"FromUserName" xml:"FromUserName"`
 	CreateTime   int64       `json:"CreateTime" xml:"CreateTime"`
 	MsgType      MessageType `json:"MsgType" xml:"MsgType"`
+	Nonce        string      `json:"-" xml:"-"`
 }
 
 // Message

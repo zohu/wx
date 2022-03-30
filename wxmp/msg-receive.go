@@ -2,7 +2,6 @@ package wxmp
 
 import (
 	"encoding/xml"
-	"github.com/hhcool/gtls/log"
 	"github.com/hhcool/wx"
 	"github.com/hhcool/wx/wxcpt"
 )
@@ -18,8 +17,8 @@ func (ctx *Context) DecodeMessage(p *wx.ParamNotify, encpt *wxcpt.BizMsg4Recv) (
 		return nil, err
 	} else {
 		msg := new(Message)
+		msg.Nonce = p.Nonce
 		if err := xml.Unmarshal(cptByte, msg); err != nil {
-			log.Error(err)
 			return nil, err
 		}
 		return msg, nil
