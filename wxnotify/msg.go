@@ -81,8 +81,8 @@ const (
 // @Description: 消息中通用的结构
 type CommonMessage struct {
 	XMLName      xml.Name    `xml:"xml"`
-	ToUserName   wxcpt.CDATA `json:"ToUserName" xml:"ToUserName"`
-	FromUserName wxcpt.CDATA `json:"FromUserName" xml:"FromUserName"`
+	ToUserName   string      `json:"ToUserName" xml:"ToUserName"`
+	FromUserName string      `json:"FromUserName" xml:"FromUserName"`
 	CreateTime   int64       `json:"CreateTime" xml:"CreateTime"`
 	MsgType      MessageType `json:"MsgType" xml:"MsgType"`
 	Nonce        string      `json:"-" xml:"-"`
