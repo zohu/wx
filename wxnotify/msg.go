@@ -86,6 +86,7 @@ type CommonMessage struct {
 	CreateTime   int64       `json:"CreateTime" xml:"CreateTime"`
 	MsgType      MessageType `json:"MsgType" xml:"MsgType"`
 	Nonce        string      `json:"-" xml:"-"`
+	ctx          *NotifyContext
 }
 
 // Message

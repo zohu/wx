@@ -1,6 +1,7 @@
 package test
 
 import (
+	"github.com/hhcool/gtls/utils"
 	"github.com/hhcool/wx"
 	"github.com/hhcool/wx/wxcpt"
 	"github.com/hhcool/wx/wxnotify"
@@ -29,4 +30,5 @@ func TestWxmpMsg(t *testing.T) {
 	if msg.MsgId == 0 {
 		t.Error("消息ID为空")
 	}
+	t.Log(utils.StructToString(msg))
 }

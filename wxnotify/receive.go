@@ -13,6 +13,7 @@ func (ctx *NotifyContext) DecodeMessage(p *wx.ParamNotify, encpt *wxcpt.BizMsg4R
 	} else {
 		msg := new(Message)
 		msg.Nonce = p.Nonce
+		msg.ctx = ctx
 		if err := xml.Unmarshal(cptByte, msg); err != nil {
 			return nil, err
 		}

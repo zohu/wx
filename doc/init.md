@@ -86,46 +86,6 @@ if err != nil {
 }
 // 其他类似……
 ```
-### 消息加解密
-参考官方java-sdk改写的go版本，支持xml和json
-```
-import "github.com/hhcool/wx/wxcpt"
-
-// 微信公众号
-// p *wx.ParamNotify, encpt *wxcpt.BizMsg4Recv
-cpt := wxcpt.NewBizMsgCrypt(ctx.App.Token, ctx.App.EncodingAesKey, ctx.Appid())
-if cptByte, err := cpt.DecryptMsg(p.MsgSignature, p.Timestamp, p.Nonce, encpt); err != nil {
-    return nil, err
-} else {
-    event := new(wxmp.Message)
-    if err := xml.Unmarshal(cptByte, event); err != nil {
-        log.Error(err)
-        return nil, err
-    }
-    return event, nil
-}
-
-// 企业微信
-if wp, err := wxwork.FindApp(appid); err == nil {
-    cpt := wxcpt.NewBizMsgCrypt(wp.App.Token, wp.App.EncodingAesKey, appid)
-    if cptByte, err := cpt.DecryptMsg(p.MsgSignature, p.Timestamp, p.Nonce, encpt); err != nil {
-        log.Error(err)
-    } else {
-        event := new(wxwork.NotifyEvent)
-        if err := xml.Unmarshal(cptByte, event); err != nil {
-            log.Error(err)
-            return ""
-        }
-        switch event.Event {
-        case "change_external_contact": // customer
-            w.changeExternalContact(event, wp)
-        case "change_external_chat": // 客户群
-        case "change_external_tag": // 标签
-        }
-    }
-}
-return "ok"
-```
 ### AccessToken的共享
 可以获取对应app的token，用于外部程序共享或自定义接口
 ```

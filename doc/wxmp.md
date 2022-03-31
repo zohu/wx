@@ -51,19 +51,15 @@ _, err := app.MenuDiyTest(userID)
 menu, err := app.MenuQueryAll()
 ```
 ### 基础消息能力
-- [x] 接收普通消息
-```
-// p *wx.ParamNotify, msg *wxcpt.BizMsg4Recv
-// 返回值message的类型 见 wxmp.Message{}
-message, err := app.DecodeMessage(p, msg)
-```
+- [x] 接收普通消息 
+> 见【[微信回调消息](./wxnotify.md)】
 - [x] 接收事件消息
-```
-// 见【接收普通消息】
-```
+> 见【[微信回调消息](./wxnotify.md)】
 - [ ] 被动回复用户消息
+> 见【[微信回调消息](./wxnotify.md)】
 - [ ] 模板消息
 - [x] 消息解密
+> 见【[微信回调消息](./wxnotify.md)】
 ```
 // 见【接收普通消息】
 ```
@@ -97,9 +93,7 @@ userinfo, err := app.UserFromOpenid(openID)
 res, err := app.QueryUserList(nextOpenID)
 ```
 - [x] 获取用户地理位置
-```
-// 参考：接收事件消息
-```
+> 见【[微信回调消息](./wxnotify.md)】
 - [ ] 黑名单管理
 ### 账号管理
 - [x] 生成带参数的二维码

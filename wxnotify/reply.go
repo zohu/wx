@@ -2,14 +2,13 @@ package wxnotify
 
 import (
 	"encoding/xml"
-	"github.com/hhcool/wx"
 	"github.com/hhcool/wx/wxcpt"
 	"strconv"
 	"time"
 )
 
-func encryptMsg(app *wx.App, data []byte, timestamp int64, nonce string) (*wxcpt.XmlBizMsg4Send, error) {
-	cpt := wxcpt.NewBizMsgCrypt(app.Token, app.EncodingAesKey, app.Appid)
+func encryptMsg(ctx *NotifyContext, data []byte, timestamp int64, nonce string) (*wxcpt.XmlBizMsg4Send, error) {
+	cpt := wxcpt.NewBizMsgCrypt(ctx.App.Token, ctx.App.EncodingAesKey, ctx.App.Appid)
 	return cpt.EncryptXmlMsg(string(data), strconv.FormatInt(timestamp, 10), nonce)
 }
 
@@ -29,9 +28,9 @@ func (msg *Message) ReplyText(content string) *MessageText {
 	return text
 }
 
-func (msg *MessageText) Encrypted(app *wx.App) (*wxcpt.XmlBizMsg4Send, error) {
+func (msg *MessageText) Encrypted() (*wxcpt.XmlBizMsg4Send, error) {
 	str, _ := xml.Marshal(msg)
-	return encryptMsg(app, str, msg.CreateTime, msg.Nonce)
+	return encryptMsg(msg.ctx, str, msg.CreateTime, msg.Nonce)
 }
 
 // ReplyImage
@@ -50,9 +49,9 @@ func (msg *Message) ReplyImage(mediaID string) *MessageImage {
 	return image
 }
 
-func (msg *MessageImage) Encrypted(app *wx.App) (*wxcpt.XmlBizMsg4Send, error) {
+func (msg *MessageImage) Encrypted() (*wxcpt.XmlBizMsg4Send, error) {
 	str, _ := xml.Marshal(msg)
-	return encryptMsg(app, str, msg.CreateTime, msg.Nonce)
+	return encryptMsg(msg.ctx, str, msg.CreateTime, msg.Nonce)
 }
 
 // ReplyVoice
@@ -71,9 +70,9 @@ func (msg *Message) ReplyVoice(mediaID string) *MessageVoice {
 	return voice
 }
 
-func (msg *MessageVoice) Encrypted(app *wx.App) (*wxcpt.XmlBizMsg4Send, error) {
+func (msg *MessageVoice) Encrypted() (*wxcpt.XmlBizMsg4Send, error) {
 	str, _ := xml.Marshal(msg)
-	return encryptMsg(app, str, msg.CreateTime, msg.Nonce)
+	return encryptMsg(msg.ctx, str, msg.CreateTime, msg.Nonce)
 }
 
 // ReplyVideo
@@ -96,9 +95,9 @@ func (msg *Message) ReplyVideo(mediaID, title, description string) *MessageVideo
 	return video
 }
 
-func (msg *MessageVideo) Encrypted(app *wx.App) (*wxcpt.XmlBizMsg4Send, error) {
+func (msg *MessageVideo) Encrypted() (*wxcpt.XmlBizMsg4Send, error) {
 	str, _ := xml.Marshal(msg)
-	return encryptMsg(app, str, msg.CreateTime, msg.Nonce)
+	return encryptMsg(msg.ctx, str, msg.CreateTime, msg.Nonce)
 }
 
 // ReplyMusic
@@ -125,9 +124,9 @@ func (msg *Message) ReplyMusic(title, description, musicURL, hQMusicURL, thumbMe
 	return music
 }
 
-func (msg *MessageMusic) Encrypted(app *wx.App) (*wxcpt.XmlBizMsg4Send, error) {
+func (msg *MessageMusic) Encrypted() (*wxcpt.XmlBizMsg4Send, error) {
 	str, _ := xml.Marshal(msg)
-	return encryptMsg(app, str, msg.CreateTime, msg.Nonce)
+	return encryptMsg(msg.ctx, str, msg.CreateTime, msg.Nonce)
 }
 
 // ReplyNews
@@ -147,7 +146,7 @@ func (msg *Message) ReplyNews(articles []Article) *MessageNews {
 	return news
 }
 
-func (msg *MessageNews) Encrypted(app *wx.App) (*wxcpt.XmlBizMsg4Send, error) {
+func (msg *MessageNews) Encrypted() (*wxcpt.XmlBizMsg4Send, error) {
 	str, _ := xml.Marshal(msg)
-	return encryptMsg(app, str, msg.CreateTime, msg.Nonce)
+	return encryptMsg(msg.ctx, str, msg.CreateTime, msg.Nonce)
 }
