@@ -1,7 +1,7 @@
 ## 微信回调消息
  - 回调消息不再使用传统的中间件形式，将接收与回复结合为msg.reply.encrypt形式，使使用更加灵活，任何框架都可以方便使用。
-### 接收消息并回复
-```
+### 接收消息并回复(公众号企业微信等通用)
+```go
 func main() {
     r := gin.New()
     r.POST("msg/:appid", RecvHandle)
@@ -41,9 +41,9 @@ func NotifyHandle(appid string,param *wx.ParamNotify,recv *wxcpt.BizMsg4Recv) st
     return string(b)
 }
 ```
-### 消息加解密
+### 消息加解密，如果需要额外使用的话
 参考官方java-sdk改写的go版本，支持xml和json
-```
+```go
 import "github.com/hhcool/wx/wxcpt"
 
 // 微信公众号
