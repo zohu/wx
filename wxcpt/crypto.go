@@ -35,6 +35,108 @@ func NewBizMsgCrypt(token, encodingAeskey, appid string) *BizMsgCrypt {
 	}
 }
 
+// EncryptJsonMsg
+// @Description: json消息加密
+// @receiver cpt
+// @param replyMsg
+// @param timestamp
+// @param nonce
+// @return *JsonBizMsg4Send
+// @return error
+func (cpt *BizMsgCrypt) EncryptJsonMsg(replyMsg, timestamp, nonce string) (*JsonBizMsg4Send, error) {
+	randStr := utils.RandomStr(16)
+	var buffer bytes.Buffer
+	buffer.WriteString(randStr)
+
+	msgLenBuf := make([]byte, 4)
+	binary.BigEndian.PutUint32(msgLenBuf, uint32(len(replyMsg)))
+	buffer.Write(msgLenBuf)
+	buffer.WriteString(replyMsg)
+	buffer.WriteString(cpt.appid)
+
+	tmpCiphertext, err := cpt.cbcEncrypt(buffer.String())
+	if nil != err {
+		return nil, err
+	}
+	ciphertext := string(tmpCiphertext)
+	signature := cpt.calSignature(timestamp, nonce, ciphertext)
+	return NewJsonBizMsg4Send(ciphertext, signature, timestamp, nonce), nil
+}
+
+// EncryptXmlMsg
+// @Description: xml消息加密
+// @receiver cpt
+// @param replyMsg
+// @param timestamp
+// @param nonce
+// @return *XmlBizMsg4Send
+// @return error
+func (cpt *BizMsgCrypt) EncryptXmlMsg(replyMsg, timestamp, nonce string) (*XmlBizMsg4Send, error) {
+	randStr := utils.RandomStr(16)
+	var buffer bytes.Buffer
+	buffer.WriteString(randStr)
+
+	msgLenBuf := make([]byte, 4)
+	binary.BigEndian.PutUint32(msgLenBuf, uint32(len(replyMsg)))
+	buffer.Write(msgLenBuf)
+	buffer.WriteString(replyMsg)
+	buffer.WriteString(cpt.appid)
+
+	tmpCiphertext, err := cpt.cbcEncrypt(buffer.String())
+	if nil != err {
+		return nil, err
+	}
+	ciphertext := string(tmpCiphertext)
+	signature := cpt.calSignature(timestamp, nonce, ciphertext)
+	return NewXmlBizMsg4Send(ciphertext, signature, timestamp, nonce), nil
+}
+
+// DecryptMsg
+// @Description: 消息解密
+// @receiver cpt
+// @param msgSignature
+// @param timestamp
+// @param nonce
+// @param msg4Recv
+// @param protocolType
+// @return []byte
+// @return *CryptError
+func (cpt *BizMsgCrypt) DecryptMsg(msgSignature, timestamp, nonce string, msg4Recv *BizMsg4Recv) ([]byte, error) {
+	signature := cpt.calSignature(timestamp, nonce, msg4Recv.Encrypt)
+	if strings.Compare(signature, msgSignature) != 0 {
+		return nil, errors.New("signature not equal")
+	}
+	plaintext, err := cpt.cbcDecrypt(msg4Recv.Encrypt)
+	if nil != err {
+		return nil, err
+	}
+	_, _, msg, appid, err := cpt.ParsePlainText(plaintext)
+	if nil != err {
+		return nil, err
+	}
+	if len(cpt.appid) > 0 && strings.Compare(string(appid), cpt.appid) != 0 {
+		return nil, errors.New("appid is not equal")
+	}
+	return msg, nil
+}
+
+// DecryptMsgFromBinary
+// @Description: 从二进制解密消息
+// @receiver cpt
+// @param msgSignature
+// @param timestamp
+// @param nonce
+// @param msg
+// @return []byte
+// @return error
+func (cpt *BizMsgCrypt) DecryptMsgFromBinary(msgSignature, timestamp, nonce string, msg []byte) ([]byte, error) {
+	recv := new(BizMsg4Recv)
+	if err := xml.Unmarshal(msg, recv); err != nil {
+		return nil, err
+	}
+	return cpt.DecryptMsg(msgSignature, timestamp, nonce, recv)
+}
+
 func (cpt *BizMsgCrypt) pKCS7Padding(plaintext string, blockSize int) []byte {
 	padding := blockSize - (len(plaintext) % blockSize)
 	padText := bytes.Repeat([]byte{byte(padding)}, padding)
@@ -155,106 +257,4 @@ func (cpt *BizMsgCrypt) VerifyURL(msgSignature, timestamp, nonce, echostr string
 		return nil, errors.New("appid is not equal")
 	}
 	return msg, nil
-}
-
-// EncryptJsonMsg
-// @Description: json消息加密
-// @receiver cpt
-// @param replyMsg
-// @param timestamp
-// @param nonce
-// @return *JsonBizMsg4Send
-// @return error
-func (cpt *BizMsgCrypt) EncryptJsonMsg(replyMsg, timestamp, nonce string) (*JsonBizMsg4Send, error) {
-	randStr := utils.RandomStr(16)
-	var buffer bytes.Buffer
-	buffer.WriteString(randStr)
-
-	msgLenBuf := make([]byte, 4)
-	binary.BigEndian.PutUint32(msgLenBuf, uint32(len(replyMsg)))
-	buffer.Write(msgLenBuf)
-	buffer.WriteString(replyMsg)
-	buffer.WriteString(cpt.appid)
-
-	tmpCiphertext, err := cpt.cbcEncrypt(buffer.String())
-	if nil != err {
-		return nil, err
-	}
-	ciphertext := string(tmpCiphertext)
-	signature := cpt.calSignature(timestamp, nonce, ciphertext)
-	return NewJsonBizMsg4Send(ciphertext, signature, timestamp, nonce), nil
-}
-
-// EncryptXmlMsg
-// @Description: xml消息加密
-// @receiver cpt
-// @param replyMsg
-// @param timestamp
-// @param nonce
-// @return *XmlBizMsg4Send
-// @return error
-func (cpt *BizMsgCrypt) EncryptXmlMsg(replyMsg, timestamp, nonce string) (*XmlBizMsg4Send, error) {
-	randStr := utils.RandomStr(16)
-	var buffer bytes.Buffer
-	buffer.WriteString(randStr)
-
-	msgLenBuf := make([]byte, 4)
-	binary.BigEndian.PutUint32(msgLenBuf, uint32(len(replyMsg)))
-	buffer.Write(msgLenBuf)
-	buffer.WriteString(replyMsg)
-	buffer.WriteString(cpt.appid)
-
-	tmpCiphertext, err := cpt.cbcEncrypt(buffer.String())
-	if nil != err {
-		return nil, err
-	}
-	ciphertext := string(tmpCiphertext)
-	signature := cpt.calSignature(timestamp, nonce, ciphertext)
-	return NewXmlBizMsg4Send(ciphertext, signature, timestamp, nonce), nil
-}
-
-// DecryptMsg
-// @Description: 消息解密
-// @receiver cpt
-// @param msgSignature
-// @param timestamp
-// @param nonce
-// @param msg4Recv
-// @param protocolType
-// @return []byte
-// @return *CryptError
-func (cpt *BizMsgCrypt) DecryptMsg(msgSignature, timestamp, nonce string, msg4Recv *BizMsg4Recv) ([]byte, error) {
-	signature := cpt.calSignature(timestamp, nonce, msg4Recv.Encrypt)
-	if strings.Compare(signature, msgSignature) != 0 {
-		return nil, errors.New("signature not equal")
-	}
-	plaintext, err := cpt.cbcDecrypt(msg4Recv.Encrypt)
-	if nil != err {
-		return nil, err
-	}
-	_, _, msg, appid, err := cpt.ParsePlainText(plaintext)
-	if nil != err {
-		return nil, err
-	}
-	if len(cpt.appid) > 0 && strings.Compare(string(appid), cpt.appid) != 0 {
-		return nil, errors.New("appid is not equal")
-	}
-	return msg, nil
-}
-
-// DecryptMsgFromBinary
-// @Description: 从二进制解密消息
-// @receiver cpt
-// @param msgSignature
-// @param timestamp
-// @param nonce
-// @param msg
-// @return []byte
-// @return error
-func (cpt *BizMsgCrypt) DecryptMsgFromBinary(msgSignature, timestamp, nonce string, msg []byte) ([]byte, error) {
-	recv := new(BizMsg4Recv)
-	if err := xml.Unmarshal(msg, recv); err != nil {
-		return nil, err
-	}
-	return cpt.DecryptMsg(msgSignature, timestamp, nonce, recv)
 }
