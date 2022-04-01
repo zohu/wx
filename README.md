@@ -23,6 +23,9 @@
 ### 单元测试参考结果
 [参考结果](./doc/ANYTEST.md)
 
+### 版本记录
+- [CHANGELOG](./doc/CHANGELOG.md#changelog)
+
 ### 文档目录
 - [开始](./doc/init.md#%E5%BC%80%E5%A7%8B)
   - [初始化](./doc/init.md#%E5%88%9D%E5%A7%8B%E5%8C%96)
@@ -601,5 +604,3 @@
   - [订阅消息](./doc/wxgame.md#%E8%AE%A2%E9%98%85%E6%B6%88%E6%81%AF)
 - [微信商户](./doc/wxpay.md)
 - [开放平台](./doc/wxopen.md)
-- [CHANGELOG](./doc/CHANGELOG.md#changelog)
-  - [v0.0.10](./doc/CHANGELOG.md#v0010)
