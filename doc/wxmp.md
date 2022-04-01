@@ -99,6 +99,17 @@ _, err := app.MsgSubscribe(wxmp.ParamMsgSubscribe{})
 res, err := app.MsgGetAutoReply()
 ```
 ### 订阅通知
+- [x] 选用模板
+```
+// 从公共模板库中选用模板，到私有模板库中
+res, err := app.SubAddTemplate(wxmp.ParamSubAddTemplate{})
+```
+- [ ] 删除模板
+- [ ] 获取公众号类目
+- [ ] 获取模板中的关键词
+- [ ] 获取所属类目的公共模板
+- [ ] 获取私有模板列表
+- [ ] 发送订阅通知
 ### 客服消息
 ### 微信网页
 ### 素材管理

@@ -1,5 +1,9 @@
 package wxmp
 
+/**
+基础消息能力
+*/
+
 import (
 	"fmt"
 	"github.com/hhcool/wx"
