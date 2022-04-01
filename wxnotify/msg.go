@@ -111,12 +111,12 @@ type Message struct {
 	Url           string `json:"Url,omitempty" xml:"Url,omitempty"`                   // 链接消息
 
 	// 事件消息
-	Event     string `json:"Event,omitempty" xml:"Event,omitempty"`         // 事件消息
-	EventKey  string `json:"EventKey,omitempty" xml:"EventKey,omitempty"`   // 事件，二维码消息、关注、菜单
-	Ticket    string `json:"Ticket,omitempty" xml:"Ticket,omitempty"`       // 事件，二维码消息，二维码ticket
-	Latitude  string `json:"Latitude,omitempty" xml:"Latitude,omitempty"`   // 事件，地理位置，纬度
-	Longitude string `json:"Longitude,omitempty" xml:"Longitude,omitempty"` // 事件，地理位置，经度
-	Precision int64  `json:"Precision,omitempty" xml:"Precision,omitempty"` // 事件，地理位置，精度
+	Event     MessageEvent `json:"Event,omitempty" xml:"Event,omitempty"`         // 事件消息
+	EventKey  string       `json:"EventKey,omitempty" xml:"EventKey,omitempty"`   // 事件，二维码消息、关注、菜单
+	Ticket    string       `json:"Ticket,omitempty" xml:"Ticket,omitempty"`       // 事件，二维码消息，二维码ticket
+	Latitude  string       `json:"Latitude,omitempty" xml:"Latitude,omitempty"`   // 事件，地理位置，纬度
+	Longitude string       `json:"Longitude,omitempty" xml:"Longitude,omitempty"` // 事件，地理位置，经度
+	Precision int64        `json:"Precision,omitempty" xml:"Precision,omitempty"` // 事件，地理位置，精度
 
 	// 企业微信
 	AgentID          int64             `json:"AgentID,omitempty" xml:"AgentID,omitempty"`                   // 企业应用的ID

@@ -3,6 +3,7 @@ package wx
 import (
 	"github.com/hhcool/gtls/log"
 	"github.com/hhcool/gtls/structs"
+	"go.uber.org/zap"
 	"sync"
 	"time"
 )
@@ -61,7 +62,7 @@ func (c *Context) NewAccessToken() string {
 	case TypeH5:
 		token = c.newAccessTokenForMp()
 	default:
-		log.Error("NewAccessToken 应用类型错误")
+		log.Error("NewAccessToken 应用类型错误", zap.String("type", c.App.AppType))
 	}
 	if token != "" {
 		c.App.Retry = "0"
@@ -99,7 +100,7 @@ func (c *Context) GetAccessToken() string {
 // @return bool
 func (c *Context) IsExists() bool {
 	if c.App == nil || structs.IsZero(c.App) || c.App.Appid == "" {
-		log.Error("应用不存在")
+		log.Error("应用不存在", zap.String("appid", c.App.Appid))
 		return false
 	}
 	return true

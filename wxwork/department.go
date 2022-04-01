@@ -33,6 +33,9 @@ func (ctx *Context) DepartmentCreat(p Department) (int64, error) {
 		return -1, fmt.Errorf("企业微信：创建部门失败（%s）", err.Error())
 	}
 	if res.Errcode != 0 {
+		if ctx.RetryAccessToken(res.Errcode) {
+			return ctx.DepartmentCreat(p)
+		}
 		return -1, fmt.Errorf("企业微信：创建部门失败（%d-%s）", res.Errcode, res.Errmsg)
 	}
 	return res.Id, nil
@@ -53,6 +56,9 @@ func (ctx *Context) DepartmentUpdate(p Department) error {
 		return fmt.Errorf("企业微信：更新部门失败（%s）", err.Error())
 	}
 	if res.Errcode != 0 {
+		if ctx.RetryAccessToken(res.Errcode) {
+			return ctx.DepartmentUpdate(p)
+		}
 		return fmt.Errorf("企业微信：更新部门失败（%d-%s）", res.Errcode, res.Errmsg)
 	}
 	return nil
@@ -78,6 +84,9 @@ func (ctx *Context) DepartmentDelete(p ParamDepartmentDelete) error {
 		return fmt.Errorf("企业微信：删除部门失败（%s）", err.Error())
 	}
 	if res.Errcode != 0 {
+		if ctx.RetryAccessToken(res.Errcode) {
+			return ctx.DepartmentDelete(p)
+		}
 		return fmt.Errorf("企业微信：删除部门失败（%d-%s）", res.Errcode, res.Errmsg)
 	}
 	return nil
@@ -107,6 +116,9 @@ func (ctx *Context) DepartmentList(p ParamDepartmentList) ([]Department, error) 
 		return nil, fmt.Errorf("企业微信：查询部门失败（%s）", err.Error())
 	}
 	if res.Errcode != 0 {
+		if ctx.RetryAccessToken(res.Errcode) {
+			return ctx.DepartmentList(p)
+		}
 		return nil, fmt.Errorf("企业微信：查询部门失败（%d-%s）", res.Errcode, res.Errmsg)
 	}
 	return res.Department, nil

@@ -57,14 +57,47 @@ menu, err := app.MenuQueryAll()
 > 见【[微信回调消息](./wxnotify.md)】
 - [ ] 被动回复用户消息
 > 见【[微信回调消息](./wxnotify.md)】
-- [ ] 模板消息
+- [x] 模板消息
+```
+// 设置所属行业
+_, err := app.MsgSetIndustry(&wxmp.ParamMsgSetIndustry{})
+
+// 获取设置的行业信息
+res, err := app.MsgGetIndustry()
+
+// 获取模板ID
+res, err := app.MsgGetTemplateId(string)
+
+// 获得模板列表
+res, err := app.MsgGetTemplateList()
+
+// 删除模板
+_, err := app.MsgDelTemplate(string)
+
+// 发送模板消息
+_, err := app.MsgSendTemplate(wxmp.ParamMsgSendTemplate{})
+
+// 是否送达成功事件，参考【[微信回调消息](./wxnotify.md)】
+```
+
 - [x] 消息解密
 > 见【[微信回调消息](./wxnotify.md)】
 ```
 // 见【接收普通消息】
 ```
-- [ ] 公众号一次性订阅消息
+- [x] 公众号一次性订阅消息
+```
+// 推送订阅模板消息给到授权微信用户
+_, err := app.MsgSubscribe(wxmp.ParamMsgSubscribe{})
+```
 - [ ] 群发和原创校验
+```
+
+```
+- [x] 获取公众号的自动回复规则
+```
+res, err := app.MsgGetAutoReply()
+```
 ### 订阅通知
 ### 客服消息
 ### 微信网页

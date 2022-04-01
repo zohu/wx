@@ -2,7 +2,7 @@ package wx
 
 import (
 	"github.com/hhcool/gtls/log"
-	"strings"
+	"go.uber.org/zap"
 	"time"
 )
 
@@ -38,11 +38,11 @@ func (c *Context) newAccessTokenForMp() string {
 		BindJSON(&res).
 		Do()
 	if err != nil {
-		log.Errorf("newAccessTokenForMp %s", err.Error())
+		log.Warn("获取token失败", zap.Error(err))
 		return ""
 	}
 	if res.Errcode != 0 {
-		log.Errorf("newAccessTokenForMp (%d)-%s", res.Errcode, res.Errmsg)
+		log.Warn("获取token失败", zap.Int("errcode", res.Errcode), zap.String("errmsg", res.Errmsg))
 	}
 	return res.AccessToken
 }
@@ -71,11 +71,11 @@ func (c *Context) newAccessTokenForWork() string {
 		BindJSON(&res).
 		Do()
 	if err != nil {
-		log.Errorf("newAccessTokenForWork %s", err.Error())
+		log.Warn("获取token失败", zap.Error(err))
 		return ""
 	}
 	if res.Errcode != 0 {
-		log.Errorf("newAccessTokenForWork (%d)-%s", res.Errcode, res.Errmsg)
+		log.Warn("获取token失败", zap.Int("errcode", res.Errcode), zap.String("errmsg", res.Errmsg))
 	}
 	return res.AccessToken
 }
@@ -87,7 +87,7 @@ func (c *Context) newAccessTokenForWork() string {
 func (w *Wechat) refreshAccessToken() {
 	defer func() {
 		if r := recover(); r != nil {
-			log.Errorf("refreshAccessToken %v", r)
+			log.Warn("刷新token失败", zap.Any("err", r))
 			w.refreshAccessToken()
 		}
 	}()
@@ -96,7 +96,7 @@ func (w *Wechat) refreshAccessToken() {
 		select {
 		case <-expTicker.C:
 			apps := wechat.SMembers(RdsAppListPrefix).Val()
-			log.Infof("refreshAccessToken 刷新Token [%s]", strings.Join(apps, ","))
+			log.Info("刷新token", zap.Strings("apps", apps))
 			for i := range apps {
 				appid := apps[i]
 				if ctx, err := FindApp(appid); err == nil {

@@ -55,6 +55,9 @@ func (ctx *Context) UserList(p ParamUserList) ([]User, error) {
 		return nil, fmt.Errorf("企业微信：查询用户列表失败（%s）", err.Error())
 	}
 	if res.Errcode != 0 {
+		if ctx.RetryAccessToken(res.Errcode) {
+			return ctx.UserList(p)
+		}
 		return nil, fmt.Errorf("企业微信：查询用户列表失败（%d-%s）", res.Errcode, res.Errmsg)
 	}
 	return res.Userlist, nil

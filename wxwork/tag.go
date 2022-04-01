@@ -48,6 +48,9 @@ func (ctx *Context) TagList(p ParamTagList) ([]ResponseTagListItem, error) {
 		return nil, fmt.Errorf("企业微信：查询标签失败（%s）", err.Error())
 	}
 	if res.Errcode != 0 {
+		if ctx.RetryAccessToken(res.Errcode) {
+			return ctx.TagList(p)
+		}
 		return nil, fmt.Errorf("企业微信：查询标签失败（%d-%s）", res.Errcode, res.Errmsg)
 	}
 	return res.TagGroup, nil

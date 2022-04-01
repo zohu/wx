@@ -83,6 +83,9 @@ func (ctx *Context) FindCustomerList(p ParamCustomerList) ([]string, error) {
 		return nil, fmt.Errorf("企业微信：查询客户列表失败（%s）", err.Error())
 	}
 	if res.Errcode != 0 {
+		if ctx.RetryAccessToken(res.Errcode) {
+			return ctx.FindCustomerList(p)
+		}
 		return nil, fmt.Errorf("企业微信：查询客户列表失败（%d-%s）", res.Errcode, res.Errmsg)
 	}
 	return res.ExternalUserid, nil
@@ -93,7 +96,7 @@ type ParamCustomerDetailWithExternalUserid struct {
 	ExternalUserid string `json:"external_userid"  query:"external_userid"`
 }
 type ResponseCustomerDetailWithExternalUserid struct {
-	Errcode         int             `json:"errcode"`
+	Errcode         int64           `json:"errcode"`
 	Errmsg          string          `json:"errmsg"`
 	ExternalContact ExternalContact `json:"external_contact"`
 	FollowUser      []FollowUser    `json:"follow_user"`
@@ -174,6 +177,9 @@ func (ctx *Context) FindCustomerDetailWithExternalUserid(p ParamCustomerDetailWi
 		return cus, fmt.Errorf("企业微信：查询客户详情失败（%s）", err.Error())
 	}
 	if res.Errcode != 0 {
+		if ctx.RetryAccessToken(res.Errcode) {
+			return ctx.FindCustomerDetailWithExternalUserid(p)
+		}
 		return cus, fmt.Errorf("企业微信：查询客户详情失败（%d-%s）", res.Errcode, res.Errmsg)
 	}
 	return res, nil
@@ -218,6 +224,9 @@ func (ctx *Context) FindCustomerDetail(p ParamCustomerDetail, list []Customer) (
 		return list, fmt.Errorf("企业微信：查询客户详情失败（%s）", err.Error())
 	}
 	if res.Errcode != 0 {
+		if ctx.RetryAccessToken(res.Errcode) {
+			return ctx.FindCustomerDetail(p, list)
+		}
 		return list, fmt.Errorf("企业微信：查询客户详情失败（%d-%s）", res.Errcode, res.Errmsg)
 	}
 	for i := range res.ExternalContactList {

@@ -80,13 +80,13 @@ type ResQueryUserList struct {
 	NextOpenid string `json:"next_openid"`
 }
 
-// QueryUserList
+// UserList
 // @Description: 查询用户列表
 // @receiver ctx
 // @param nextOpenID
 // @return *ResQueryUserList
 // @return error
-func (ctx *Context) QueryUserList(nextOpenID string) (*ResQueryUserList, error) {
+func (ctx *Context) UserList(nextOpenID string) (*ResQueryUserList, error) {
 	var res ResQueryUserList
 	param := new(ParamQueryUserList)
 	param.AccessToken = ctx.GetAccessToken()
@@ -102,7 +102,7 @@ func (ctx *Context) QueryUserList(nextOpenID string) (*ResQueryUserList, error) 
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
-			return ctx.QueryUserList(nextOpenID)
+			return ctx.UserList(nextOpenID)
 		}
 		return nil, fmt.Errorf("%s 查询用户列表失败，%d-%s", ctx.Appid(), res.Errcode, res.Errmsg)
 	}
