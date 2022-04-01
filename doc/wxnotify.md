@@ -1,6 +1,12 @@
 ## 微信回调消息
  - 回调消息不再使用传统的中间件形式，将接收与回复结合为msg.reply.encrypt形式，使使用更加灵活，任何框架都可以方便使用。
-### 接收消息并回复(公众号企业微信等通用)
+### 支持的回调
+- [x] 公众号普通消息推送回调
+- [x] 公众号事件消息推送回调
+- [x] 公众号模板消息送达事件回调
+- [x] 公众号订阅通知事件推送
+- [x] 企业微信回调
+### 接收消息并回复(通用)
 ```go
 func main() {
     r := gin.New()
@@ -10,17 +16,17 @@ func main() {
 func RecvHandle(c *gin.Context) {
     appid := c.Param("appid")
     p := new(wx.ParamNotify)
-	p.MsgSignature, _ = c.GetQuery("msg_signature")
-	p.Timestamp, _ = c.GetQuery("timestamp")
-	p.Nonce, _ = c.GetQuery("nonce")
-	echostr, _ := c.GetQuery("echostr")
-	p.Echostr, _ = url.PathUnescape(echostr)
-	recv := new(wxnotify.Message)
-	if err := c.ShouldBindXML(recv); err != nil {
-		log.Error(err)
-	}
-	c.String(NotifyHandle(appid,p,recv))
-	c.Abort()
+    p.MsgSignature, _ = c.GetQuery("msg_signature")
+    p.Timestamp, _ = c.GetQuery("timestamp")
+    p.Nonce, _ = c.GetQuery("nonce")
+    echostr, _ := c.GetQuery("echostr")
+    p.Echostr, _ = url.PathUnescape(echostr)
+    recv := new(wxnotify.Message)
+    if err := c.ShouldBindXML(recv); err != nil {
+        log.Error(err)
+    }
+    c.String(NotifyHandle(appid,p,recv))
+    c.Abort()
 }
 
 func NotifyHandle(appid string,param *wx.ParamNotify,recv *wxcpt.BizMsg4Recv) string {

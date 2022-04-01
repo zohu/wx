@@ -38,23 +38,25 @@ const (
 
 	// 公众号事件
 
-	MessageEventSubscribe              MessageEvent = "subscribe"                 // 关注事件
-	MessageEventUnsubscribe            MessageEvent = "unsubscribe"               // 取关事件
-	MessageEventScan                   MessageEvent = "SCAN"                      // 扫描二维码事件
-	MessageEventLocation               MessageEvent = "LOCATION"                  // 上报地理位置事件
-	MessageEventClick                  MessageEvent = "CLICK"                     // 点击菜单拉取消息时的事件
-	MessageEventView                   MessageEvent = "VIEW"                      // 点击菜单跳转链接时的事件推送
-	MessageEventScancodePush           MessageEvent = "scancode_push"             // 扫码推事件的事件推送
-	MessageEventScancodeWaitmsg        MessageEvent = "scancode_waitmsg"          // 扫码推事件且弹出“消息接收中”提示框的事件推送
-	MessageEventPicSysphoto            MessageEvent = "pic_sysphoto"              // 弹出系统拍照发图的事件推送
-	MessageEventPicPhotoOrAlbum        MessageEvent = "pic_photo_or_album"        // 弹出拍照或者相册发图的事件推送
-	MessageEventPicWeixin              MessageEvent = "pic_weixin"                // 弹出微信相册发图器的事件推送
-	MessageEventLocationSelect         MessageEvent = "location_select"           // 弹出地理位置选择器的事件推送
-	MessageEventTemplateSendJobFinish  MessageEvent = "TEMPLATESENDJOBFINISH"     // 发送模板消息推送通知
-	MessageEventMassSendJobFinish      MessageEvent = "MASSSENDJOBFINISH"         // 群发消息推送通知
-	MessageEventWxaMediaCheck          MessageEvent = "wxa_media_check"           // 异步校验图片/音频是否含有违法违规内容推送事件
-	MessageEventSubscribeMsgPopupEvent MessageEvent = "subscribe_msg_popup_event" // 订阅通知事件推送
-	MessageEventPublishJobFinish       MessageEvent = "PUBLISHJOBFINISH"          // 发布任务完成
+	MessageEventSubscribe               MessageEvent = "subscribe"                  // 关注事件
+	MessageEventUnsubscribe             MessageEvent = "unsubscribe"                // 取关事件
+	MessageEventScan                    MessageEvent = "SCAN"                       // 扫描二维码事件
+	MessageEventLocation                MessageEvent = "LOCATION"                   // 上报地理位置事件
+	MessageEventClick                   MessageEvent = "CLICK"                      // 点击菜单拉取消息时的事件
+	MessageEventView                    MessageEvent = "VIEW"                       // 点击菜单跳转链接时的事件推送
+	MessageEventScancodePush            MessageEvent = "scancode_push"              // 扫码推事件的事件推送
+	MessageEventScancodeWaitmsg         MessageEvent = "scancode_waitmsg"           // 扫码推事件且弹出“消息接收中”提示框的事件推送
+	MessageEventPicSysphoto             MessageEvent = "pic_sysphoto"               // 弹出系统拍照发图的事件推送
+	MessageEventPicPhotoOrAlbum         MessageEvent = "pic_photo_or_album"         // 弹出拍照或者相册发图的事件推送
+	MessageEventPicWeixin               MessageEvent = "pic_weixin"                 // 弹出微信相册发图器的事件推送
+	MessageEventLocationSelect          MessageEvent = "location_select"            // 弹出地理位置选择器的事件推送
+	MessageEventTemplateSendJobFinish   MessageEvent = "TEMPLATESENDJOBFINISH"      // 发送模板消息推送通知
+	MessageEventMassSendJobFinish       MessageEvent = "MASSSENDJOBFINISH"          // 群发消息推送通知
+	MessageEventWxaMediaCheck           MessageEvent = "wxa_media_check"            // 异步校验图片/音频是否含有违法违规内容推送事件
+	MessageEventSubscribeMsgPopupEvent  MessageEvent = "subscribe_msg_popup_event"  // 订阅通知事件推送
+	MessageEventSubscribeMsgChangeEvent MessageEvent = "subscribe_msg_change_event" // 订阅通知用户管理
+	MessageEventSubscribeMsgSentEvent   MessageEvent = "subscribe_msg_sent_event"   // 订阅通知发送订阅通知
+	MessageEventPublishJobFinish        MessageEvent = "PUBLISHJOBFINISH"           // 发布任务完成
 
 	// 企业微信事件
 
@@ -117,6 +119,9 @@ type Message struct {
 	Latitude  string       `json:"Latitude,omitempty" xml:"Latitude,omitempty"`   // 事件，地理位置，纬度
 	Longitude string       `json:"Longitude,omitempty" xml:"Longitude,omitempty"` // 事件，地理位置，经度
 	Precision int64        `json:"Precision,omitempty" xml:"Precision,omitempty"` // 事件，地理位置，精度
+	SubscribeMsgPopupEvent
+	SubscribeMsgChangeEvent
+	SubscribeMsgSentEvent
 
 	// 企业微信
 	AgentID          int64             `json:"AgentID,omitempty" xml:"AgentID,omitempty"`                   // 企业应用的ID
@@ -243,6 +248,28 @@ type CustomerEvent struct {
 	QuitScene      int64  `json:"QuitScene,omitempty" xml:"QuitScene,omitempty"`           // 当是成员退群时有值。表示成员的退群方式
 	MemChangeCnt   int64  `json:"MemChangeCnt,omitempty" xml:"MemChangeCnt,omitempty"`     // 当是成员入群或退群时有值。表示成员变更数量
 	StrategyId     string `json:"StrategyId,omitempty" xml:"StrategyId,omitempty"`         // 标签或标签组所属的规则组id，只回调给“客户联系”应用
+}
+type SubscribeMsgPopupEvent struct {
+	SubscribeMsgPopupEvent []struct {
+		TemplateId            string `json:"TemplateId,omitempty" xml:"TemplateId,omitempty"`                       // 模板 id（一次订阅可能有多条通知，带有多个 id）
+		SubscribeStatusString string `json:"SubscribeStatusString,omitempty" xml:"SubscribeStatusString,omitempty"` // 用户点击行为（同意、取消发送通知）
+		PopupScene            int64  `json:"PopupScene,omitempty" xml:"PopupScene,omitempty"`                       // 1弹窗来自H5页面,2弹窗来自图文消息
+	} `json:"SubscribeMsgPopupEvent,omitempty" xml:"SubscribeMsgPopupEvent>List,omitempty"` // 用户操作订阅通知弹窗
+}
+
+type SubscribeMsgChangeEvent struct {
+	SubscribeMsgChangeEvent []struct {
+		TemplateId            string `json:"TemplateId,omitempty" xml:"TemplateId,omitempty"`                       // 模板 id（一次订阅可能有多条通知，带有多个 id）
+		SubscribeStatusString string `json:"SubscribeStatusString,omitempty" xml:"SubscribeStatusString,omitempty"` // 用户点击行为（仅推送用户拒收通知）
+	} `json:"SubscribeMsgChangeEvent,omitempty" xml:"SubscribeMsgChangeEvent>List,omitempty"` // 用户管理订阅通知
+}
+type SubscribeMsgSentEvent struct {
+	SubscribeMsgSentEvent []struct {
+		TemplateId  string `json:"TemplateId,omitempty" xml:"TemplateId,omitempty"`   // 模板 id（一次订阅可能有多条通知，带有多个 id）
+		MsgID       string `json:"MsgID,omitempty" xml:"MsgID,omitempty"`             // 消息 id
+		ErrorCode   int64  `json:"ErrorCode,omitempty" xml:"ErrorCode,omitempty"`     // 推送结果状态码（0表示成功）
+		ErrorStatus string `json:"ErrorStatus,omitempty" xml:"ErrorStatus,omitempty"` // 推送结果状态码文字含义
+	} `json:"SubscribeMsgSentEvent,omitempty" xml:"SubscribeMsgSentEvent>List,omitempty"` // 发送订阅通知
 }
 
 // MessageText

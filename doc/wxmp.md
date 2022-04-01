@@ -34,7 +34,7 @@ err := app.MenuDelete()
 ```
 - [x] 新增个性化菜单
 ```
-_, err := app.MenuDiyAdd(wxmp.MenuDiy{})
+_, err := app.MenuDiyAdd(&wxmp.MenuDiy{})
 ```
 - [x] 删除个性化菜单
 ```
@@ -75,7 +75,7 @@ res, err := app.MsgGetTemplateList()
 _, err := app.MsgDelTemplate(string)
 
 // 发送模板消息
-_, err := app.MsgSendTemplate(wxmp.ParamMsgSendTemplate{})
+_, err := app.MsgSendTemplate(&wxmp.ParamMsgSendTemplate{})
 
 // 是否送达成功事件，参考【[微信回调消息](./wxnotify.md)】
 ```
@@ -88,7 +88,7 @@ _, err := app.MsgSendTemplate(wxmp.ParamMsgSendTemplate{})
 - [x] 公众号一次性订阅消息
 ```
 // 推送订阅模板消息给到授权微信用户
-_, err := app.MsgSubscribe(wxmp.ParamMsgSubscribe{})
+_, err := app.MsgSubscribe(&wxmp.ParamMsgSubscribe{})
 ```
 - [ ] 群发和原创校验
 ```
@@ -102,14 +102,34 @@ res, err := app.MsgGetAutoReply()
 - [x] 选用模板
 ```
 // 从公共模板库中选用模板，到私有模板库中
-res, err := app.SubAddTemplate(wxmp.ParamSubAddTemplate{})
+res, err := app.SubAddTemplate(&wxmp.ParamSubAddTemplate{})
 ```
-- [ ] 删除模板
-- [ ] 获取公众号类目
+- [x] 删除模板
+```
+_, err := app.SubDelTemplate(priTmplId string)
+```
+- [x] 获取公众号类目
+```
+res, err := app.SubGetCategory()
+```
 - [ ] 获取模板中的关键词
-- [ ] 获取所属类目的公共模板
-- [ ] 获取私有模板列表
-- [ ] 发送订阅通知
+```
+res, err := app.SubGetTemplateKeywords(tid string)
+```
+- [x] 获取所属类目的公共模板
+```
+res, err := app.SubGetTemplateTitle(ids string, start int, limit int)
+```
+- [x] 获取私有模板列表
+```
+res, err := app.SubGetTemplates()
+```
+- [x] 发送订阅通知
+```
+_, err := app.SubBizSend(&wxmp.ParamSubBizSend{})
+```
+- [x] 订阅通知事件推送
+> 见【[微信回调消息](./wxnotify.md)】
 ### 客服消息
 ### 微信网页
 ### 素材管理
