@@ -1,7 +1,7 @@
 ```shell
 go test -v ./test
 ```
-
+> 通过率 = %
 ```log
 2022-04-01 17:09:25.233 INFO    rds/redis.go:49 初始化缓存库    [Single]
 === RUN   TestWxmpMsg
