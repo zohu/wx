@@ -4,6 +4,7 @@ import (
 	"github.com/hhcool/gtls/utils"
 	"github.com/hhcool/wx"
 	"github.com/hhcool/wx/wxcpt"
+	"github.com/hhcool/wx/wxmp"
 	"github.com/hhcool/wx/wxnotify"
 	"testing"
 )
@@ -31,4 +32,13 @@ func TestWxmpMsg(t *testing.T) {
 		t.Error("消息ID为空")
 	}
 	t.Log(utils.StructToString(msg))
+}
+func TestH5GetOauth2URL(t *testing.T) {
+	uri, err := mp.H5GetOauth2URL("https://beituyun.com?xx=1", wxmp.H5ScopeTypeSnsapiUserinfo, "0001")
+	if err != nil {
+		t.Error(err)
+	}
+	if uri != "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx8f4971af0e9f0c45&redirect_uri=https%3A%2F%2Fbeituyun.com%3Fxx%3D1&response_type=code&scope=snsapi_userinfo&state=0001#wechat_redirect" {
+		t.Error("H5GetOauth2URL FAIL")
+	}
 }

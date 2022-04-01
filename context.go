@@ -18,7 +18,6 @@ const (
 	TypeWork        = "3"
 	TypeApp         = "4"
 	TypeMiniApp     = "5"
-	TypeH5          = "6"
 )
 
 type App struct {
@@ -58,8 +57,6 @@ func (c *Context) NewAccessToken() string {
 	case TypeApp:
 		token = c.newAccessTokenForMp()
 	case TypeMiniApp:
-		token = c.newAccessTokenForMp()
-	case TypeH5:
 		token = c.newAccessTokenForMp()
 	default:
 		log.Error("NewAccessToken 应用类型错误", zap.String("type", c.App.AppType))
@@ -156,17 +153,6 @@ func (c *Context) IsApp() bool {
 // @return bool
 func (c *Context) IsMiniApp() bool {
 	if c.App.AppType == TypeMiniApp {
-		return true
-	}
-	return false
-}
-
-// IsH5
-// @Description: 是否H5
-// @receiver c
-// @return bool
-func (c *Context) IsH5() bool {
-	if c.App.AppType == TypeH5 {
 		return true
 	}
 	return false

@@ -132,6 +132,16 @@ _, err := app.SubBizSend(&wxmp.ParamSubBizSend{})
 > 见【[微信回调消息](./wxnotify.md)】
 ### 客服消息
 ### 微信网页
+- [x] 网页授权
+```
+// ① 获取授权链接
+uri,err := app.H5GetOauth2URL(redirectUri string, scope H5ScopeType, state string)
+
+// ② code换用户信息
+user, err := app.H5GetUserinfo(code string)
+```
+- [x] 用户授权信息变更事件推送
+> 见【[微信回调消息](./wxnotify.md)】
 ### 素材管理
 - [ ] 新增临时素材
 - [ ] 获取临时素材

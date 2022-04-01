@@ -23,7 +23,9 @@ type Option struct {
 type Wechat struct {
 	debug    bool
 	ctx      context.Context
-	Del      func(k string) *redis.IntCmd
+	RSet     func(k string, v interface{}, t time.Duration) *redis.StatusCmd
+	RGet     func(k string) *redis.StringCmd
+	RDel     func(k string) *redis.IntCmd
 	SetNX    func(k string, v interface{}, t time.Duration) *redis.BoolCmd
 	SAdd     func(key string, member ...interface{}) *redis.IntCmd
 	SRem     func(key string, member ...interface{}) *redis.IntCmd
@@ -38,7 +40,9 @@ var wechat = new(Wechat)
 
 func Init(op *Option) {
 	rds.NewRedis(&rds.Option{Host: op.Host, Password: op.Password})
-	wechat.Del = rds.Client.Del
+	wechat.RSet = rds.Client.Set
+	wechat.RGet = rds.Client.Get
+	wechat.RDel = rds.Client.Del
 	wechat.SetNX = rds.Client.SetNX
 	wechat.SAdd = rds.Client.SAdd
 	wechat.SRem = rds.Client.SRem
@@ -97,7 +101,7 @@ func PutApp(app App) error {
 // @param appid
 func DelApp(appid string) {
 	_ = wechat.SRem(RdsAppListPrefix, appid).Err()
-	_ = wechat.Del(RdsAppPrefix + appid).Err()
+	_ = wechat.RDel(RdsAppPrefix + appid).Err()
 }
 
 // FindAllApp

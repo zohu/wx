@@ -115,7 +115,7 @@ func (ctx *Context) SubGetCategory() (*ResSubGetCategory, error) {
 
 type ParamSubGetTemplateKeywords struct {
 	wx.ParamAccessToken
-	Tid string `json:"tid"`
+	Tid string `json:"tid" query:"tid"`
 }
 type ResSubGetTemplateKeywords struct {
 	wx.Response
@@ -159,9 +159,9 @@ func (ctx *Context) SubGetTemplateKeywords(tid string) (*ResSubGetTemplateKeywor
 
 type ParamSubGetTemplateTitle struct {
 	wx.ParamAccessToken
-	Ids   string `json:"ids"`
-	Start int    `json:"start"`
-	Limit int    `json:"limit"`
+	Ids   string `json:"ids" query:"ids"`
+	Start int    `json:"start" query:"start"`
+	Limit int    `json:"limit" query:"limit"`
 }
 type ResSubGetTemplateTitle struct {
 	wx.Response

@@ -57,6 +57,7 @@ const (
 	MessageEventSubscribeMsgChangeEvent MessageEvent = "subscribe_msg_change_event" // 订阅通知用户管理
 	MessageEventSubscribeMsgSentEvent   MessageEvent = "subscribe_msg_sent_event"   // 订阅通知发送订阅通知
 	MessageEventPublishJobFinish        MessageEvent = "PUBLISHJOBFINISH"           // 发布任务完成
+	MessageEventUserInfoModified        MessageEvent = "user_info_modified"         // 用户授权信息变更事件推送
 
 	// 企业微信事件
 
@@ -113,12 +114,15 @@ type Message struct {
 	Url           string `json:"Url,omitempty" xml:"Url,omitempty"`                   // 链接消息
 
 	// 事件消息
-	Event     MessageEvent `json:"Event,omitempty" xml:"Event,omitempty"`         // 事件消息
-	EventKey  string       `json:"EventKey,omitempty" xml:"EventKey,omitempty"`   // 事件，二维码消息、关注、菜单
-	Ticket    string       `json:"Ticket,omitempty" xml:"Ticket,omitempty"`       // 事件，二维码消息，二维码ticket
-	Latitude  string       `json:"Latitude,omitempty" xml:"Latitude,omitempty"`   // 事件，地理位置，纬度
-	Longitude string       `json:"Longitude,omitempty" xml:"Longitude,omitempty"` // 事件，地理位置，经度
-	Precision int64        `json:"Precision,omitempty" xml:"Precision,omitempty"` // 事件，地理位置，精度
+	Event      MessageEvent `json:"Event,omitempty" xml:"Event,omitempty"`           // 事件消息
+	EventKey   string       `json:"EventKey,omitempty" xml:"EventKey,omitempty"`     // 事件，二维码消息、关注、菜单
+	Ticket     string       `json:"Ticket,omitempty" xml:"Ticket,omitempty"`         // 事件，二维码消息，二维码ticket
+	Latitude   string       `json:"Latitude,omitempty" xml:"Latitude,omitempty"`     // 事件，地理位置，纬度
+	Longitude  string       `json:"Longitude,omitempty" xml:"Longitude,omitempty"`   // 事件，地理位置，经度
+	Precision  int64        `json:"Precision,omitempty" xml:"Precision,omitempty"`   // 事件，地理位置，精度
+	OpenID     string       `json:"OpenID,omitempty" xml:"OpenID,omitempty"`         // 授权用户资料变更,
+	AppID      string       `json:"AppID,omitempty" xml:"AppID,omitempty"`           // 授权用户资料变更,公众号的AppID
+	RevokeInfo string       `json:"RevokeInfo,omitempty" xml:"RevokeInfo,omitempty"` // 授权用户资料变更,用户撤回的H5授权信息，201:地址,202:发票信息,203:卡券信息,204:麦克风,205:昵称和头像,206:位置信息,207:选中的图片或视频
 	SubscribeMsgPopupEvent
 	SubscribeMsgChangeEvent
 	SubscribeMsgSentEvent
