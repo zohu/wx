@@ -137,8 +137,8 @@ _, err := app.SubBizSend(&wxmp.ParamSubBizSend{})
 // ① 获取授权链接
 uri,err := app.H5GetOauth2URL(redirectUri string, scope H5ScopeType, state string)
 
-// ② code换用户信息
-user, err := app.H5GetUserinfo(code string)
+// ② code换用户信息，scope需要和第①步的一致
+user, err := H5GetUserinfo(code string, scope H5ScopeType)
 ```
 - [x] 用户授权信息变更事件推送
 > 见【[微信回调消息](./wxnotify.md)】

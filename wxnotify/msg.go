@@ -2,7 +2,6 @@ package wxnotify
 
 import (
 	"encoding/xml"
-	"github.com/hhcool/wx/wxcpt"
 )
 
 // MessageType
@@ -276,65 +275,40 @@ type SubscribeMsgSentEvent struct {
 	} `json:"SubscribeMsgSentEvent,omitempty" xml:"SubscribeMsgSentEvent>List,omitempty"` // 发送订阅通知
 }
 
-// MessageText
-// @Description: 回复文本消息
-type MessageText struct {
+// MessageReply
+// @Description: 回复消息
+type MessageReply struct {
 	CommonMessage
-	Content wxcpt.CDATA `xml:"Content"`
-}
-
-// MessageImage
-// @Description: 回复图片消息
-type MessageImage struct {
-	CommonMessage
-	Image struct {
-		MediaID string `xml:"MediaId"`
-	} `xml:"Image"`
-}
-
-// MessageVoice
-// @Description: 回复语音消息
-type MessageVoice struct {
-	CommonMessage
-	Voice struct {
-		MediaID string `xml:"MediaId"`
-	} `xml:"Voice"`
-}
-
-// MessageVideo
-// @Description: 回复视频消息
-type MessageVideo struct {
-	CommonMessage
-	Video struct {
-		MediaID     string `xml:"MediaId"`
-		Title       string `xml:"Title,omitempty"`
-		Description string `xml:"Description,omitempty"`
-	} `xml:"Video"`
-}
-
-// MessageMusic
-// @Description: 回复音乐消息
-type MessageMusic struct {
-	CommonMessage
-	Music struct {
-		Title        string `xml:"Title"        `
-		Description  string `xml:"Description"  `
-		MusicURL     string `xml:"MusicUrl"     `
-		HQMusicURL   string `xml:"HQMusicUrl"   `
-		ThumbMediaID string `xml:"ThumbMediaId"`
-	} `xml:"Music"`
-}
-
-// MessageNews
-// @Description: 回复图文消息
-type MessageNews struct {
-	CommonMessage
-	ArticleCount int       `xml:"ArticleCount"`
+	// 回复文本
+	Content string `xml:"Content,omitempty"`
+	// 回复图片
+	Image *MediaID `xml:"Image,omitempty"`
+	// 回复录音
+	Voice *MediaID `xml:"Voice,omitempty"`
+	// 回复视频
+	Video *Video `xml:"Video,omitempty"`
+	// 回复音乐
+	Music *Music `xml:"Music,omitempty"`
+	// 回复图文
+	ArticleCount int       `xml:"ArticleCount,omitempty"`
 	Articles     []Article `xml:"Articles>item,omitempty"`
 }
 
-// Article
-// @Description: 图文
+type MediaID struct {
+	MediaID string `xml:"MediaId,omitempty"`
+}
+type Video struct {
+	MediaID     string `xml:"MediaId,omitempty"`
+	Title       string `xml:"Title,omitempty"`
+	Description string `xml:"Description,omitempty"`
+}
+type Music struct {
+	Title        string `xml:"Title,omitempty"`
+	Description  string `xml:"Description,omitempty"`
+	MusicURL     string `xml:"MusicUrl,omitempty"`
+	HQMusicURL   string `xml:"HQMusicUrl,omitempty"`
+	ThumbMediaID string `xml:"ThumbMediaId,omitempty"`
+}
 type Article struct {
 	Title       string `xml:"Title,omitempty"`
 	Description string `xml:"Description,omitempty"`

@@ -1,12 +1,12 @@
 ## 微信回调消息
  - 回调消息不再使用传统的中间件形式，将接收与回复结合为msg.reply.encrypt形式，使使用更加灵活，任何框架都可以方便使用。
-### 支持的回调
+### 支持的推送回调
 - [x] 公众号普通消息推送
 - [x] 公众号事件消息推送
 - [x] 公众号模板消息送达事件推送
 - [x] 公众号订阅通知事件推送
 - [x] 公众号H5用户授权信息变更事件推送
-- [x] 企业微信推送
+- [x] 企业微信客户联系推送
 ### 接收消息并回复(通用)
 ```go
 func main() {
@@ -26,7 +26,18 @@ func RecvHandle(c *gin.Context) {
     if err := c.ShouldBindXML(recv); err != nil {
         log.Error(err)
     }
-    c.String(NotifyHandle(appid,p,recv))
+	// 解密、解析消息
+    replyMsg := NotifyHandle(appid,p,recv)
+	// 处理返回值
+    if res == "" {
+        c.String(http.StatusOK, "")
+        c.Abort()
+        return
+    }
+    output, _ := xml.MarshalIndent(replyMsg, "  ", "    ")
+    _, _ = c.Writer.WriteString(xml.Header)
+    _, _ = c.Writer.Write(output)
+    c.Status(http.StatusOK)
     c.Abort()
 }
 

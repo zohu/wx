@@ -12,25 +12,25 @@ func encryptMsg(ctx *NotifyContext, data []byte, timestamp int64, nonce string) 
 	return cpt.EncryptXmlMsg(string(data), strconv.FormatInt(timestamp, 10), nonce)
 }
 
+func (msg *MessageReply) Encrypted() (*wxcpt.XmlBizMsg4Send, error) {
+	str, _ := xml.Marshal(msg)
+	return encryptMsg(msg.ctx, str, msg.CreateTime, msg.Nonce)
+}
+
 // ReplyText
 // @Description: 回复文本消息
 // @receiver ctx
 // @param content
 // @return *MessageText
-func (msg *Message) ReplyText(content string) *MessageText {
-	text := new(MessageText)
+func (msg *Message) ReplyText(content string) *MessageReply {
+	text := new(MessageReply)
 	text.Nonce = msg.Nonce
 	text.MsgType = MessageTypeText
 	text.FromUserName = msg.ToUserName
 	text.ToUserName = msg.FromUserName
 	text.CreateTime = time.Now().Unix()
-	text.Content = wxcpt.CDATA{Value: content}
+	text.Content = content
 	return text
-}
-
-func (msg *MessageText) Encrypted() (*wxcpt.XmlBizMsg4Send, error) {
-	str, _ := xml.Marshal(msg)
-	return encryptMsg(msg.ctx, str, msg.CreateTime, msg.Nonce)
 }
 
 // ReplyImage
@@ -38,8 +38,8 @@ func (msg *MessageText) Encrypted() (*wxcpt.XmlBizMsg4Send, error) {
 // @receiver ctx
 // @param mediaID
 // @return *MessageImage
-func (msg *Message) ReplyImage(mediaID string) *MessageImage {
-	image := new(MessageImage)
+func (msg *Message) ReplyImage(mediaID string) *MessageReply {
+	image := new(MessageReply)
 	image.Nonce = msg.Nonce
 	image.MsgType = MessageTypeImage
 	image.FromUserName = msg.ToUserName
@@ -49,18 +49,13 @@ func (msg *Message) ReplyImage(mediaID string) *MessageImage {
 	return image
 }
 
-func (msg *MessageImage) Encrypted() (*wxcpt.XmlBizMsg4Send, error) {
-	str, _ := xml.Marshal(msg)
-	return encryptMsg(msg.ctx, str, msg.CreateTime, msg.Nonce)
-}
-
 // ReplyVoice
 // @Description: 回复语音消息
 // @receiver ctx
 // @param mediaID
 // @return *MessageVoice
-func (msg *Message) ReplyVoice(mediaID string) *MessageVoice {
-	voice := new(MessageVoice)
+func (msg *Message) ReplyVoice(mediaID string) *MessageReply {
+	voice := new(MessageReply)
 	voice.Nonce = msg.Nonce
 	voice.MsgType = MessageTypeVoice
 	voice.FromUserName = msg.ToUserName
@@ -70,11 +65,6 @@ func (msg *Message) ReplyVoice(mediaID string) *MessageVoice {
 	return voice
 }
 
-func (msg *MessageVoice) Encrypted() (*wxcpt.XmlBizMsg4Send, error) {
-	str, _ := xml.Marshal(msg)
-	return encryptMsg(msg.ctx, str, msg.CreateTime, msg.Nonce)
-}
-
 // ReplyVideo
 // @Description: 回复视频消息
 // @receiver ctx
@@ -82,8 +72,8 @@ func (msg *MessageVoice) Encrypted() (*wxcpt.XmlBizMsg4Send, error) {
 // @param title
 // @param description
 // @return *MessageVideo
-func (msg *Message) ReplyVideo(mediaID, title, description string) *MessageVideo {
-	video := new(MessageVideo)
+func (msg *Message) ReplyVideo(mediaID, title, description string) *MessageReply {
+	video := new(MessageReply)
 	video.Nonce = msg.Nonce
 	video.MsgType = MessageTypeVideo
 	video.FromUserName = msg.ToUserName
@@ -95,11 +85,6 @@ func (msg *Message) ReplyVideo(mediaID, title, description string) *MessageVideo
 	return video
 }
 
-func (msg *MessageVideo) Encrypted() (*wxcpt.XmlBizMsg4Send, error) {
-	str, _ := xml.Marshal(msg)
-	return encryptMsg(msg.ctx, str, msg.CreateTime, msg.Nonce)
-}
-
 // ReplyMusic
 // @Description: 回复音乐消息
 // @receiver ctx
@@ -109,8 +94,8 @@ func (msg *MessageVideo) Encrypted() (*wxcpt.XmlBizMsg4Send, error) {
 // @param hQMusicURL
 // @param thumbMediaID
 // @return *MessageMusic
-func (msg *Message) ReplyMusic(title, description, musicURL, hQMusicURL, thumbMediaID string) *MessageMusic {
-	music := new(MessageMusic)
+func (msg *Message) ReplyMusic(title, description, musicURL, hQMusicURL, thumbMediaID string) *MessageReply {
+	music := new(MessageReply)
 	music.Nonce = msg.Nonce
 	music.MsgType = MessageTypeMusic
 	music.FromUserName = msg.ToUserName
@@ -124,18 +109,13 @@ func (msg *Message) ReplyMusic(title, description, musicURL, hQMusicURL, thumbMe
 	return music
 }
 
-func (msg *MessageMusic) Encrypted() (*wxcpt.XmlBizMsg4Send, error) {
-	str, _ := xml.Marshal(msg)
-	return encryptMsg(msg.ctx, str, msg.CreateTime, msg.Nonce)
-}
-
 // ReplyNews
 // @Description: 回复图文消息
 // @receiver ctx
 // @param articles
 // @return *MessageNews
-func (msg *Message) ReplyNews(articles []Article) *MessageNews {
-	news := new(MessageNews)
+func (msg *Message) ReplyNews(articles []Article) *MessageReply {
+	news := new(MessageReply)
 	news.Nonce = msg.Nonce
 	news.MsgType = MessageTypeNews
 	news.FromUserName = msg.ToUserName
@@ -144,9 +124,4 @@ func (msg *Message) ReplyNews(articles []Article) *MessageNews {
 	news.ArticleCount = len(articles)
 	news.Articles = articles
 	return news
-}
-
-func (msg *MessageNews) Encrypted() (*wxcpt.XmlBizMsg4Send, error) {
-	str, _ := xml.Marshal(msg)
-	return encryptMsg(msg.ctx, str, msg.CreateTime, msg.Nonce)
 }

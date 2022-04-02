@@ -64,7 +64,7 @@ type ResH5GetUserinfo struct {
 // @param openid
 // @return *ResH5GetUserinfo
 // @return error
-func (ctx *Context) H5GetUserinfo(code string) (*ResH5GetUserinfo, error) {
+func (ctx *Context) H5GetUserinfo(code string, scope H5ScopeType) (*ResH5GetUserinfo, error) {
 	var token H5Token
 	wechat := wx.NewWechat()
 	if err := wechat.Get(fmt.Sprintf(
@@ -80,6 +80,10 @@ func (ctx *Context) H5GetUserinfo(code string) (*ResH5GetUserinfo, error) {
 		return nil, fmt.Errorf("获取token失败，%d-%s", token.Errcode, token.Errmsg)
 	}
 	var userinfo ResH5GetUserinfo
+	if scope == H5ScopeTypeBase {
+		userinfo.Openid = token.Openid
+		return &userinfo, nil
+	}
 	if err := wechat.Get(fmt.Sprintf(
 		"https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s&lang=zh_CN",
 		token.AccessToken,
