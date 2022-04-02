@@ -122,6 +122,7 @@ type Message struct {
 	OpenID     string       `json:"OpenID,omitempty" xml:"OpenID,omitempty"`         // 授权用户资料变更,
 	AppID      string       `json:"AppID,omitempty" xml:"AppID,omitempty"`           // 授权用户资料变更,公众号的AppID
 	RevokeInfo string       `json:"RevokeInfo,omitempty" xml:"RevokeInfo,omitempty"` // 授权用户资料变更,用户撤回的H5授权信息，201:地址,202:发票信息,203:卡券信息,204:麦克风,205:昵称和头像,206:位置信息,207:选中的图片或视频
+	TransInfo  *TransInfo   `json:"TransInfo,omitempty" xml:"TransInfo,omitempty"`   // 消息转发到指定客服
 	SubscribeMsgPopupEvent
 	SubscribeMsgChangeEvent
 	SubscribeMsgSentEvent
@@ -273,6 +274,9 @@ type SubscribeMsgSentEvent struct {
 		ErrorCode   int64  `json:"ErrorCode,omitempty" xml:"ErrorCode,omitempty"`     // 推送结果状态码（0表示成功）
 		ErrorStatus string `json:"ErrorStatus,omitempty" xml:"ErrorStatus,omitempty"` // 推送结果状态码文字含义
 	} `json:"SubscribeMsgSentEvent,omitempty" xml:"SubscribeMsgSentEvent>List,omitempty"` // 发送订阅通知
+}
+type TransInfo struct {
+	KfAccount string `json:"KfAccount,omitempty" xml:"KfAccount,omitempty"` // 指定会话接入的客服账号
 }
 
 // MessageReply
