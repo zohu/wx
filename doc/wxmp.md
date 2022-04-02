@@ -156,8 +156,33 @@ user, err := H5GetUserinfo(code string, scope H5ScopeType)
 ### 发布能力
 ### 图文消息留言管理
 ### 用户管理
-- [ ] 用户标签管理
-- [ ] 设置用户备注名
+- [x] 用户标签管理
+```
+// 创建标签
+res,err := app.UserTagCreate(name string)
+
+// 获取公众号已创建的标签
+res,err := app.UserTagQuery()
+
+// 编辑标签
+_, err := app.UserTagEdit(id int64, name string)
+
+// 获取标签下粉丝列表
+res, err := app.UserTagGetUser(id int64, nextOpenid string)
+
+// 批量为用户打标签
+_, err := app.UserTagBatch(openid []string, tagid int64)
+
+// 批量为用户取消标签
+_, err := app.UserTagUnBatch(openid []string, tagid int64)
+
+// 获取用户身上的标签列表
+res, err := app.UserTagGetFromUser(openid string)
+```
+- [x] 设置用户备注名
+```
+_, err := app.UserRemarkUpdate(openid string, remark string)
+```
 - [x] 获取用户基本信息（含unionID）
 ``` 
 userinfo, err := app.UserFromOpenid(openID)
@@ -168,11 +193,34 @@ res, err := app.QueryUserList(nextOpenID)
 ```
 - [x] 获取用户地理位置
 > 见【[微信回调消息](./wxnotify.md)】
-- [ ] 黑名单管理
+- [x] 黑名单管理
+```
+// 获取公众号的黑名单列表
+res, err := app.UserGetBlackList(beginOpenid string)
+
+// 拉黑用户
+_, err := app.UserBlackListPush(openidList []string)
+
+// 取消拉黑
+_, err := app.UserBlackListUnPush(openidList []string)
+```
 ### 账号管理
 - [x] 生成带参数的二维码
-- [ ] 长链接转短链接
-- [ ] 短key托管
+```
+res, err := app.Qrcode(&wxmp.ParamNewQrcode)
+```
+- [x] 长链接转短链接
+```
+// 官方已废弃
+```
+- [x] 短key托管
+```
+// 获取短Key，ex有效期，可以不传，默认2592000
+res, err := app.ShortKey(data string, ex ...int)
+
+// 还原短key
+res, err := app.FetchGenShorten(shortKey string)
+```
 ### 数据统计
 ### 微信卡券
 ### 微信门店
