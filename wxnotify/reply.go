@@ -2,17 +2,23 @@ package wxnotify
 
 import (
 	"encoding/xml"
+	"github.com/hhcool/gtls/log"
 	"github.com/hhcool/wx/wxcpt"
+	"go.uber.org/zap"
 	"strconv"
 	"time"
 )
 
-func encryptMsg(ctx *NotifyContext, data []byte, timestamp int64, nonce string) (*wxcpt.XmlBizMsg4Send, error) {
+func encryptMsg(ctx *NotifyContext, data []byte, timestamp int64, nonce string) *wxcpt.XmlBizMsg4Send {
 	cpt := wxcpt.NewBizMsgCrypt(ctx.App.Token, ctx.App.EncodingAesKey, ctx.App.Appid)
-	return cpt.EncryptXmlMsg(string(data), strconv.FormatInt(timestamp, 10), nonce)
+	send, err := cpt.EncryptXmlMsg(string(data), strconv.FormatInt(timestamp, 10), nonce)
+	if err != nil {
+		log.Error("加密失败", zap.Error(err))
+	}
+	return send
 }
 
-func (msg *MessageReply) Encrypted() (*wxcpt.XmlBizMsg4Send, error) {
+func (msg *MessageReply) Encrypted() *wxcpt.XmlBizMsg4Send {
 	str, _ := xml.Marshal(msg)
 	return encryptMsg(msg.ctx, str, msg.CreateTime, msg.Nonce)
 }

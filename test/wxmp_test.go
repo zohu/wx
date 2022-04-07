@@ -32,6 +32,25 @@ func TestWxmpMsg(t *testing.T) {
 		t.Error("消息ID为空")
 	}
 	t.Log(utils.StructToString(msg))
+
+	msg, err = notify.DecodeMessage(
+		&wx.ParamNotify{
+			MsgSignature: "128e95f07f42bf3ead8ac6bf9b7c51b8ea79f19e",
+			Timestamp:    "1649346655",
+			Nonce:        "872915664",
+		},
+		&wxcpt.BizMsg4Recv{
+			Tousername: "gh_1cd4920365d4",
+			Encrypt:    "/NgOahn80RF551L3HEv/GxRzA2VLr6vyXLjSQMN6A5VyfR0hDFXYYFxsrWRvAn4NprNRh34yh8FBI1lsM7O+ETt3XFqoWb+JrzFEtKOzkMj3ImgL8nxqX5sj48XT2S3ZFve42evrdw/ViT303EKhAulHP7B49L+k6YGneuMjBCHrHtWd5sGVV5s8eI+bXdS8uI86VSpHvEEGkALRydu6JtP5glFta10HCSZdLeZgDcKtZOR2bqX8mBTC6vfdK/07rlFZn8x0MKOHwI+52d7dlp+ttA4f5Rw5mc9XX5FMdJOmEtigDHX7g9PqLOwzaKb7sNmM7SnCbHPpv06iiCynvWC+t28dlR4w2de4tn9GcqEZJOEKLn40oitKWKkyWeJ3",
+		},
+	)
+	if err != nil {
+		t.Error(err)
+	}
+	if msg.MsgId == 0 {
+		t.Error("消息ID为空")
+	}
+	t.Log(utils.StructToString(msg))
 }
 func TestH5GetOauth2URL(t *testing.T) {
 	uri, err := mp.H5GetOauth2URL("https://beituyun.com?xx=1", wxmp.H5ScopeTypeSnsapiUserinfo, "0001")
