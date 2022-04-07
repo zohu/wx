@@ -25,6 +25,7 @@ func (msg *MessageReply) Encrypted() (*wxcpt.XmlBizMsg4Send, error) {
 func (msg *Message) ReplyText(content string) *MessageReply {
 	text := new(MessageReply)
 	text.Nonce = msg.Nonce
+	text.ctx = msg.ctx
 	text.MsgType = MessageTypeText
 	text.FromUserName = msg.ToUserName
 	text.ToUserName = msg.FromUserName
@@ -41,6 +42,7 @@ func (msg *Message) ReplyText(content string) *MessageReply {
 func (msg *Message) ReplyImage(mediaID string) *MessageReply {
 	image := new(MessageReply)
 	image.Nonce = msg.Nonce
+	image.ctx = msg.ctx
 	image.MsgType = MessageTypeImage
 	image.FromUserName = msg.ToUserName
 	image.ToUserName = msg.FromUserName
@@ -57,6 +59,7 @@ func (msg *Message) ReplyImage(mediaID string) *MessageReply {
 func (msg *Message) ReplyVoice(mediaID string) *MessageReply {
 	voice := new(MessageReply)
 	voice.Nonce = msg.Nonce
+	voice.ctx = msg.ctx
 	voice.MsgType = MessageTypeVoice
 	voice.FromUserName = msg.ToUserName
 	voice.ToUserName = msg.FromUserName
@@ -75,6 +78,7 @@ func (msg *Message) ReplyVoice(mediaID string) *MessageReply {
 func (msg *Message) ReplyVideo(mediaID, title, description string) *MessageReply {
 	video := new(MessageReply)
 	video.Nonce = msg.Nonce
+	video.ctx = msg.ctx
 	video.MsgType = MessageTypeVideo
 	video.FromUserName = msg.ToUserName
 	video.ToUserName = msg.FromUserName
@@ -97,6 +101,7 @@ func (msg *Message) ReplyVideo(mediaID, title, description string) *MessageReply
 func (msg *Message) ReplyMusic(title, description, musicURL, hQMusicURL, thumbMediaID string) *MessageReply {
 	music := new(MessageReply)
 	music.Nonce = msg.Nonce
+	music.ctx = msg.ctx
 	music.MsgType = MessageTypeMusic
 	music.FromUserName = msg.ToUserName
 	music.ToUserName = msg.FromUserName
@@ -117,6 +122,7 @@ func (msg *Message) ReplyMusic(title, description, musicURL, hQMusicURL, thumbMe
 func (msg *Message) ReplyNews(articles []Article) *MessageReply {
 	news := new(MessageReply)
 	news.Nonce = msg.Nonce
+	news.ctx = msg.ctx
 	news.MsgType = MessageTypeNews
 	news.FromUserName = msg.ToUserName
 	news.ToUserName = msg.FromUserName
