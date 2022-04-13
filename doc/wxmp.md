@@ -217,12 +217,21 @@ _, err := app.KfUpdate(account string, name string)
 uri,err := app.H5GetOauth2URL(redirectUri string, scope H5ScopeType, state string)
 
 // ② code换用户信息，scope需要和第①步的一致
-user, err := H5GetUserinfo(code string, scope H5ScopeType)
+user, err := app.H5GetUserinfo(code string, scope H5ScopeType)
 ```
 - [x] 用户授权信息变更事件推送
 > 见【[微信回调消息](./wxnotify.md)】
 ### 素材管理
-- [ ] 新增临时素材
+- [x] 新增临时素材
+```
+// 如果是本地文件
+file,_ := os.Open("xxx.jpg")
+// 如果是multipart
+var mf *multipart.FileHeader
+file,_ := mf.Open()
+
+res, err := app.MediaTemporaryAdd(mediaType MediaType, file io.Reader, fileName string)
+```
 - [ ] 获取临时素材
 - [ ] 新增永久素材
 - [ ] 获取永久素材

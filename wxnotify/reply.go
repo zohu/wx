@@ -13,7 +13,8 @@ func encryptMsg(ctx *NotifyContext, data []byte, timestamp int64, nonce string) 
 	cpt := wxcpt.NewBizMsgCrypt(ctx.App.Token, ctx.App.EncodingAesKey, ctx.App.Appid)
 	send, err := cpt.EncryptXmlMsg(string(data), strconv.FormatInt(timestamp, 10), nonce)
 	if err != nil {
-		log.Error("加密失败", zap.Error(err))
+		log.Warn("加密失败", zap.Error(err))
+		return nil
 	}
 	return send
 }

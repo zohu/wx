@@ -1,7 +1,6 @@
 package test
 
 import (
-	"github.com/hhcool/gtls/utils"
 	"github.com/hhcool/wx"
 	"github.com/hhcool/wx/wxcpt"
 	"github.com/hhcool/wx/wxnotify"
@@ -28,5 +27,7 @@ func TestWxWorkMsg(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	t.Log(utils.StructToString(msg))
+	if msg.FromUserName == "" {
+		t.Error("解密失败")
+	}
 }

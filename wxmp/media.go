@@ -1,7 +1,10 @@
 package wxmp
 
 import (
+	"fmt"
+	"github.com/guonaihong/gout"
 	"github.com/hhcool/wx"
+	"io"
 	"mime/multipart"
 )
 
@@ -30,54 +33,39 @@ type ResMediaTemporaryAdd struct {
 // @receiver ctx
 // @param mediaType
 // @param file
-func (ctx *Context) MediaTemporaryAdd(mediaType MediaType, file *multipart.FileHeader) (*ResMediaTemporaryAdd, error) {
-	return nil, nil
-}
-
-// MediaTemporaryQuery
-// @Description: 查询临时素材
-// @receiver ctx
-// @param mediaId
-// @return {}
-func (ctx *Context) MediaTemporaryQuery(mediaId string) {}
-
-type ParamMediaForeverAdd struct {
-	Title              string `json:"title"`
-	ThumbMediaId       string `json:"thumb_media_id"`
-	Content            string `json:"content"`
-	ContentSourceUrl   string `json:"content_source_url"`
-	Author             string `json:"author,omitempty"`
-	Digest             string `json:"digest,omitempty"`
-	NeedOpenComment    int    `json:"need_open_comment"`
-	OnlyFansCanComment int    `json:"only_fans_can_comment"`
-}
-type ResMediaForeverAdd struct {
-	wx.Response
-	MediaID string `json:"media_id"`
-}
-
-// MediaForeverAdd
-// @Description: 新增永久素材
-// @receiver ctx
-// @param param
-// @return *ResMediaForeverAdd
-// @return error
-func (ctx *Context) MediaForeverAdd(param *ParamMediaForeverAdd) (*ResMediaForeverAdd, error) {
-	return nil, nil
-}
-
-func (ctx *Context) MediaForeverQuery(mediaID string) {
-
-}
-
-func (ctx *Context) MediaForeverDelete(mediaID string) {
-
-}
-func (ctx *Context) MediaForeverUpdate() {}
-
-func (ctx *Context) MediaCount() {}
-func (ctx *Context) MediaList()  {}
-
-func (ctx *Context) MediaFileUpload() {
-
+func (ctx *Context) MediaTemporaryAdd(mediaType MediaType, file io.Reader, fileName string) (*ResMediaTemporaryAdd, error) {
+	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
+		return nil, fmt.Errorf("%s 非公众号", ctx.Appid())
+	}
+	pr, pw := io.Pipe()
+	bw := multipart.NewWriter(pw)
+	go func() {
+		fw, _ := bw.CreateFormFile("media", fileName)
+		_, _ = io.Copy(fw, file)
+		_ = bw.Close()
+		_ = pw.Close()
+	}()
+	var q struct {
+		wx.ParamAccessToken
+		Type MediaType `query:"type"`
+	}
+	res := new(ResMediaTemporaryAdd)
+	q.AccessToken = ctx.GetAccessToken()
+	q.Type = mediaType
+	wechat := wx.NewWechat()
+	if err := wechat.Post(wx.ApiMp + "/media/upload").
+		SetQuery(&q).
+		SetHeader(gout.H{"Content-Type": bw.FormDataContentType()}).
+		SetBody(pr).
+		BindJSON(&res).
+		Do(); err != nil {
+		return nil, fmt.Errorf("%s 上传临时素材失败 %s", ctx.Appid(), err.Error())
+	}
+	if res.Errcode != 0 {
+		if ctx.RetryAccessToken(res.Errcode) {
+			return ctx.MediaTemporaryAdd(mediaType, file, fileName)
+		}
+		return nil, fmt.Errorf("%s 上传临时素材失败 %s", ctx.Appid(), res.Errmsg)
+	}
+	return res, nil
 }
