@@ -23,6 +23,10 @@ func (msg *MessageReply) Encrypted() *wxcpt.XmlBizMsg4Send {
 	str, _ := xml.Marshal(msg)
 	return encryptMsg(msg.ctx, str, msg.CreateTime, msg.Nonce)
 }
+func (msg *MessageReplyArticles) Encrypted() *wxcpt.XmlBizMsg4Send {
+	str, _ := xml.Marshal(msg)
+	return encryptMsg(msg.ctx, str, msg.CreateTime, msg.Nonce)
+}
 
 // ReplyText
 // @Description: 回复文本消息
@@ -126,8 +130,8 @@ func (msg *Message) ReplyMusic(title, description, musicURL, hQMusicURL, thumbMe
 // @receiver ctx
 // @param articles
 // @return *MessageNews
-func (msg *Message) ReplyNews(articles []*Article) *MessageReply {
-	news := new(MessageReply)
+func (msg *Message) ReplyNews(articles []*Article) *MessageReplyArticles {
+	news := new(MessageReplyArticles)
 	news.Nonce = msg.Nonce
 	news.ctx = msg.ctx
 	news.MsgType = MessageTypeNews
