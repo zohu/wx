@@ -13,6 +13,14 @@ type ParamDraftGetAll struct {
 	Page int `json:"page"`
 	Rows int `json:"rows"`
 }
+type ResDraftGetAll struct {
+	wx.Response
+	List  []ResDraftGetAllWxItem `json:"list"`
+	Page  int                    `json:"page"`
+	Rows  int                    `json:"rows"`
+	Total int                    `json:"total"`
+	Count int                    `json:"count"`
+}
 type ResDraftGetAllWx struct {
 	wx.Response
 	TotalCount int                    `json:"total_count"`
@@ -44,7 +52,7 @@ type ResDraftGetAllWxItem struct {
 // @param h
 // @return *wx.ReturnResponseDataList
 // @return error
-func (ctx *Context) DraftGetAll(h *ParamDraftGetAll) (*wx.ReturnResponseDataList, error) {
+func (ctx *Context) DraftGetAll(h *ParamDraftGetAll) (*ResDraftGetAll, error) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
 		return nil, fmt.Errorf("%s 非公众号", ctx.Appid())
 	}
@@ -62,11 +70,13 @@ func (ctx *Context) DraftGetAll(h *ParamDraftGetAll) (*wx.ReturnResponseDataList
 		}
 		return nil, fmt.Errorf("%s 查询草稿失败 %s", ctx.Appid(), wxr.Errmsg)
 	}
-	res := new(wx.ReturnResponseDataList)
+	res := new(ResDraftGetAll)
 	res.Page = h.Page
 	res.Rows = h.Rows
 	res.Count = wxr.ItemCount
 	res.Total = wxr.TotalCount
 	res.List = wxr.Item
+	res.Errcode = wxr.Errcode
+	res.Errmsg = wxr.Errmsg
 	return res, nil
 }

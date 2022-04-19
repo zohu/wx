@@ -14,14 +14,6 @@ type ParamNotify struct {
 	EncryptType  string `json:"encrypt_type,omitempty"`
 }
 
-type ReturnResponseDataList struct {
-	List  interface{} `json:"list"`
-	Page  int         `json:"page"`
-	Rows  int         `json:"rows"`
-	Total int         `json:"total"`
-	Count int         `json:"count"`
-}
-
 func (n *ParamNotify) IsSafeMode() bool {
 	return n.EncryptType == "aes"
 }
