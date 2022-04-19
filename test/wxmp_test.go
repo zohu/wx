@@ -64,3 +64,10 @@ func TestDraftGetAll(t *testing.T) {
 	fmt.Println(utils.StructToString(res))
 
 }
+func TestMediaList(t *testing.T) {
+	res, err := mp.MediaList(wxmp.MediaTypeImage, 1, 20)
+	if err != nil {
+		t.Error(err)
+	}
+	fmt.Println(utils.StructToString(res))
+}
