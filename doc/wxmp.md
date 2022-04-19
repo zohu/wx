@@ -241,6 +241,7 @@ res, err := app.MediaTemporaryAdd(mediaType MediaType, file io.Reader, fileName 
 - [ ] 获取素材列表
 - [ ] 上传素材文件
 ### 草稿箱
+- [x] 查询草稿箱列表
 ### 发布能力
 ### 图文消息留言管理
 ### 用户管理
