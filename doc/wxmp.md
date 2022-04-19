@@ -238,11 +238,12 @@ res, err := app.MediaTemporaryAdd(mediaType MediaType, file io.Reader, fileName 
 - [ ] 删除永久素材
 - [ ] 修改永久图文素材
 - [ ] 获取素材总数
-- [ ] 获取素材列表
+- [x] 获取素材列表
 - [ ] 上传素材文件
 ### 草稿箱
 - [x] 查询草稿箱列表
 ### 发布能力
+- [x] 获取成功发布列表
 ### 图文消息留言管理
 ### 用户管理
 - [x] 用户标签管理
