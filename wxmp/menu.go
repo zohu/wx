@@ -73,7 +73,7 @@ func (ctx *Context) MenuAdd(menu *Menu) error {
 	wechat := wx.NewWechat()
 	if err := wechat.Post(wx.ApiMp + "/menu/create").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
-		SetJSON(&menu).
+		SetJSON(menu).
 		BindJSON(&res).
 		Do(); err != nil {
 		return fmt.Errorf("%s 创建菜单失败（%s）", ctx.Appid(), err.Error())
