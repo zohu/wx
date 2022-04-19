@@ -70,3 +70,15 @@ func TestMediaTemporaryAdd(t *testing.T) {
 	}
 	fmt.Println(utils.StructToString(res))
 }
+func TestDraftGetAll(t *testing.T) {
+	res, err := mp.DraftGetAll(&wxmp.ParamDraftGetAll{
+		Page:      1,
+		Rows:      20,
+		NoContent: 0,
+	})
+	if err != nil {
+		t.Error(err)
+	}
+	fmt.Println(utils.StructToString(res))
+
+}
