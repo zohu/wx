@@ -33,7 +33,7 @@ const (
 )
 
 type MenuButtonItem struct {
-	Type      MenuType         `json:"type"`
+	Type      MenuType         `json:"type,omitempty"`
 	Name      string           `json:"name"`
 	Key       MenuKey          `json:"key,omitempty"`
 	Url       string           `json:"url,omitempty"`
