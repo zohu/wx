@@ -10,8 +10,14 @@ import (
 */
 
 type ParamDraftGetAll struct {
-	Page int `json:"page"`
-	Rows int `json:"rows"`
+	Page      int `json:"page"`
+	Rows      int `json:"rows"`
+	NoContent int `json:"no_content"`
+}
+type ParamDraftGetAllWx struct {
+	Offset    int `json:"offset"`
+	Count     int `json:"count"`
+	NoContent int `json:"no_content"`
 }
 type ResDraftGetAll struct {
 	wx.Response
@@ -60,6 +66,11 @@ func (ctx *Context) DraftGetAll(h *ParamDraftGetAll) (*ResDraftGetAll, error) {
 	var wxr ResDraftGetAllWx
 	if err := wechat.Get(wx.ApiMp + "draft/batchget").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
+		SetBody(&ParamDraftGetAllWx{
+			Offset:    (h.Page - 1) * h.Rows,
+			Count:     h.Rows,
+			NoContent: h.NoContent,
+		}).
 		BindJSON(&wxr).
 		Do(); err != nil {
 		return nil, fmt.Errorf("%s 查询草稿失败 %s", ctx.Appid(), err.Error())
