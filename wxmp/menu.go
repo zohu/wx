@@ -279,7 +279,7 @@ func (ctx *Context) MenuQueryAll() (*ResMenuQueryAll, error) {
 	}
 	var res ResMenuQueryAll
 	wechat := wx.NewWechat()
-	if err := wechat.Get(wx.ApiMp + "menu/get").
+	if err := wechat.Get(wx.ApiMp + "/menu/get").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		BindJSON(&res).
 		Do(); err != nil {
