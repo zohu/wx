@@ -126,7 +126,7 @@ func (msg *Message) ReplyMusic(title, description, musicURL, hQMusicURL, thumbMe
 // @receiver ctx
 // @param articles
 // @return *MessageNews
-func (msg *Message) ReplyNews(articles []Article) *MessageReply {
+func (msg *Message) ReplyNews(articles []*Article) *MessageReply {
 	news := new(MessageReply)
 	news.Nonce = msg.Nonce
 	news.ctx = msg.ctx

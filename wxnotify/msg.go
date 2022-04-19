@@ -294,8 +294,8 @@ type MessageReply struct {
 	// 回复音乐
 	Music *Music `xml:"Music,omitempty"`
 	// 回复图文
-	ArticleCount int       `xml:"ArticleCount,omitempty"`
-	Articles     []Article `xml:"Articles>item,omitempty"`
+	ArticleCount int        `xml:"ArticleCount,omitempty"`
+	Articles     []*Article `xml:"Articles>item,omitempty"`
 }
 
 type MediaID struct {
