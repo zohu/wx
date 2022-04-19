@@ -123,7 +123,7 @@ func (ctx *Context) MediaList(mediaType MediaType, page int64, rows int64) (*Res
 	}
 	wechat := wx.NewWechat()
 	var wxr ResMediaListItem
-	if err := wechat.Post(wx.ApiMp + "/draft/batchget").
+	if err := wechat.Post(wx.ApiMp + "/material/batchget_material").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		SetJSON(&ParamMediaList{
 			Offset: (page - 1) * rows,
@@ -132,13 +132,13 @@ func (ctx *Context) MediaList(mediaType MediaType, page int64, rows int64) (*Res
 		}).
 		BindJSON(&wxr).
 		Do(); err != nil {
-		return nil, fmt.Errorf("%s 查询永久素材失败失败 %s", ctx.Appid(), err.Error())
+		return nil, fmt.Errorf("%s 查询永久素材失败 %s", ctx.Appid(), err.Error())
 	}
 	if wxr.Errcode != 0 {
 		if ctx.RetryAccessToken(wxr.Errcode) {
 			return ctx.MediaList(mediaType, page, rows)
 		}
-		return nil, fmt.Errorf("%s 查询永久素材失败失败 %s", ctx.Appid(), wxr.Errmsg)
+		return nil, fmt.Errorf("%s 查询永久素材失败 %s", ctx.Appid(), wxr.Errmsg)
 	}
 	res := new(ResMediaList)
 	res.Page = page

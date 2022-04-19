@@ -71,3 +71,10 @@ func TestMediaList(t *testing.T) {
 	}
 	fmt.Println(utils.StructToString(res))
 }
+func TestIssueList(t *testing.T) {
+	res, err := mp.IssueList(0, 1, 20)
+	if err != nil {
+		t.Error(err)
+	}
+	fmt.Println(utils.StructToString(res))
+}
