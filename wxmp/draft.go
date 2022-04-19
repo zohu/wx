@@ -49,7 +49,7 @@ type ResDraftGetAllWxItem struct {
 			Url                string `json:"url"`
 		} `json:"news_item"`
 	} `json:"content"`
-	UpdateTime string `json:"update_time"`
+	UpdateTime int `json:"update_time"`
 }
 
 // DraftGetAll
