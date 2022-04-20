@@ -1,6 +1,7 @@
 package wxmp
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/hhcool/wx"
@@ -71,9 +72,10 @@ func (ctx *Context) MenuAdd(menu *Menu) error {
 	}
 	var res wx.Response
 	wechat := wx.NewWechat()
+	b, _ := json.Marshal(menu)
 	if err := wechat.Post(wx.ApiMp + "/menu/create").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
-		SetJSON(menu).
+		SetJSON(b).
 		BindJSON(&res).
 		Do(); err != nil {
 		return fmt.Errorf("%s 创建菜单失败（%s）", ctx.Appid(), err.Error())

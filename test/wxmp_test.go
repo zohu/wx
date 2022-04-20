@@ -1,8 +1,6 @@
 package test
 
 import (
-	"fmt"
-	"github.com/hhcool/gtls/utils"
 	"github.com/hhcool/wx"
 	"github.com/hhcool/wx/wxcpt"
 	"github.com/hhcool/wx/wxmp"
@@ -46,14 +44,13 @@ func TestH5GetOauth2URL(t *testing.T) {
 
 func TestMediaTemporaryAdd(t *testing.T) {
 	f, _ := os.Open("./11.JPG")
-	res, err := mp.MediaTemporaryAdd(wxmp.MediaTypeImage, f, "11.JPG")
+	_, err := mp.MediaTemporaryAdd(wxmp.MediaTypeImage, f, "11.JPG")
 	if err != nil {
 		t.Error(err)
 	}
-	fmt.Println(utils.StructToString(res))
 }
 func TestDraftGetAll(t *testing.T) {
-	res, err := mp.DraftGetAll(&wxmp.ParamDraftGetAll{
+	_, err := mp.DraftGetAll(&wxmp.ParamDraftGetAll{
 		Page:      1,
 		Rows:      20,
 		NoContent: 0,
@@ -61,20 +58,16 @@ func TestDraftGetAll(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	fmt.Println(utils.StructToString(res))
-
 }
 func TestMediaList(t *testing.T) {
-	res, err := mp.MediaList(wxmp.MediaTypeImage, 1, 20)
+	_, err := mp.MediaList(wxmp.MediaTypeImage, 1, 20)
 	if err != nil {
 		t.Error(err)
 	}
-	fmt.Println(utils.StructToString(res))
 }
 func TestIssueList(t *testing.T) {
-	res, err := mp.IssueList(0, 1, 20)
+	_, err := mp.IssueList(0, 1, 20)
 	if err != nil {
 		t.Error(err)
 	}
-	fmt.Println(utils.StructToString(res))
 }

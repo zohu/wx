@@ -15,7 +15,7 @@ func init() {
 	wx.Init(&wx.Option{
 		Host:     []string{"localhost:8011"},
 		Password: "JCFkQYex4f",
-		Mode:     "debug",
+		Mode:     "prod",
 	})
 	mp, _ = wxmp.FindApp("wx8f4971af0e9f0c45")
 	work, _ = wxwork.FindApp("ww72ca60e7592549b5")
