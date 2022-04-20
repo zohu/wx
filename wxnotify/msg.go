@@ -212,23 +212,23 @@ type TemplateCard struct {
 	} `json:"SelectedItems,omitempty" xml:"SelectedItems>SelectedItem,omitempty"`
 }
 type UserEvent struct {
-	UserID         string `json:"UserID,omitempty" xml:"UserID,omitempty"`                 // 成员UserID
-	NewUserID      string `json:"NewUserID,omitempty" xml:"NewUserID,omitempty"`           // 成员新UserID
-	Name           string `json:"Name,omitempty" xml:"Name,omitempty"`                     // 成员名称;代开发自建应用需要管理员授权才返回
-	Department     string `json:"Department,omitempty" xml:"Department,omitempty"`         // 成员部门列表，仅返回该应用有查看权限的部门id
-	MainDepartment string `json:"MainDepartment,omitempty" xml:"MainDepartment,omitempty"` // 主部门
-	IsLeaderInDept string `json:"IsLeaderInDept,omitempty" xml:"IsLeaderInDept,omitempty"` // 表示所在部门是否为部门负责人，0-否，1-是，顺序与Department字段的部门逐一对应。上游共享的应用不返回该字段
-	DirectLeader   string `json:"DirectLeader,omitempty" xml:"DirectLeader,omitempty"`     // 直属上级UserID，最多5个。代开发的自建应用和上游共享的应用不返回该字段
-	Position       string `json:"Position,omitempty" xml:"Position,omitempty"`             // 职位信息。长度为0~64个字节;代开发自建应用需要管理员授权才返回。上游共享的应用不返回该字段
-	Mobile         string `json:"Mobile,omitempty" xml:"Mobile,omitempty"`                 // 手机号码;代开发自建应用需要管理员授权才返回。上游共享的应用不返回该字段
-	Gender         int64  `json:"Gender,omitempty" xml:"Gender,omitempty"`                 // 性别，1表示男性，2表示女性。上游共享的应用不返回该字段
-	Email          string `json:"Email,omitempty" xml:"Email,omitempty"`                   // 邮箱;代开发自建应用需要管理员授权才返回。上游共享的应用不返回该字段
-	BizMail        string `json:"BizMail,omitempty" xml:"BizMail,omitempty"`               // 企业邮箱;代开发自建应用不返回该字段。上游共享的应用不返回该字段
-	Status         int64  `json:"Status,omitempty" xml:"Status,omitempty"`                 // 激活状态：1=已激活 2=已禁用 4=未激活 已激活代表已激活企业微信或已关注微信插件（原企业号）5=成员退出
-	Avatar         string `json:"Avatar,omitempty" xml:"Avatar,omitempty"`                 // 头像url。注：如果要获取小图将url最后的”/0”改成”/100”即可。上游共享的应用不返回该字段
-	Alias          string `json:"Alias,omitempty" xml:"Alias,omitempty"`                   // 成员别名。上游共享的应用不返回该字段
-	Telephone      string `json:"Telephone,omitempty" xml:"Telephone,omitempty"`           // 座机;代开发自建应用需要管理员授权才返回。上游共享的应用不返回该字段
-	Address        string `json:"Address,omitempty" xml:"Address,omitempty"`               // 地址;代开发自建应用需要管理员授权才返回。上游共享的应用不返回该字段
+	UserID         string      `json:"UserID,omitempty" xml:"UserID,omitempty"`                 // 成员UserID
+	NewUserID      string      `json:"NewUserID,omitempty" xml:"NewUserID,omitempty"`           // 成员新UserID
+	Name           string      `json:"Name,omitempty" xml:"Name,omitempty"`                     // 成员名称;代开发自建应用需要管理员授权才返回
+	Department     string      `json:"Department,omitempty" xml:"Department,omitempty"`         // 成员部门列表，仅返回该应用有查看权限的部门id
+	MainDepartment string      `json:"MainDepartment,omitempty" xml:"MainDepartment,omitempty"` // 主部门
+	IsLeaderInDept string      `json:"IsLeaderInDept,omitempty" xml:"IsLeaderInDept,omitempty"` // 表示所在部门是否为部门负责人，0-否，1-是，顺序与Department字段的部门逐一对应。上游共享的应用不返回该字段
+	DirectLeader   string      `json:"DirectLeader,omitempty" xml:"DirectLeader,omitempty"`     // 直属上级UserID，最多5个。代开发的自建应用和上游共享的应用不返回该字段
+	Position       string      `json:"Position,omitempty" xml:"Position,omitempty"`             // 职位信息。长度为0~64个字节;代开发自建应用需要管理员授权才返回。上游共享的应用不返回该字段
+	Mobile         string      `json:"Mobile,omitempty" xml:"Mobile,omitempty"`                 // 手机号码;代开发自建应用需要管理员授权才返回。上游共享的应用不返回该字段
+	Gender         int64       `json:"Gender,omitempty" xml:"Gender,omitempty"`                 // 性别，1表示男性，2表示女性。上游共享的应用不返回该字段
+	Email          string      `json:"Email,omitempty" xml:"Email,omitempty"`                   // 邮箱;代开发自建应用需要管理员授权才返回。上游共享的应用不返回该字段
+	BizMail        string      `json:"BizMail,omitempty" xml:"BizMail,omitempty"`               // 企业邮箱;代开发自建应用不返回该字段。上游共享的应用不返回该字段
+	Status         interface{} `json:"Status,omitempty" xml:"Status,omitempty"`                 // 激活状态：1=已激活 2=已禁用 4=未激活 已激活代表已激活企业微信或已关注微信插件（原企业号）5=成员退出
+	Avatar         string      `json:"Avatar,omitempty" xml:"Avatar,omitempty"`                 // 头像url。注：如果要获取小图将url最后的”/0”改成”/100”即可。上游共享的应用不返回该字段
+	Alias          string      `json:"Alias,omitempty" xml:"Alias,omitempty"`                   // 成员别名。上游共享的应用不返回该字段
+	Telephone      string      `json:"Telephone,omitempty" xml:"Telephone,omitempty"`           // 座机;代开发自建应用需要管理员授权才返回。上游共享的应用不返回该字段
+	Address        string      `json:"Address,omitempty" xml:"Address,omitempty"`               // 地址;代开发自建应用需要管理员授权才返回。上游共享的应用不返回该字段
 	ExtAttr        []struct {
 		Name string   `json:"Name,omitempty" xml:"Name,omitempty"`
 		Type int64    `json:"Type,omitempty" xml:"Type,omitempty"`
