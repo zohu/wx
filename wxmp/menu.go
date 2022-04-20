@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/hhcool/wx"
+	"strings"
 )
 
 /**
@@ -73,9 +74,11 @@ func (ctx *Context) MenuAdd(menu *Menu) error {
 	var res wx.Response
 	wechat := wx.NewWechat()
 	b, _ := json.Marshal(menu)
+	b1 := string(b)
+	b1 = strings.ReplaceAll(b1, "\\u0026", "&")
 	if err := wechat.Post(wx.ApiMp + "/menu/create").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
-		SetJSON(b).
+		SetBody([]byte(b1)).
 		BindJSON(&res).
 		Do(); err != nil {
 		return fmt.Errorf("%s 创建菜单失败（%s）", ctx.Appid(), err.Error())
