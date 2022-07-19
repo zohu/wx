@@ -53,6 +53,7 @@ func (c *Context) newAccessTokenForMp() (string, string) {
 	}
 	if res.Errcode != 0 {
 		log.Warn("获取token失败", zap.Int("errcode", res.Errcode), zap.String("errmsg", res.Errmsg))
+		return "", ""
 	}
 	var tk ResponseMpTicket
 	err = wechat.Get(ApiMp + "/ticket/getticket").
