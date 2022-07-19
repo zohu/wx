@@ -26,8 +26,18 @@ type ParamMpAccessToken struct {
 	Appid     string `json:"appid" query:"appid"`
 	Secret    string `json:"secret" query:"secret"`
 }
+type ParamMpTicket struct {
+	AccessToken string `json:"access_token" query:"access_token"`
+	Type        string `json:"type" query:"type"`
+}
+type ResponseMpTicket struct {
+	Errcode   int    `json:"errcode"`
+	Errmsg    string `json:"errmsg"`
+	Ticket    string `json:"ticket"`
+	ExpiresIn int    `json:"expires_in"`
+}
 
-func (c *Context) newAccessTokenForMp() string {
+func (c *Context) newAccessTokenForMp() (string, string) {
 	var res ResponseAccessToken
 	err := wechat.Get(ApiMp + "/token").
 		SetQuery(ParamMpAccessToken{
@@ -39,12 +49,20 @@ func (c *Context) newAccessTokenForMp() string {
 		Do()
 	if err != nil {
 		log.Warn("获取token失败", zap.Error(err))
-		return ""
+		return "", ""
 	}
 	if res.Errcode != 0 {
 		log.Warn("获取token失败", zap.Int("errcode", res.Errcode), zap.String("errmsg", res.Errmsg))
 	}
-	return res.AccessToken
+	var tk ResponseMpTicket
+	err = wechat.Get(ApiMp + "/ticket/getticket").
+		SetQuery(&ParamMpTicket{
+			AccessToken: res.AccessToken,
+			Type:        "jsapi",
+		}).
+		BindJSON(&tk).
+		Do()
+	return res.AccessToken, tk.Ticket
 }
 
 /**

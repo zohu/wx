@@ -218,6 +218,9 @@ uri,err := app.H5GetOauth2URL(redirectUri string, scope H5ScopeType, state strin
 
 // ② code换用户信息，scope需要和第①步的一致
 user, err := app.H5GetUserinfo(code string, scope H5ScopeType)
+
+// 获取jssdk配置
+config,err := H5GetJsSdkConfig(uri string)
 ```
 - [x] 用户授权信息变更事件推送
 > 见【[微信回调消息](./wxnotify.md)】

@@ -2,8 +2,10 @@ package wxmp
 
 import (
 	"fmt"
+	"github.com/hhcool/gtls/utils"
 	"github.com/hhcool/wx"
 	"net/url"
+	"time"
 )
 
 type H5ScopeType string
@@ -96,4 +98,29 @@ func (ctx *Context) H5GetUserinfo(code string, scope H5ScopeType) (*ResH5GetUser
 		return nil, fmt.Errorf("获取用户信息失败，%d-%s", token.Errcode, token.Errmsg)
 	}
 	return &userinfo, nil
+}
+
+type H5JsSdkConfig struct {
+	NonceStr  string `json:"nonce_str"`
+	Timestamp int64  `json:"timestamp"`
+	Signature string `json:"signature"`
+}
+
+func (ctx *Context) H5GetJsSdkConfig(uri string) (*H5JsSdkConfig, error) {
+	jssdk := new(H5JsSdkConfig)
+	jssdk.Timestamp = time.Now().Unix()
+	jssdk.NonceStr = utils.RandomStr(16)
+	tk := ctx.GetTicket()
+	if tk == "" {
+		return jssdk, fmt.Errorf("获取ticket失败")
+	}
+	query := fmt.Sprintf(
+		"jsapi_ticket=%s&noncestr=%s&timestamp=%d&url=%s",
+		tk,
+		jssdk.NonceStr,
+		jssdk.Timestamp,
+		uri,
+	)
+	jssdk.Signature = utils.Signature(query)
+	return jssdk, nil
 }

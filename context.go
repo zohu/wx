@@ -27,6 +27,7 @@ type App struct {
 	EncodingAesKey string    `json:"encoding_aes_key"`
 	AppType        string    `json:"app_type"`
 	AccessToken    string    `json:"access_token"`
+	Ticket         string    `json:"ticket"`
 	ExpireTime     time.Time `json:"expire_time"`
 	Retry          string    `json:"retry"`
 }
@@ -46,18 +47,18 @@ func (c *Context) NewAccessToken() string {
 	if c.App.ExpireTime.Before(time.Now()) {
 		c.App.AccessToken = ""
 	}
-	token := ""
+	var token, tk string
 	switch c.App.AppType {
 	case TypeMpServe:
-		token = c.newAccessTokenForMp()
+		token, tk = c.newAccessTokenForMp()
 	case TypeMpSubscribe:
-		token = c.newAccessTokenForMp()
+		token, tk = c.newAccessTokenForMp()
 	case TypeWork:
 		token = c.newAccessTokenForWork()
 	case TypeApp:
-		token = c.newAccessTokenForMp()
+		token, _ = c.newAccessTokenForMp()
 	case TypeMiniApp:
-		token = c.newAccessTokenForMp()
+		token, _ = c.newAccessTokenForMp()
 	default:
 		log.Warn("NewAccessToken 应用类型错误", zap.String("type", c.App.AppType))
 	}
@@ -65,6 +66,7 @@ func (c *Context) NewAccessToken() string {
 		c.App.Retry = "0"
 		c.App.AccessToken = token
 		c.App.ExpireTime = time.Now().Add(time.Second * 7000)
+		c.App.Ticket = tk
 		wechat.HSet(RdsAppPrefix+c.App.Appid, StructToMap(c.App))
 	} else {
 		wechat.HIncrBy(RdsAppPrefix+c.App.Appid, "retry", 1)
@@ -89,6 +91,15 @@ func (c *Context) GetAccessToken() string {
 		_ = c.NewAccessToken()
 	}
 	return c.App.AccessToken
+}
+
+func (c *Context) GetTicket() string {
+	newCtx, _ := FindApp(c.App.Appid)
+	c.App = newCtx.App
+	if !c.IsExists() {
+		return ""
+	}
+	return c.App.Ticket
 }
 
 // IsExists
