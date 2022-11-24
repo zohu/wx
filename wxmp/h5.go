@@ -94,8 +94,8 @@ func (ctx *Context) H5GetUserinfo(code string, scope H5ScopeType) (*ResH5GetUser
 		Do(); err != nil {
 		return nil, fmt.Errorf("获取用户信息失败，%s", err.Error())
 	}
-	if token.Errcode != 0 {
-		return nil, fmt.Errorf("获取用户信息失败，%d-%s", token.Errcode, token.Errmsg)
+	if userinfo.Errcode != 0 {
+		return nil, fmt.Errorf("获取用户信息失败，%d-%s", userinfo.Errcode, userinfo.Errmsg)
 	}
 	return &userinfo, nil
 }

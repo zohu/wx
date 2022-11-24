@@ -80,7 +80,7 @@ type ParamWorkAccessToken struct {
 // @Description: 企业微信获取新token
 // @receiver c
 // @return string
-func (c *Context) newAccessTokenForWork() string {
+func (c *Context) newAccessTokenForWork() (string, string) {
 	var res ResponseAccessToken
 	err := wechat.Get(ApiWork + "/gettoken").
 		SetQuery(ParamWorkAccessToken{
@@ -91,12 +91,17 @@ func (c *Context) newAccessTokenForWork() string {
 		Do()
 	if err != nil {
 		zlog.Warn("获取token失败", zap.Error(err))
-		return ""
+		return "", ""
 	}
 	if res.Errcode != 0 {
 		zlog.Warn("获取token失败", zap.Int("errcode", res.Errcode), zap.String("errmsg", res.Errmsg))
 	}
-	return res.AccessToken
+	var tk ResponseMpTicket
+	err = wechat.Get(ApiWork + "/get_jsapi_ticket").
+		SetQuery(ParamAccessToken{AccessToken: res.AccessToken}).
+		BindJSON(&tk).
+		Do()
+	return res.AccessToken, tk.Ticket
 }
 
 /*

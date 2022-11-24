@@ -54,7 +54,7 @@ func (c *Context) NewAccessToken() string {
 	case TypeMpSubscribe:
 		token, tk = c.newAccessTokenForMp()
 	case TypeWork:
-		token = c.newAccessTokenForWork()
+		token, tk = c.newAccessTokenForWork()
 	case TypeApp:
 		token, _ = c.newAccessTokenForMp()
 	case TypeMiniApp:
