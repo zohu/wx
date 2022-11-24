@@ -2,7 +2,7 @@ package wxwork
 
 import (
 	"fmt"
-	"github.com/hhcool/wx"
+	"github.com/zohu/wx"
 )
 
 type ScheduleAttendeesType string

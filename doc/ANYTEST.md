@@ -13,6 +13,6 @@ go test -v ./test
     wxwork_test.go:31: {"XMLName":{"Space":"","Local":""},"ToUserName":"ww72ca60e7592549b5","FromUserName":"sys","CreateTime":1648612835,"MsgType":"event","Event":"change_external_contact","ChangeType":"edit_external_contact","UserID":"1002","ExternalUserID":"wmwaSCCwAABCFazWglrk8b-M3uSJAn3g"}
 --- PASS: TestWxWorkMsg (0.00s)
 PASS
-ok      github.com/hhcool/wx/test       1.172s
+ok      github.com/zohu/wx/test       1.172s
 
 ```

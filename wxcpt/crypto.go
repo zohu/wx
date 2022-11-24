@@ -10,7 +10,7 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
-	"github.com/hhcool/gtls/utils"
+	"github.com/zohu/wx/utils"
 	"sort"
 	"strings"
 )

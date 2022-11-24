@@ -3,7 +3,7 @@ package wxmp
 import (
 	"fmt"
 	"github.com/guonaihong/gout"
-	"github.com/hhcool/wx"
+	"github.com/zohu/wx"
 	"io"
 	"mime/multipart"
 )

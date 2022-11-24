@@ -9,7 +9,7 @@
 ### 初始化
 ```go
 // 本段代码全局唯一即可，可以放到main或者自定义的bootstrap
-import "github.com/hhcool/wx"
+import "github.com/zohu/wx"
 // 初始化微信服务
 wx.Init(&wx.Option{
     Host:     Config.Redis.Host,// []string, 一个host列表，支持Client和Cluster；
@@ -72,8 +72,8 @@ func AppInit() {
 ### 获取实例
 调用api之前，需要获取对应的app实例
 ```go
-import "github.com/hhcool/wx/wxmp"
-import "github.com/hhcool/wx/wxwork"
+import "github.com/zohu/wx/wxmp"
+import "github.com/zohu/wx/wxwork"
 // 获取公众号实例
 app, err := wxmp.FindApp(appid)
 if err != nil {

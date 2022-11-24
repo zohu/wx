@@ -2,7 +2,7 @@ package wxmp
 
 import (
 	"fmt"
-	"github.com/hhcool/wx"
+	"github.com/zohu/wx"
 )
 
 /**

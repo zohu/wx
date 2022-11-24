@@ -3,7 +3,7 @@ package wxprogram
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/hhcool/wx"
+	"github.com/zohu/wx"
 )
 
 /**

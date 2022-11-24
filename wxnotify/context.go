@@ -1,6 +1,6 @@
 package wxnotify
 
-import "github.com/hhcool/wx"
+import "github.com/zohu/wx"
 
 type NotifyContext struct {
 	*wx.Context

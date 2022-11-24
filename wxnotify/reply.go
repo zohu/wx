@@ -2,8 +2,8 @@ package wxnotify
 
 import (
 	"encoding/xml"
-	"github.com/hhcool/gtls/log"
-	"github.com/hhcool/wx/wxcpt"
+	"github.com/zohu/wx/wxcpt"
+	"github.com/zohu/zlog"
 	"go.uber.org/zap"
 	"strconv"
 	"time"
@@ -13,7 +13,7 @@ func encryptMsg(ctx *NotifyContext, data []byte, timestamp int64, nonce string) 
 	cpt := wxcpt.NewBizMsgCrypt(ctx.App.Token, ctx.App.EncodingAesKey, ctx.App.Appid)
 	send, err := cpt.EncryptXmlMsg(string(data), strconv.FormatInt(timestamp, 10), nonce)
 	if err != nil {
-		log.Warn("加密失败", zap.Error(err))
+		zlog.Warn("加密失败", zap.Error(err))
 		return nil
 	}
 	return send

@@ -1,10 +1,10 @@
 package test
 
 import (
-	"github.com/hhcool/wx"
-	"github.com/hhcool/wx/wxcpt"
-	"github.com/hhcool/wx/wxmp"
-	"github.com/hhcool/wx/wxnotify"
+	"github.com/zohu/wx"
+	"github.com/zohu/wx/wxcpt"
+	"github.com/zohu/wx/wxmp"
+	"github.com/zohu/wx/wxnotify"
 	"os"
 	"testing"
 )

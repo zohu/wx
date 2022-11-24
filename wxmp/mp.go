@@ -3,7 +3,7 @@ package wxmp
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/hhcool/wx"
+	"github.com/zohu/wx"
 )
 
 type Context struct {

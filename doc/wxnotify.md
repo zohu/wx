@@ -64,7 +64,7 @@ func NotifyHandle(appid string,param *wx.ParamNotify,recv *wxcpt.BizMsg4Recv) st
 ### 消息加解密，如果需要额外使用的话
 参考官方java-sdk改写的go版本，支持xml和json
 ```go
-import "github.com/hhcool/wx/wxcpt"
+import "github.com/zohu/wx/wxcpt"
 
 // 微信公众号
 // p *wx.ParamNotify, encpt *wxcpt.BizMsg4Recv

@@ -5,7 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-redis/redis/v8"
-	"github.com/hhcool/gtls/rds"
+	"github.com/zohu/zch"
+	"github.com/zohu/zstructs"
 	"time"
 )
 
@@ -39,17 +40,41 @@ type Wechat struct {
 var wechat = new(Wechat)
 
 func Init(op *Option) {
-	rds.NewRedis(&rds.Option{Host: op.Host, Password: op.Password})
-	wechat.RSet = rds.Client.Set
-	wechat.RGet = rds.Client.Get
-	wechat.RDel = rds.Client.Del
-	wechat.SetNX = rds.Client.SetNX
-	wechat.SAdd = rds.Client.SAdd
-	wechat.SRem = rds.Client.SRem
-	wechat.SMembers = rds.Client.SMembers
-	wechat.HSet = rds.Client.HSet
-	wechat.HGetAll = rds.Client.HGetAll
-	wechat.HIncrBy = rds.Client.HIncrBy
+	rds := zch.NewRds(&redis.UniversalOptions{
+		Addrs:    op.Host,
+		Password: op.Password,
+		DB:       0,
+	})
+	wechat.RSet = func(k string, v interface{}, t time.Duration) *redis.StatusCmd {
+		return rds.Set(context.TODO(), k, v, t)
+	}
+	wechat.RGet = func(k string) *redis.StringCmd {
+		return rds.Get(context.TODO(), k)
+	}
+	wechat.RDel = func(k string) *redis.IntCmd {
+		return rds.Del(context.TODO(), k)
+	}
+	wechat.SetNX = func(k string, v interface{}, t time.Duration) *redis.BoolCmd {
+		return rds.SetNX(context.TODO(), k, v, t)
+	}
+	wechat.SAdd = func(key string, member ...interface{}) *redis.IntCmd {
+		return rds.SAdd(context.TODO(), key, member...)
+	}
+	wechat.SRem = func(key string, member ...interface{}) *redis.IntCmd {
+		return rds.SRem(context.TODO(), key, member...)
+	}
+	wechat.SMembers = func(key string) *redis.StringSliceCmd {
+		return rds.SMembers(context.TODO(), key)
+	}
+	wechat.HSet = func(key string, value ...interface{}) *redis.IntCmd {
+		return rds.HSet(context.TODO(), key, value...)
+	}
+	wechat.HGetAll = func(key string) *redis.StringStringMapCmd {
+		return rds.HGetAll(context.TODO(), key)
+	}
+	wechat.HIncrBy = func(key string, field string, integer int64) *redis.IntCmd {
+		return rds.HIncrBy(context.TODO(), key, field, integer)
+	}
 	wechat.debug = op.Mode == "debug"
 	go wechat.refreshAccessToken()
 }
@@ -85,7 +110,7 @@ func PutApp(app App) error {
 	app.Retry = "0"
 	app.ExpireTime = time.Now()
 	wechat.SAdd(RdsAppListPrefix, app.Appid)
-	if err := wechat.HSet(RdsAppPrefix+app.Appid, StructToMap(app)).Err(); err != nil {
+	if err := wechat.HSet(RdsAppPrefix+app.Appid, zstructs.Map(app)).Err(); err != nil {
 		return fmt.Errorf("PutApp: %s", err.Error())
 	}
 	if ctx, err := FindApp(app.Appid); err != nil {

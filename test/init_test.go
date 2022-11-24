@@ -1,9 +1,9 @@
 package test
 
 import (
-	"github.com/hhcool/wx"
-	"github.com/hhcool/wx/wxmp"
-	"github.com/hhcool/wx/wxwork"
+	"github.com/zohu/wx"
+	"github.com/zohu/wx/wxmp"
+	"github.com/zohu/wx/wxwork"
 )
 
 var (

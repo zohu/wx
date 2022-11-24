@@ -2,8 +2,8 @@ package wxnotify
 
 import (
 	"encoding/xml"
-	"github.com/hhcool/wx"
-	"github.com/hhcool/wx/wxcpt"
+	"github.com/zohu/wx"
+	"github.com/zohu/wx/wxcpt"
 )
 
 func (ctx *NotifyContext) DecodeMessage(p *wx.ParamNotify, encpt *wxcpt.BizMsg4Recv) (*Message, error) {

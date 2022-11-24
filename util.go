@@ -3,20 +3,15 @@ package wx
 import (
 	"github.com/guonaihong/gout"
 	"github.com/guonaihong/gout/dataflow"
-	"github.com/hhcool/gtls/log"
-	"github.com/hhcool/gtls/structs"
+	"github.com/zohu/zlog"
 	"time"
 )
-
-func StructToMap(data interface{}) map[string]interface{} {
-	return structs.Map(data)
-}
 
 // HTTP CLIENT
 func debug() gout.DebugFunc {
 	return func(o *gout.DebugOption) {
 		o.Debug = true
-		o.Write = log.SafeWriter()
+		o.Write = zlog.SafeWriter()
 	}
 }
 func (w *Wechat) Post(url string) *dataflow.DataFlow {

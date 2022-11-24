@@ -1,9 +1,9 @@
 package test
 
 import (
-	"github.com/hhcool/wx"
-	"github.com/hhcool/wx/wxcpt"
-	"github.com/hhcool/wx/wxnotify"
+	"github.com/zohu/wx"
+	"github.com/zohu/wx/wxcpt"
+	"github.com/zohu/wx/wxnotify"
 	"testing"
 )
 

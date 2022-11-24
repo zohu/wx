@@ -3,7 +3,7 @@ package wxwork
 import (
 	"encoding/xml"
 	"fmt"
-	"github.com/hhcool/wx"
+	"github.com/zohu/wx"
 	"time"
 )
 

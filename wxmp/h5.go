@@ -2,8 +2,8 @@ package wxmp
 
 import (
 	"fmt"
-	"github.com/hhcool/gtls/utils"
-	"github.com/hhcool/wx"
+	"github.com/zohu/wx"
+	"github.com/zohu/wx/utils"
 	"net/url"
 	"time"
 )

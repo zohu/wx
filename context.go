@@ -1,8 +1,8 @@
 package wx
 
 import (
-	"github.com/hhcool/gtls/log"
-	"github.com/hhcool/gtls/structs"
+	"github.com/zohu/zlog"
+	"github.com/zohu/zstructs"
 	"go.uber.org/zap"
 	"sync"
 	"time"
@@ -60,14 +60,14 @@ func (c *Context) NewAccessToken() string {
 	case TypeMiniApp:
 		token, _ = c.newAccessTokenForMp()
 	default:
-		log.Warn("NewAccessToken 应用类型错误", zap.String("type", c.App.AppType))
+		zlog.Warn("NewAccessToken 应用类型错误", zap.String("type", c.App.AppType))
 	}
 	if token != "" {
 		c.App.Retry = "0"
 		c.App.AccessToken = token
 		c.App.ExpireTime = time.Now().Add(time.Second * 7000)
 		c.App.Ticket = tk
-		wechat.HSet(RdsAppPrefix+c.App.Appid, StructToMap(c.App))
+		wechat.HSet(RdsAppPrefix+c.App.Appid, zstructs.Map(c.App))
 	} else {
 		wechat.HIncrBy(RdsAppPrefix+c.App.Appid, "retry", 1)
 	}
@@ -107,8 +107,8 @@ func (c *Context) GetTicket() string {
 // @receiver c
 // @return bool
 func (c *Context) IsExists() bool {
-	if c.App == nil || structs.IsZero(c.App) || c.App.Appid == "" {
-		log.Warn("应用不存在", zap.String("appid", c.App.Appid))
+	if c.App == nil || zstructs.IsZero(c.App) || c.App.Appid == "" {
+		zlog.Warn("应用不存在", zap.String("appid", c.App.Appid))
 		return false
 	}
 	return true
