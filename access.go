@@ -97,10 +97,13 @@ func (c *Context) newAccessTokenForWork() (string, string) {
 		zlog.Warn("获取token失败", zap.Int("errcode", res.Errcode), zap.String("errmsg", res.Errmsg))
 	}
 	var tk ResponseMpTicket
-	err = wechat.Get(ApiWork + "/get_jsapi_ticket").
-		SetQuery(ParamAccessToken{AccessToken: res.AccessToken}).
-		BindJSON(&tk).
+	err = wechat.Get(ApiWork + "/ticket/get").
+		SetQuery(&ParamMpTicket{
+			AccessToken: res.AccessToken,
+			Type:        "agent_config",
+		}).BindJSON(&tk).
 		Do()
+
 	return res.AccessToken, tk.Ticket
 }
 
