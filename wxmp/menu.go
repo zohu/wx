@@ -250,13 +250,13 @@ func (ctx *Context) MenuDiyTest(userID string) (*ResMenuDiyTest, error) {
 			UserID string `json:"user_id"`
 		}{UserID: userID}).
 		BindJSON(&res).Do(); err != nil {
-		return nil, fmt.Errorf("%s 测试个性化菜单失败 %s", ctx.Appid(), err.Error())
+		return nil, fmt.Errorf("%s 测试个性化菜单失败 %s", ctx.App.Appid, err.Error())
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.MenuDiyTest(userID)
 		}
-		return nil, fmt.Errorf("%s 测试个性化菜单失败 %s", ctx.Appid(), res.Errmsg)
+		return nil, fmt.Errorf("%s 测试个性化菜单失败 %s", ctx.App.Appid, res.Errmsg)
 	}
 	return &res, nil
 }
@@ -280,7 +280,7 @@ type ResMenuQueryAll struct {
 // @return error
 func (ctx *Context) MenuQueryAll() (*ResMenuQueryAll, error) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.Appid())
+		return nil, fmt.Errorf("%s 非公众号", ctx.App.Appid)
 	}
 	var res ResMenuQueryAll
 	wechat := wx.NewWechat()
@@ -288,13 +288,13 @@ func (ctx *Context) MenuQueryAll() (*ResMenuQueryAll, error) {
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		BindJSON(&res).
 		Do(); err != nil {
-		return nil, fmt.Errorf("%s 查询菜单失败 %s", ctx.Appid(), err.Error())
+		return nil, fmt.Errorf("%s 查询菜单失败 %s", ctx.App.Appid, err.Error())
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.MenuQueryAll()
 		}
-		return nil, fmt.Errorf("%s 查询菜单失败 %s", ctx.Appid(), res.Errmsg)
+		return nil, fmt.Errorf("%s 查询菜单失败 %s", ctx.App.Appid, res.Errmsg)
 	}
 	return &res, nil
 }

@@ -10,7 +10,7 @@ import (
 )
 
 func encryptMsg(ctx *NotifyContext, data []byte, timestamp int64, nonce string) *wxcpt.XmlBizMsg4Send {
-	cpt := wxcpt.NewBizMsgCrypt(ctx.App.Token, ctx.App.EncodingAesKey, ctx.App.Appid)
+	cpt := wxcpt.NewBizMsgCrypt(ctx.App.Token, ctx.App.EncodingAesKey, ctx.AppidMain())
 	send, err := cpt.EncryptXmlMsg(string(data), strconv.FormatInt(timestamp, 10), nonce)
 	if err != nil {
 		zlog.Warn("加密失败", zap.Error(err))
