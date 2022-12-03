@@ -189,18 +189,28 @@ func (c *Context) RetryAccessToken(errcode int64) bool {
 	}
 }
 
+// Appid
+// @Description: 获取标志appid（如果是企微应用的话，返回的是应用ID，不能直接用于接口）
+// @receiver c
+// @return string
 func (c *Context) Appid() string {
 	if strings.Contains(c.App.Appid, ":") {
 		return strings.Split(c.App.Appid, ":")[1]
 	}
 	return c.App.Appid
 }
+
+// AppidMain
+// @Description: 获取主appid（如果是企微应用的话，返回的是企微APPID）
+// @receiver c
+// @return string
 func (c *Context) AppidMain() string {
 	if strings.Contains(c.App.Appid, ":") {
 		return strings.Split(c.App.Appid, ":")[0]
 	}
 	return c.App.Appid
 }
+
 func (c *Context) AppSecret() string {
 	return c.App.AppSecret
 }
