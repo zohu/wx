@@ -69,7 +69,7 @@ type MenuDiy struct {
 // @return error
 func (ctx *Context) MenuAdd(menu *Menu) error {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return fmt.Errorf("%s 非公众号", ctx.Appid())
+		return fmt.Errorf("%s 非公众号", ctx.App.Appid)
 	}
 	var res wx.Response
 	wechat := wx.NewWechat()
@@ -81,13 +81,13 @@ func (ctx *Context) MenuAdd(menu *Menu) error {
 		SetBody([]byte(b1)).
 		BindJSON(&res).
 		Do(); err != nil {
-		return fmt.Errorf("%s 创建菜单失败（%s）", ctx.Appid(), err.Error())
+		return fmt.Errorf("%s 创建菜单失败（%s）", ctx.App.Appid, err.Error())
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.MenuAdd(menu)
 		}
-		return fmt.Errorf("%s 创建菜单失败（%d-%s）", ctx.Appid(), res.Errcode, res.Errmsg)
+		return fmt.Errorf("%s 创建菜单失败（%d-%s）", ctx.App.Appid, res.Errcode, res.Errmsg)
 	}
 	return nil
 }
@@ -115,7 +115,7 @@ type ResMenuQuery struct {
 // @return error
 func (ctx *Context) MenuQuery() (*ResMenuQuery, error) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.Appid())
+		return nil, fmt.Errorf("%s 非公众号", ctx.App.Appid)
 	}
 	var res ResMenuQuery
 	wechat := wx.NewWechat()
@@ -123,13 +123,13 @@ func (ctx *Context) MenuQuery() (*ResMenuQuery, error) {
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		BindJSON(&res).
 		Do(); err != nil {
-		return nil, fmt.Errorf("%s 查询菜单失败 %s", ctx.Appid(), err.Error())
+		return nil, fmt.Errorf("%s 查询菜单失败 %s", ctx.App.Appid, err.Error())
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.MenuQuery()
 		}
-		return nil, fmt.Errorf("%s 查询菜单失败（%d-%s）", ctx.Appid(), res.Errcode, res.Errmsg)
+		return nil, fmt.Errorf("%s 查询菜单失败（%d-%s）", ctx.App.Appid, res.Errcode, res.Errmsg)
 	}
 	return &res, nil
 }
@@ -140,7 +140,7 @@ func (ctx *Context) MenuQuery() (*ResMenuQuery, error) {
 // @return error
 func (ctx *Context) MenuDelete() error {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return fmt.Errorf("%s 非公众号", ctx.Appid())
+		return fmt.Errorf("%s 非公众号", ctx.App.Appid)
 	}
 	var res wx.Response
 	wechat := wx.NewWechat()
@@ -148,13 +148,13 @@ func (ctx *Context) MenuDelete() error {
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		BindJSON(&res).
 		Do(); err != nil {
-		return fmt.Errorf("%s 删除菜单失败 %s", ctx.Appid(), err.Error())
+		return fmt.Errorf("%s 删除菜单失败 %s", ctx.App.Appid, err.Error())
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.MenuDelete()
 		}
-		return fmt.Errorf("%s 删除菜单失败（%d-%s）", ctx.Appid(), res.Errcode, res.Errmsg)
+		return fmt.Errorf("%s 删除菜单失败（%d-%s）", ctx.App.Appid, res.Errcode, res.Errmsg)
 	}
 	return nil
 }
@@ -172,7 +172,7 @@ type ResMenuDiyAdd struct {
 // @return error
 func (ctx *Context) MenuDiyAdd(menu MenuDiy) (*ResMenuDiyAdd, error) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.Appid())
+		return nil, fmt.Errorf("%s 非公众号", ctx.App.Appid)
 	}
 	var res ResMenuDiyAdd
 	wechat := wx.NewWechat()
@@ -181,13 +181,13 @@ func (ctx *Context) MenuDiyAdd(menu MenuDiy) (*ResMenuDiyAdd, error) {
 		SetJSON(&menu).
 		BindJSON(&res).
 		Do(); err != nil {
-		return nil, fmt.Errorf("%s 新增个性化菜单失败 %s", ctx.Appid(), err.Error())
+		return nil, fmt.Errorf("%s 新增个性化菜单失败 %s", ctx.App.Appid, err.Error())
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.MenuDiyAdd(menu)
 		}
-		return nil, fmt.Errorf("%s 新增个性化菜单失败 %s", ctx.Appid(), res.Errmsg)
+		return nil, fmt.Errorf("%s 新增个性化菜单失败 %s", ctx.App.Appid, res.Errmsg)
 	}
 	return &res, nil
 }
@@ -203,7 +203,7 @@ func (ctx *Context) MenuDiyDelete(menuid string) (*wx.Response, error) {
 		return nil, errors.New("menuid不能为空")
 	}
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.Appid())
+		return nil, fmt.Errorf("%s 非公众号", ctx.App.Appid)
 	}
 	var res wx.Response
 	wechat := wx.NewWechat()
@@ -213,13 +213,13 @@ func (ctx *Context) MenuDiyDelete(menuid string) (*wx.Response, error) {
 			Menuid string `json:"menuid"`
 		}{Menuid: menuid}).
 		BindJSON(&res).Do(); err != nil {
-		return nil, fmt.Errorf("%s 删除个性化菜单失败 %s", ctx.Appid(), err.Error())
+		return nil, fmt.Errorf("%s 删除个性化菜单失败 %s", ctx.App.Appid, err.Error())
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.MenuDiyDelete(menuid)
 		}
-		return nil, fmt.Errorf("%s 删除个性化菜单失败 %s", ctx.Appid(), res.Errmsg)
+		return nil, fmt.Errorf("%s 删除个性化菜单失败 %s", ctx.App.Appid, res.Errmsg)
 	}
 	return &res, nil
 }
@@ -240,7 +240,7 @@ func (ctx *Context) MenuDiyTest(userID string) (*ResMenuDiyTest, error) {
 		return nil, errors.New("userID不能为空")
 	}
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.Appid())
+		return nil, fmt.Errorf("%s 非公众号", ctx.App.Appid)
 	}
 	var res ResMenuDiyTest
 	wechat := wx.NewWechat()

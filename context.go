@@ -4,6 +4,7 @@ import (
 	"github.com/zohu/zlog"
 	"github.com/zohu/zstructs"
 	"go.uber.org/zap"
+	"strings"
 	"sync"
 	"time"
 )
@@ -67,9 +68,9 @@ func (c *Context) NewAccessToken() string {
 		c.App.AccessToken = token
 		c.App.ExpireTime = time.Now().Add(time.Second * 7000)
 		c.App.Ticket = tk
-		wechat.HSet(RdsAppPrefix+c.App.Appid, zstructs.Map(c.App))
+		wechat.HSet(RdsAppPrefix+c.Appid(), zstructs.Map(c.App))
 	} else {
-		wechat.HIncrBy(RdsAppPrefix+c.App.Appid, "retry", 1)
+		wechat.HIncrBy(RdsAppPrefix+c.Appid(), "retry", 1)
 	}
 	return c.App.AccessToken
 }
@@ -79,7 +80,7 @@ func (c *Context) NewAccessToken() string {
 // @receiver c
 // @return string
 func (c *Context) GetAccessToken() string {
-	newCtx, _ := FindApp(c.App.Appid)
+	newCtx, _ := FindApp(c.Appid())
 	c.App = newCtx.App
 	if !c.IsExists() {
 		return ""
@@ -94,7 +95,7 @@ func (c *Context) GetAccessToken() string {
 }
 
 func (c *Context) GetTicket() string {
-	newCtx, _ := FindApp(c.App.Appid)
+	newCtx, _ := FindApp(c.Appid())
 	c.App = newCtx.App
 	if !c.IsExists() {
 		return ""
@@ -107,7 +108,7 @@ func (c *Context) GetTicket() string {
 // @receiver c
 // @return bool
 func (c *Context) IsExists() bool {
-	if c.App == nil || zstructs.IsZero(c.App) || c.App.Appid == "" {
+	if c.App == nil || zstructs.IsZero(c.App) || c.Appid() == "" {
 		zlog.Warn("应用不存在", zap.String("appid", c.App.Appid))
 		return false
 	}
@@ -177,7 +178,7 @@ func (c *Context) IsMiniApp() bool {
 func (c *Context) RetryAccessToken(errcode int64) bool {
 	switch errcode {
 	case 40014, 41001, 42001, 42007:
-		if wechat.SetNX(RdsAppRetryPrefix+c.App.Appid, 1, time.Minute*2).Val() {
+		if wechat.SetNX(RdsAppRetryPrefix+c.Appid(), 1, time.Minute*2).Val() {
 			if t := c.NewAccessToken(); t != "" {
 				return true
 			}
@@ -189,5 +190,17 @@ func (c *Context) RetryAccessToken(errcode int64) bool {
 }
 
 func (c *Context) Appid() string {
+	if strings.Contains(c.App.Appid, ":") {
+		return strings.Split(c.App.Appid, ":")[1]
+	}
 	return c.App.Appid
+}
+func (c *Context) AppidMain() string {
+	if strings.Contains(c.App.Appid, ":") {
+		return strings.Split(c.App.Appid, ":")[0]
+	}
+	return c.App.Appid
+}
+func (c *Context) AppSecret() string {
+	return c.App.AppSecret
 }

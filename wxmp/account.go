@@ -43,7 +43,7 @@ type ResQrcode struct {
 // @return error
 func (ctx *Context) Qrcode(p *ParamNewQrcode) (*ResQrcode, error) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.Appid())
+		return nil, fmt.Errorf("%s 非公众号", ctx.App.Appid)
 	}
 	var param ParamQrcode
 	param.ActionInfo.Scene.SceneStr = p.Scene
@@ -61,13 +61,13 @@ func (ctx *Context) Qrcode(p *ParamNewQrcode) (*ResQrcode, error) {
 		BindJSON(&res).
 		Do()
 	if err != nil {
-		return nil, fmt.Errorf("%s 获取二维码失败（%s）", ctx.Appid(), err.Error())
+		return nil, fmt.Errorf("%s 获取二维码失败（%s）", ctx.App.Appid, err.Error())
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.Qrcode(p)
 		}
-		return nil, fmt.Errorf("%s 获取二维码失败（%d-%s）", ctx.Appid(), res.Errcode, res.Errmsg)
+		return nil, fmt.Errorf("%s 获取二维码失败（%d-%s）", ctx.App.Appid, res.Errcode, res.Errmsg)
 	}
 	return &res, nil
 }
@@ -90,7 +90,7 @@ type ResGenShorten struct {
 // @return error
 func (ctx *Context) GenShorten(data string, ex ...int) (*ResGenShorten, error) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.Appid())
+		return nil, fmt.Errorf("%s 非公众号", ctx.App.Appid)
 	}
 	wechat := wx.NewWechat()
 	param := new(ParamGenShorten)
@@ -104,13 +104,13 @@ func (ctx *Context) GenShorten(data string, ex ...int) (*ResGenShorten, error) {
 		SetJSON(param).
 		BindJSON(&res).
 		Do(); err != nil {
-		return nil, fmt.Errorf("获取短KEY %s %s", ctx.Appid(), err.Error())
+		return nil, fmt.Errorf("获取短KEY %s %s", ctx.App.Appid, err.Error())
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.GenShorten(data, ex...)
 		}
-		return nil, fmt.Errorf("获取短KEY %s %d-%s", ctx.Appid(), res.Errcode, res.Errmsg)
+		return nil, fmt.Errorf("获取短KEY %s %d-%s", ctx.App.Appid, res.Errcode, res.Errmsg)
 	}
 	return &res, nil
 }
@@ -133,7 +133,7 @@ type ResFetchGenShorten struct {
 // @return error
 func (ctx *Context) FetchGenShorten(shortKey string) (*ResFetchGenShorten, error) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.Appid())
+		return nil, fmt.Errorf("%s 非公众号", ctx.App.Appid)
 	}
 	wechat := wx.NewWechat()
 	param := new(ParamFetchGenShorten)
@@ -144,13 +144,13 @@ func (ctx *Context) FetchGenShorten(shortKey string) (*ResFetchGenShorten, error
 		SetJSON(param).
 		BindJSON(&res).
 		Do(); err != nil {
-		return nil, fmt.Errorf("还原短key %s %s", ctx.Appid(), err.Error())
+		return nil, fmt.Errorf("还原短key %s %s", ctx.App.Appid, err.Error())
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.FetchGenShorten(shortKey)
 		}
-		return nil, fmt.Errorf("还原短key %s %d-%s", ctx.Appid(), res.Errcode, res.Errmsg)
+		return nil, fmt.Errorf("还原短key %s %d-%s", ctx.App.Appid, res.Errcode, res.Errmsg)
 	}
 	return &res, nil
 }

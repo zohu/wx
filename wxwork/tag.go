@@ -35,7 +35,7 @@ type ResponseTagListItem struct {
 
 func (ctx *Context) TagList(p ParamTagList) ([]ResponseTagListItem, error) {
 	if !ctx.IsWork() {
-		return nil, fmt.Errorf("企业微信：应用 %s 非企业号", ctx.Appid())
+		return nil, fmt.Errorf("企业微信：应用 %s 非企业号", ctx.App.Appid)
 	}
 	wechat := wx.NewWechat()
 	var res ResponseTagList

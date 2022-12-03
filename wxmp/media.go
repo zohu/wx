@@ -35,7 +35,7 @@ type ResMediaTemporaryAdd struct {
 // @param file
 func (ctx *Context) MediaTemporaryAdd(mediaType MediaType, file io.Reader, fileName string) (*ResMediaTemporaryAdd, error) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.Appid())
+		return nil, fmt.Errorf("%s 非公众号", ctx.App.Appid)
 	}
 	pr, pw := io.Pipe()
 	bw := multipart.NewWriter(pw)
@@ -59,13 +59,13 @@ func (ctx *Context) MediaTemporaryAdd(mediaType MediaType, file io.Reader, fileN
 		SetBody(pr).
 		BindJSON(&res).
 		Do(); err != nil {
-		return nil, fmt.Errorf("%s 上传临时素材失败 %s", ctx.Appid(), err.Error())
+		return nil, fmt.Errorf("%s 上传临时素材失败 %s", ctx.App.Appid, err.Error())
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.MediaTemporaryAdd(mediaType, file, fileName)
 		}
-		return nil, fmt.Errorf("%s 上传临时素材失败 %s", ctx.Appid(), res.Errmsg)
+		return nil, fmt.Errorf("%s 上传临时素材失败 %s", ctx.App.Appid, res.Errmsg)
 	}
 	return res, nil
 }
@@ -119,7 +119,7 @@ type ParamMediaList struct {
 // @return error
 func (ctx *Context) MediaList(mediaType MediaType, page int64, rows int64) (*ResMediaList, error) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.Appid())
+		return nil, fmt.Errorf("%s 非公众号", ctx.App.Appid)
 	}
 	wechat := wx.NewWechat()
 	var wxr ResMediaListItem
@@ -132,13 +132,13 @@ func (ctx *Context) MediaList(mediaType MediaType, page int64, rows int64) (*Res
 		}).
 		BindJSON(&wxr).
 		Do(); err != nil {
-		return nil, fmt.Errorf("%s 查询永久素材失败 %s", ctx.Appid(), err.Error())
+		return nil, fmt.Errorf("%s 查询永久素材失败 %s", ctx.App.Appid, err.Error())
 	}
 	if wxr.Errcode != 0 {
 		if ctx.RetryAccessToken(wxr.Errcode) {
 			return ctx.MediaList(mediaType, page, rows)
 		}
-		return nil, fmt.Errorf("%s 查询永久素材失败 %s", ctx.Appid(), wxr.Errmsg)
+		return nil, fmt.Errorf("%s 查询永久素材失败 %s", ctx.App.Appid, wxr.Errmsg)
 	}
 	res := new(ResMediaList)
 	res.Page = page

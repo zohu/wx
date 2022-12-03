@@ -35,7 +35,7 @@ type ResUserFromOpenid struct {
 // @return error
 func (ctx *Context) UserFromOpenid(openid string) (*Userinfo, error) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.Appid())
+		return nil, fmt.Errorf("%s 非公众号", ctx.App.Appid)
 	}
 	wechat := wx.NewWechat()
 	p := new(ParamUserFromOpenid)
@@ -46,13 +46,13 @@ func (ctx *Context) UserFromOpenid(openid string) (*Userinfo, error) {
 		SetQuery(&p).
 		BindJSON(&res).
 		Do(); err != nil {
-		return nil, fmt.Errorf("%s 查询用户信息失败，%s", ctx.Appid(), err.Error())
+		return nil, fmt.Errorf("%s 查询用户信息失败，%s", ctx.App.Appid, err.Error())
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.UserFromOpenid(openid)
 		}
-		return nil, fmt.Errorf("%s 查询用户信息失败，%s，%d-%s", ctx.Appid(), openid, res.Errcode, res.Errmsg)
+		return nil, fmt.Errorf("%s 查询用户信息失败，%s，%d-%s", ctx.App.Appid, openid, res.Errcode, res.Errmsg)
 	}
 	return &Userinfo{
 		Subscribe:      res.Subscribe,
@@ -91,7 +91,7 @@ type ResQueryUserList struct {
 // @return error
 func (ctx *Context) UserList(nextOpenID string) (*ResQueryUserList, error) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.Appid())
+		return nil, fmt.Errorf("%s 非公众号", ctx.App.Appid)
 	}
 	var res ResQueryUserList
 	param := new(ParamQueryUserList)
@@ -104,13 +104,13 @@ func (ctx *Context) UserList(nextOpenID string) (*ResQueryUserList, error) {
 		SetQuery(&param).
 		BindJSON(&res).
 		Do(); err != nil {
-		return nil, fmt.Errorf("%s 查询用户列表失败 %s", ctx.Appid(), err.Error())
+		return nil, fmt.Errorf("%s 查询用户列表失败 %s", ctx.App.Appid, err.Error())
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.UserList(nextOpenID)
 		}
-		return nil, fmt.Errorf("%s 查询用户列表失败，%d-%s", ctx.Appid(), res.Errcode, res.Errmsg)
+		return nil, fmt.Errorf("%s 查询用户列表失败，%d-%s", ctx.App.Appid, res.Errcode, res.Errmsg)
 	}
 	return &res, nil
 }
@@ -135,7 +135,7 @@ type ResUserTagCreate struct {
 // @return error
 func (ctx *Context) UserTagCreate(name string) (*ResUserTagCreate, error) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.Appid())
+		return nil, fmt.Errorf("%s 非公众号", ctx.App.Appid)
 	}
 	wechat := wx.NewWechat()
 	var res ResUserTagCreate
@@ -146,13 +146,13 @@ func (ctx *Context) UserTagCreate(name string) (*ResUserTagCreate, error) {
 		SetJSON(param).
 		BindJSON(&res).
 		Do(); err != nil {
-		return nil, fmt.Errorf("创建标签失败 %s %s", ctx.Appid(), err.Error())
+		return nil, fmt.Errorf("创建标签失败 %s %s", ctx.App.Appid, err.Error())
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.UserTagCreate(name)
 		}
-		return nil, fmt.Errorf("创建标签失败 %s %d-%s", ctx.Appid(), res.Errcode, res.Errmsg)
+		return nil, fmt.Errorf("创建标签失败 %s %d-%s", ctx.App.Appid, res.Errcode, res.Errmsg)
 	}
 	return &res, nil
 }
@@ -173,7 +173,7 @@ type ResUserTagQuery struct {
 // @return error
 func (ctx *Context) UserTagQuery() (*ResUserTagQuery, error) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.Appid())
+		return nil, fmt.Errorf("%s 非公众号", ctx.App.Appid)
 	}
 	wechat := wx.NewWechat()
 	var res ResUserTagQuery
@@ -181,13 +181,13 @@ func (ctx *Context) UserTagQuery() (*ResUserTagQuery, error) {
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		BindJSON(&res).
 		Do(); err != nil {
-		return nil, fmt.Errorf("查询标签失败 %s %s", ctx.Appid(), err.Error())
+		return nil, fmt.Errorf("查询标签失败 %s %s", ctx.App.Appid, err.Error())
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.UserTagQuery()
 		}
-		return nil, fmt.Errorf("查询标签失败 %s %d-%s", ctx.Appid(), res.Errcode, res.Errmsg)
+		return nil, fmt.Errorf("查询标签失败 %s %d-%s", ctx.App.Appid, res.Errcode, res.Errmsg)
 	}
 	return &res, nil
 }
@@ -205,7 +205,7 @@ type ParamUserTagEdit struct {
 // @return error
 func (ctx *Context) UserTagEdit(id int64, name string) (*wx.Response, error) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.Appid())
+		return nil, fmt.Errorf("%s 非公众号", ctx.App.Appid)
 	}
 	wechat := wx.NewWechat()
 	var res wx.Response
@@ -217,13 +217,13 @@ func (ctx *Context) UserTagEdit(id int64, name string) (*wx.Response, error) {
 		SetJSON(param).
 		BindJSON(&res).
 		Do(); err != nil {
-		return nil, fmt.Errorf("更新标签失败 %s %s", ctx.Appid(), err.Error())
+		return nil, fmt.Errorf("更新标签失败 %s %s", ctx.App.Appid, err.Error())
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.UserTagEdit(id, name)
 		}
-		return nil, fmt.Errorf("更新标签失败 %s %d-%s", ctx.Appid(), res.Errcode, res.Errmsg)
+		return nil, fmt.Errorf("更新标签失败 %s %d-%s", ctx.App.Appid, res.Errcode, res.Errmsg)
 	}
 	return &res, nil
 }

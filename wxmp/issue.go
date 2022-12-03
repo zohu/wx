@@ -58,7 +58,7 @@ type ParamIssueList struct {
 // @return error
 func (ctx *Context) IssueList(noContent int, page int64, rows int64) (*ResIssueList, error) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.Appid())
+		return nil, fmt.Errorf("%s 非公众号", ctx.App.Appid)
 	}
 	wechat := wx.NewWechat()
 	var wxr ResIssueListItem
@@ -71,13 +71,13 @@ func (ctx *Context) IssueList(noContent int, page int64, rows int64) (*ResIssueL
 		}).
 		BindJSON(&wxr).
 		Do(); err != nil {
-		return nil, fmt.Errorf("%s 查询发布记录失败 %s", ctx.Appid(), err.Error())
+		return nil, fmt.Errorf("%s 查询发布记录失败 %s", ctx.App.Appid, err.Error())
 	}
 	if wxr.Errcode != 0 {
 		if ctx.RetryAccessToken(wxr.Errcode) {
 			return ctx.IssueList(noContent, page, rows)
 		}
-		return nil, fmt.Errorf("%s 查询发布记录失败 %s", ctx.Appid(), wxr.Errmsg)
+		return nil, fmt.Errorf("%s 查询发布记录失败 %s", ctx.App.Appid, wxr.Errmsg)
 	}
 	res := new(ResIssueList)
 	res.Page = page

@@ -29,7 +29,7 @@ func (ctx *Context) H5GetOauth2URL(redirectUri string, scope H5ScopeType, state 
 		return "", err
 	}
 	params := url.Values{}
-	params.Add("appid", ctx.Appid())
+	params.Add("appid", ctx.AppidMain())
 	params.Add("redirect_uri", redirectUri)
 	params.Add("response_type", "code")
 	params.Add("scope", string(scope))
@@ -71,7 +71,7 @@ func (ctx *Context) H5GetUserinfo(code string, scope H5ScopeType) (*ResH5GetUser
 	wechat := wx.NewWechat()
 	if err := wechat.Get(fmt.Sprintf(
 		"https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code",
-		ctx.Appid(),
+		ctx.AppidMain(),
 		ctx.App.AppSecret,
 		code,
 	)).BindJSON(&token).

@@ -42,8 +42,8 @@ func (c *Context) newAccessTokenForMp() (string, string) {
 	err := wechat.Get(ApiMp + "/token").
 		SetQuery(ParamMpAccessToken{
 			GrantType: "client_credential",
-			Appid:     c.App.Appid,
-			Secret:    c.App.AppSecret,
+			Appid:     c.AppidMain(),
+			Secret:    c.AppSecret(),
 		}).
 		BindJSON(&res).
 		Do()
@@ -84,8 +84,8 @@ func (c *Context) newAccessTokenForWork() (string, string) {
 	var res ResponseAccessToken
 	err := wechat.Get(ApiWork + "/gettoken").
 		SetQuery(ParamWorkAccessToken{
-			Corpid:     c.App.Appid,
-			Corpsecret: c.App.AppSecret,
+			Corpid:     c.AppidMain(),
+			Corpsecret: c.AppSecret(),
 		}).
 		BindJSON(&res).
 		Do()
