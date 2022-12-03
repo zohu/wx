@@ -4,7 +4,6 @@ import (
 	"github.com/zohu/zlog"
 	"github.com/zohu/zstructs"
 	"go.uber.org/zap"
-	"strings"
 	"sync"
 	"time"
 )
@@ -23,6 +22,7 @@ const (
 
 type App struct {
 	Appid          string    `json:"appid"`
+	AppidWork      string    `json:"appid_work"`
 	AppSecret      string    `json:"app_secret"`
 	Token          string    `json:"token"`
 	EncodingAesKey string    `json:"encoding_aes_key"`
@@ -109,7 +109,7 @@ func (c *Context) GetTicket() string {
 // @return bool
 func (c *Context) IsExists() bool {
 	if c.App == nil || zstructs.IsZero(c.App) || c.Appid() == "" {
-		zlog.Warn("应用不存在", zap.String("appid", c.App.Appid))
+		zlog.Warn("应用不存在", zap.String("appid", c.Appid()))
 		return false
 	}
 	return true
@@ -194,9 +194,6 @@ func (c *Context) RetryAccessToken(errcode int64) bool {
 // @receiver c
 // @return string
 func (c *Context) Appid() string {
-	if strings.Contains(c.App.Appid, ":") {
-		return strings.Split(c.App.Appid, ":")[1]
-	}
 	return c.App.Appid
 }
 
@@ -205,8 +202,8 @@ func (c *Context) Appid() string {
 // @receiver c
 // @return string
 func (c *Context) AppidMain() string {
-	if strings.Contains(c.App.Appid, ":") {
-		return strings.Split(c.App.Appid, ":")[0]
+	if c.App.AppidWork != "" {
+		return c.App.AppidWork
 	}
 	return c.App.Appid
 }

@@ -35,7 +35,7 @@ type ResUserFromOpenid struct {
 // @return error
 func (ctx *Context) UserFromOpenid(openid string) (*Userinfo, error) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.App.Appid)
+		return nil, fmt.Errorf("%s 非公众号", ctx.Appid())
 	}
 	wechat := wx.NewWechat()
 	p := new(ParamUserFromOpenid)

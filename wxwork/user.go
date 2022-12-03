@@ -42,7 +42,7 @@ type ResponseUserList struct {
 
 func (ctx *Context) UserList(p ParamUserList) ([]User, error) {
 	if !ctx.IsWork() {
-		return nil, fmt.Errorf("企业微信：应用 %s 非企业号", ctx.App.Appid)
+		return nil, fmt.Errorf("企业微信：应用 %s 非企业号", ctx.Appid())
 	}
 	p.AccessToken = ctx.GetAccessToken()
 	wechat := wx.NewWechat()

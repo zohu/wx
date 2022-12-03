@@ -55,10 +55,10 @@ func AppInit() {
                 log.Infof("初始化应用（%s）", wp.Appid)
             } else {
                 if ctx.App.ExpireTime.Before(time.Now()) {
-                    log.Infof("应用Token过期，刷新Token（%s）", ctx.App.Appid)
+                    log.Infof("应用Token过期，刷新Token（%s）", ctx.Appid())
                     _ = ctx.GetAccessToken()
                 } else {
-                    log.Infof("应用正常 %s", ctx.App.Appid)
+                    log.Infof("应用正常 %s", ctx.Appid())
                 }
             }
         } else {

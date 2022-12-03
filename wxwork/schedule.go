@@ -56,7 +56,7 @@ type ScheduleCreateInfo struct {
 // ScheduleCreate 创建日程
 func (ctx *Context) ScheduleCreate(p ScheduleCreateInfo) (string, error) {
 	if !ctx.IsWork() {
-		return "", fmt.Errorf("企业微信：应用 %s 非企业号", ctx.App.Appid)
+		return "", fmt.Errorf("企业微信：应用 %s 非企业号", ctx.Appid())
 	}
 	wechat := wx.NewWechat()
 	//response实体
@@ -89,7 +89,7 @@ type ScheduleUpdateInfo struct {
 // ScheduleUpdate 日程更新
 func (ctx *Context) ScheduleUpdate(p ScheduleUpdateInfo) (string, error) {
 	if !ctx.IsWork() {
-		return "", fmt.Errorf("企业微信：应用 %s 非企业号", ctx.App.Appid)
+		return "", fmt.Errorf("企业微信：应用 %s 非企业号", ctx.Appid())
 	}
 	wechat := wx.NewWechat()
 	//response实体
@@ -120,7 +120,7 @@ type AttendeesUpdateInfo struct {
 // ScheduleAttendeesUpdate 更新参与人
 func (ctx *Context) ScheduleAttendeesUpdate(p AttendeesUpdateInfo, attendeesType ScheduleAttendeesType) error {
 	if !ctx.IsWork() {
-		return fmt.Errorf("企业微信：应用 %s 非企业号", ctx.App.Appid)
+		return fmt.Errorf("企业微信：应用 %s 非企业号", ctx.Appid())
 	}
 	wechat := wx.NewWechat()
 	//response实体
@@ -193,7 +193,7 @@ func (ctx *Context) GetScheduleDetail(p GetScheduleRequest) (ScheduleDetailRespo
 	//response实体
 	res := ScheduleDetailResponse{}
 	if !ctx.IsWork() {
-		return res, fmt.Errorf("企业微信：应用 %s 非企业号", ctx.App.Appid)
+		return res, fmt.Errorf("企业微信：应用 %s 非企业号", ctx.Appid())
 	}
 	wechat := wx.NewWechat()
 
@@ -223,7 +223,7 @@ type CancelSchedule struct {
 // CancelSchedule 取消日程
 func (ctx *Context) CancelSchedule(p CancelSchedule) error {
 	if !ctx.IsWork() {
-		return fmt.Errorf("企业微信：应用 %s 非企业号", ctx.App.Appid)
+		return fmt.Errorf("企业微信：应用 %s 非企业号", ctx.Appid())
 	}
 	wechat := wx.NewWechat()
 	//response实体

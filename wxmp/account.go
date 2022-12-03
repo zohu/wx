@@ -43,7 +43,7 @@ type ResQrcode struct {
 // @return error
 func (ctx *Context) Qrcode(p *ParamNewQrcode) (*ResQrcode, error) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.App.Appid)
+		return nil, fmt.Errorf("%s 非公众号", ctx.Appid())
 	}
 	var param ParamQrcode
 	param.ActionInfo.Scene.SceneStr = p.Scene
