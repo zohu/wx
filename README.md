@@ -381,11 +381,12 @@
     - [ ] 防疫场所码
 - [微信小程序](./doc/wxprogram.md#%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F)
   - [登录](./doc/wxprogram.md#%E7%99%BB%E5%BD%95)
-    - [ ] 登录凭证校验
+    - [x] 登录凭证校验
   - [用户信息](./doc/wxprogram.md#%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF)
     - [ ] 检查加密信息是否由微信生成
     - [ ] 用户支付完成后，获取该用户的UnionId
     - [ ] 换取插件用户的唯一标识openpid
+    - [x] 手机号快速验证
   - [接口调用凭证](./doc/wxprogram.md#%E6%8E%A5%E5%8F%A3%E8%B0%83%E7%94%A8%E5%87%AD%E8%AF%81)
     - [ ] 接口调用凭证
   - [数据分析](./doc/wxprogram.md#%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90)
