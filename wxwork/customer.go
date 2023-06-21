@@ -75,7 +75,7 @@ func (ctx *Context) FindCustomerList(p ParamCustomerList) ([]string, error) {
 	p.AccessToken = ctx.GetAccessToken()
 	wechat := wx.NewWechat()
 	var res ResponseCustomerList
-	err := wechat.Get(wx.ApiWork + "/externalcontact/list").
+	err := wechat.Get(wx.ApiWorkCgiBin + "/externalcontact/list").
 		SetQuery(p).
 		BindJSON(&res).
 		Do()
@@ -169,7 +169,7 @@ func (ctx *Context) FindCustomerDetailWithExternalUserid(p ParamCustomerDetailWi
 	p.AccessToken = ctx.GetAccessToken()
 	wechat := wx.NewWechat()
 	var res ResponseCustomerDetailWithExternalUserid
-	err := wechat.Get(wx.ApiWork + "/externalcontact/get").
+	err := wechat.Get(wx.ApiWorkCgiBin + "/externalcontact/get").
 		SetQuery(p).
 		BindJSON(&res).
 		Do()
@@ -215,7 +215,7 @@ func (ctx *Context) FindCustomerDetail(p ParamCustomerDetail, list []Customer) (
 	p.Limit = 100
 	wechat := wx.NewWechat()
 	var res ResponseCustomerDetail
-	err := wechat.Post(wx.ApiWork + "/externalcontact/batch/get_by_user").
+	err := wechat.Post(wx.ApiWorkCgiBin + "/externalcontact/batch/get_by_user").
 		SetQuery(wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		SetJSON(p).
 		BindJSON(&res).

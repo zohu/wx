@@ -55,7 +55,7 @@ func (ctx *Context) Qrcode(p *ParamNewQrcode) (*ResQrcode, error) {
 	}
 	wechat := wx.NewWechat()
 	var res ResQrcode
-	err := wechat.Post(wx.ApiMp + "/qrcode/create").
+	err := wechat.Post(wx.ApiCgiBin + "/qrcode/create").
 		SetQuery(wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		SetJSON(&param).
 		BindJSON(&res).
@@ -99,7 +99,7 @@ func (ctx *Context) GenShorten(data string, ex ...int) (*ResGenShorten, error) {
 		param.ExpireSeconds = ex[0]
 	}
 	var res ResGenShorten
-	if err := wechat.Post(wx.ApiMp + "/shorten/gen").
+	if err := wechat.Post(wx.ApiCgiBin + "/shorten/gen").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		SetJSON(param).
 		BindJSON(&res).
@@ -139,7 +139,7 @@ func (ctx *Context) FetchGenShorten(shortKey string) (*ResFetchGenShorten, error
 	param := new(ParamFetchGenShorten)
 	param.ShortKey = shortKey
 	var res ResFetchGenShorten
-	if err := wechat.Post(wx.ApiMp + "/shorten/fetch").
+	if err := wechat.Post(wx.ApiCgiBin + "/shorten/fetch").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		SetJSON(param).
 		BindJSON(&res).

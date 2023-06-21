@@ -35,7 +35,7 @@ func (ctx *Context) KfList() (*ResKfList, error) {
 	}
 	wechat := wx.NewWechat()
 	var res ResKfList
-	if err := wechat.Get(wx.ApiMp + "/customservice/getkflist").
+	if err := wechat.Get(wx.ApiCgiBin + "/customservice/getkflist").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		BindJSON(&res).
 		Do(); err != nil {
@@ -61,7 +61,7 @@ func (ctx *Context) KfOnlineList() (*ResKfList, error) {
 	}
 	wechat := wx.NewWechat()
 	var res ResKfList
-	if err := wechat.Get(wx.ApiMp + "/customservice/getonlinekflist").
+	if err := wechat.Get(wx.ApiCgiBin + "/customservice/getonlinekflist").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		BindJSON(&res).
 		Do(); err != nil {
@@ -97,7 +97,7 @@ func (ctx *Context) KfAdd(account string, name string) (*wx.Response, error) {
 	param.KfAccount = account
 	param.Nickname = name
 	var res wx.Response
-	if err := wechat.Post(wx.ApiMp + "/customservice/kfaccount/add").
+	if err := wechat.Post(wx.ApiCgiBin + "/customservice/kfaccount/add").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		SetJSON(param).
 		BindJSON(&res).
@@ -134,7 +134,7 @@ func (ctx *Context) KfInvite(account string, inviteWx string) (*wx.Response, err
 	param.KfAccount = account
 	param.InviteWx = inviteWx
 	var res wx.Response
-	if err := wechat.Post(wx.ApiMp + "/customservice/kfaccount/inviteworker").
+	if err := wechat.Post(wx.ApiCgiBin + "/customservice/kfaccount/inviteworker").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		SetJSON(param).
 		BindJSON(&res).
@@ -171,7 +171,7 @@ func (ctx *Context) KfUpdate(account string, name string) (*wx.Response, error) 
 	param.KfAccount = account
 	param.Nickname = name
 	var res wx.Response
-	if err := wechat.Post(wx.ApiMp + "/customservice/kfaccount/update").
+	if err := wechat.Post(wx.ApiCgiBin + "/customservice/kfaccount/update").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		SetJSON(param).
 		BindJSON(&res).

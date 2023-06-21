@@ -42,7 +42,7 @@ func (ctx *Context) UserFromOpenid(openid string) (*Userinfo, error) {
 	p.AccessToken = ctx.GetAccessToken()
 	p.Openid = openid
 	var res ResUserFromOpenid
-	if err := wechat.Post(wx.ApiMp + "/user/info").
+	if err := wechat.Post(wx.ApiCgiBin + "/user/info").
 		SetQuery(&p).
 		BindJSON(&res).
 		Do(); err != nil {
@@ -100,7 +100,7 @@ func (ctx *Context) UserList(nextOpenID string) (*ResQueryUserList, error) {
 		param.NextOpenid = nextOpenID
 	}
 	wechat := wx.NewWechat()
-	if err := wechat.Get(wx.ApiMp + "/user/get").
+	if err := wechat.Get(wx.ApiCgiBin + "/user/get").
 		SetQuery(&param).
 		BindJSON(&res).
 		Do(); err != nil {
@@ -141,7 +141,7 @@ func (ctx *Context) UserTagCreate(name string) (*ResUserTagCreate, error) {
 	var res ResUserTagCreate
 	param := new(ParamUserTagCreate)
 	param.Tag.Name = name
-	if err := wechat.Post(wx.ApiMp + "/tags/create").
+	if err := wechat.Post(wx.ApiCgiBin + "/tags/create").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		SetJSON(param).
 		BindJSON(&res).
@@ -177,7 +177,7 @@ func (ctx *Context) UserTagQuery() (*ResUserTagQuery, error) {
 	}
 	wechat := wx.NewWechat()
 	var res ResUserTagQuery
-	if err := wechat.Get(wx.ApiMp + "/tags/get").
+	if err := wechat.Get(wx.ApiCgiBin + "/tags/get").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		BindJSON(&res).
 		Do(); err != nil {
@@ -212,7 +212,7 @@ func (ctx *Context) UserTagEdit(id int64, name string) (*wx.Response, error) {
 	param := new(ParamUserTagEdit)
 	param.Tag.ID = id
 	param.Tag.Name = name
-	if err := wechat.Post(wx.ApiMp + "/tags/update").
+	if err := wechat.Post(wx.ApiCgiBin + "/tags/update").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		SetJSON(param).
 		BindJSON(&res).
@@ -246,7 +246,7 @@ func (ctx *Context) UserTagDel(id int64) (*wx.Response, error) {
 	var res wx.Response
 	param := new(ParamUserTagEdit)
 	param.Tag.ID = id
-	if err := wechat.Post(wx.ApiMp + "/tags/delete").
+	if err := wechat.Post(wx.ApiCgiBin + "/tags/delete").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		SetJSON(param).
 		BindJSON(&res).
@@ -291,7 +291,7 @@ func (ctx *Context) UserTagGetUser(id int64, nextOpenid string) (*ResUserTagGetU
 	param := new(ParamUserTagGetUser)
 	param.Tagid = id
 	param.NextOpenid = nextOpenid
-	if err := wechat.Post(wx.ApiMp + "/user/tag/get").
+	if err := wechat.Post(wx.ApiCgiBin + "/user/tag/get").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		SetJSON(param).
 		BindJSON(&res).
@@ -328,7 +328,7 @@ func (ctx *Context) UserTagBatch(openid []string, tagid int64) (*wx.Response, er
 	param := new(ParamUserTagBatch)
 	param.OpenidList = openid
 	param.Tagid = tagid
-	if err := wechat.Post(wx.ApiMp + "/tags/members/batchtagging").
+	if err := wechat.Post(wx.ApiCgiBin + "/tags/members/batchtagging").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		SetJSON(param).
 		BindJSON(&res).
@@ -365,7 +365,7 @@ func (ctx *Context) UserTagUnBatch(openid []string, tagid int64) (*wx.Response, 
 	param := new(ParamUserTagUnBatch)
 	param.OpenidList = openid
 	param.Tagid = tagid
-	if err := wechat.Post(wx.ApiMp + "/tags/members/batchuntagging").
+	if err := wechat.Post(wx.ApiCgiBin + "/tags/members/batchuntagging").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		SetJSON(param).
 		BindJSON(&res).
@@ -403,7 +403,7 @@ func (ctx *Context) UserTagGetFromUser(openid string) (*ResUserTagGetFromUser, e
 	var res ResUserTagGetFromUser
 	param := new(ParamUserTagGetFromUser)
 	param.Openid = openid
-	if err := wechat.Post(wx.ApiMp + "/tags/getidlist").
+	if err := wechat.Post(wx.ApiCgiBin + "/tags/getidlist").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		SetJSON(param).
 		BindJSON(&res).
@@ -440,7 +440,7 @@ func (ctx *Context) UserRemarkUpdate(openid string, remark string) (*wx.Response
 	param := new(ParamUserRemarkUpdate)
 	param.Openid = openid
 	param.Remark = remark
-	if err := wechat.Post(wx.ApiMp + "/user/info/updateremark").
+	if err := wechat.Post(wx.ApiCgiBin + "/user/info/updateremark").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		SetJSON(param).
 		BindJSON(&res).
@@ -483,7 +483,7 @@ func (ctx *Context) UserGetBlackList(beginOpenid string) (*ResUserGetBlackList, 
 	param := new(ParamUserGetBlackList)
 	param.BeginOpenid = beginOpenid
 	var res ResUserGetBlackList
-	if err := wechat.Post(wx.ApiMp + "/tags/members/getblacklist").
+	if err := wechat.Post(wx.ApiCgiBin + "/tags/members/getblacklist").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		SetJSON(param).
 		BindJSON(&res).
@@ -517,7 +517,7 @@ func (ctx *Context) UserBlackListPush(openidList []string) (*wx.Response, error)
 	param := new(ParamUserBlackListPush)
 	param.OpenidList = openidList
 	var res wx.Response
-	if err := wechat.Post(wx.ApiMp + "/tags/members/batchblacklist").
+	if err := wechat.Post(wx.ApiCgiBin + "/tags/members/batchblacklist").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		SetJSON(param).
 		BindJSON(&res).
@@ -551,7 +551,7 @@ func (ctx *Context) UserBlackListUnPush(openidList []string) (*wx.Response, erro
 	param := new(ParamUserBlackListUnPush)
 	param.OpenidList = openidList
 	var res wx.Response
-	if err := wechat.Post(wx.ApiMp + "/tags/members/batchunblacklist").
+	if err := wechat.Post(wx.ApiCgiBin + "/tags/members/batchunblacklist").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		SetJSON(param).
 		BindJSON(&res).

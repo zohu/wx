@@ -39,7 +39,7 @@ type ResponseMpTicket struct {
 
 func (c *Context) newAccessTokenForMp() (string, string) {
 	var res ResponseAccessToken
-	err := wechat.Get(ApiMp + "/token").
+	err := wechat.Get(ApiCgiBin + "/token").
 		SetQuery(ParamMpAccessToken{
 			GrantType: "client_credential",
 			Appid:     c.AppidMain(),
@@ -56,7 +56,7 @@ func (c *Context) newAccessTokenForMp() (string, string) {
 		return "", ""
 	}
 	var tk ResponseMpTicket
-	err = wechat.Get(ApiMp + "/ticket/getticket").
+	err = wechat.Get(ApiCgiBin + "/ticket/getticket").
 		SetQuery(&ParamMpTicket{
 			AccessToken: res.AccessToken,
 			Type:        "jsapi",
@@ -82,7 +82,7 @@ type ParamWorkAccessToken struct {
 // @return string
 func (c *Context) newAccessTokenForWork() (string, string) {
 	var res ResponseAccessToken
-	err := wechat.Get(ApiWork + "/gettoken").
+	err := wechat.Get(ApiWorkCgiBin + "/gettoken").
 		SetQuery(ParamWorkAccessToken{
 			Corpid:     c.AppidMain(),
 			Corpsecret: c.AppSecret(),
@@ -97,7 +97,7 @@ func (c *Context) newAccessTokenForWork() (string, string) {
 		zlog.Warn("获取token失败", zap.Int("errcode", res.Errcode), zap.String("errmsg", res.Errmsg))
 	}
 	var tk ResponseMpTicket
-	err = wechat.Get(ApiWork + "/ticket/get").
+	err = wechat.Get(ApiWorkCgiBin + "/ticket/get").
 		SetQuery(&ParamMpTicket{
 			AccessToken: res.AccessToken,
 			Type:        "agent_config",

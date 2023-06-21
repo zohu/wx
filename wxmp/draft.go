@@ -64,7 +64,7 @@ func (ctx *Context) DraftGetAll(h *ParamDraftGetAll) (*ResDraftGetAll, error) {
 	}
 	wechat := wx.NewWechat()
 	var wxr ResDraftGetAllWx
-	if err := wechat.Post(wx.ApiMp + "/draft/batchget").
+	if err := wechat.Post(wx.ApiCgiBin + "/draft/batchget").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		SetJSON(&ParamDraftGetAllWx{
 			Offset:    (h.Page - 1) * h.Rows,

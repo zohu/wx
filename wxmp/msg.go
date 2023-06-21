@@ -26,7 +26,7 @@ func (ctx *Context) MsgSetIndustry(p *ParamMsgSetIndustry) (*wx.Response, error)
 	}
 	var res wx.Response
 	wechat := wx.NewWechat()
-	if err := wechat.Post(wx.ApiMp + "/template/api_set_industry").
+	if err := wechat.Post(wx.ApiCgiBin + "/template/api_set_industry").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		SetJSON(&p).
 		BindJSON(&res).
@@ -65,7 +65,7 @@ func (ctx *Context) MsgGetIndustry() (*ResGetIndustry, error) {
 	}
 	var res ResGetIndustry
 	wechat := wx.NewWechat()
-	if err := wechat.Get(wx.ApiMp + "/template/get_industry").
+	if err := wechat.Get(wx.ApiCgiBin + "/template/get_industry").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		BindJSON(&res).
 		Do(); err != nil {
@@ -100,7 +100,7 @@ func (ctx *Context) MsgGetTemplateId(shortId string) (*ResMsgGetTemplateId, erro
 	}
 	var res ResMsgGetTemplateId
 	wechat := wx.NewWechat()
-	if err := wechat.Post(wx.ApiMp + "/template/api_add_template").
+	if err := wechat.Post(wx.ApiCgiBin + "/template/api_add_template").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		SetJSON(&ParamMsgGetTemplateId{TemplateIdShort: shortId}).
 		BindJSON(&res).
@@ -139,7 +139,7 @@ func (ctx *Context) MsgGetTemplateList() (*ResMsgGetTemplateList, error) {
 	}
 	var res ResMsgGetTemplateList
 	wechat := wx.NewWechat()
-	if err := wechat.Get(wx.ApiMp + "/template/get_all_private_template").
+	if err := wechat.Get(wx.ApiCgiBin + "/template/get_all_private_template").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		BindJSON(&res).
 		Do(); err != nil {
@@ -170,7 +170,7 @@ func (ctx *Context) MsgDelTemplate(templateId string) (*wx.Response, error) {
 	}
 	var res wx.Response
 	wechat := wx.NewWechat()
-	if err := wechat.Post(wx.ApiMp + "/template/del_private_template").
+	if err := wechat.Post(wx.ApiCgiBin + "/template/del_private_template").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		SetJSON(&ParamMsgDelTemplate{TemplateId: templateId}).
 		BindJSON(&res).
@@ -213,7 +213,7 @@ func (ctx *Context) MsgSendTemplate(p *ParamMsgSendTemplate) (*wx.Response, erro
 	}
 	var res wx.Response
 	wechat := wx.NewWechat()
-	if err := wechat.Post(wx.ApiMp + "/message/template/send").
+	if err := wechat.Post(wx.ApiCgiBin + "/message/template/send").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		SetJSON(p).
 		BindJSON(&res).
@@ -256,7 +256,7 @@ func (ctx *Context) MsgSubscribe(p *ParamMsgSubscribe) (*wx.Response, error) {
 	}
 	var res wx.Response
 	wechat := wx.NewWechat()
-	if err := wechat.Post(wx.ApiMp + "/message/template/subscribe").
+	if err := wechat.Post(wx.ApiCgiBin + "/message/template/subscribe").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		SetJSON(p).
 		BindJSON(&res).
@@ -324,7 +324,7 @@ func (ctx *Context) MsgGetAutoReply() (*ResMsgGetAutoReply, error) {
 	}
 	var res ResMsgGetAutoReply
 	wechat := wx.NewWechat()
-	if err := wechat.Get(wx.ApiMp + "/get_current_autoreply_info").
+	if err := wechat.Get(wx.ApiCgiBin + "/get_current_autoreply_info").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		BindJSON(&res).
 		Do(); err != nil {

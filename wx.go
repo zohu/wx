@@ -80,9 +80,7 @@ func Init(op *Option) {
 }
 
 func NewWechat() *Wechat {
-	c, cc := context.WithCancel(context.Background())
-	wechat.ctx = c
-	wechat.Cancel = cc
+	wechat.ctx, wechat.Cancel = context.WithCancel(context.Background())
 	return wechat
 }
 

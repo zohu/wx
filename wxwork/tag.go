@@ -39,7 +39,7 @@ func (ctx *Context) TagList(p ParamTagList) ([]ResponseTagListItem, error) {
 	}
 	wechat := wx.NewWechat()
 	var res ResponseTagList
-	err := wechat.Post(wx.ApiWork + "/externalcontact/get_corp_tag_list").
+	err := wechat.Post(wx.ApiWorkCgiBin + "/externalcontact/get_corp_tag_list").
 		SetQuery(wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		SetJSON(p).
 		BindJSON(&res).

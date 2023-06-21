@@ -76,7 +76,7 @@ func (ctx *Context) MenuAdd(menu *Menu) error {
 	b, _ := json.Marshal(menu)
 	b1 := string(b)
 	b1 = strings.ReplaceAll(b1, "\\u0026", "&")
-	if err := wechat.Post(wx.ApiMp + "/menu/create").
+	if err := wechat.Post(wx.ApiCgiBin + "/menu/create").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		SetBody([]byte(b1)).
 		BindJSON(&res).
@@ -119,7 +119,7 @@ func (ctx *Context) MenuQuery() (*ResMenuQuery, error) {
 	}
 	var res ResMenuQuery
 	wechat := wx.NewWechat()
-	if err := wechat.Get(wx.ApiMp + "/get_current_selfmenu_info").
+	if err := wechat.Get(wx.ApiCgiBin + "/get_current_selfmenu_info").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		BindJSON(&res).
 		Do(); err != nil {
@@ -144,7 +144,7 @@ func (ctx *Context) MenuDelete() error {
 	}
 	var res wx.Response
 	wechat := wx.NewWechat()
-	if err := wechat.Get(wx.ApiMp + "/menu/delete").
+	if err := wechat.Get(wx.ApiCgiBin + "/menu/delete").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		BindJSON(&res).
 		Do(); err != nil {
@@ -176,7 +176,7 @@ func (ctx *Context) MenuDiyAdd(menu MenuDiy) (*ResMenuDiyAdd, error) {
 	}
 	var res ResMenuDiyAdd
 	wechat := wx.NewWechat()
-	if err := wechat.Post(wx.ApiMp + "/menu/addconditional").
+	if err := wechat.Post(wx.ApiCgiBin + "/menu/addconditional").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		SetJSON(&menu).
 		BindJSON(&res).
@@ -207,7 +207,7 @@ func (ctx *Context) MenuDiyDelete(menuid string) (*wx.Response, error) {
 	}
 	var res wx.Response
 	wechat := wx.NewWechat()
-	if err := wechat.Post(wx.ApiMp + "/menu/delconditional").
+	if err := wechat.Post(wx.ApiCgiBin + "/menu/delconditional").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		SetJSON(&struct {
 			Menuid string `json:"menuid"`
@@ -244,7 +244,7 @@ func (ctx *Context) MenuDiyTest(userID string) (*ResMenuDiyTest, error) {
 	}
 	var res ResMenuDiyTest
 	wechat := wx.NewWechat()
-	if err := wechat.Post(wx.ApiMp + "/menu/trymatch").
+	if err := wechat.Post(wx.ApiCgiBin + "/menu/trymatch").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		SetJSON(&struct {
 			UserID string `json:"user_id"`
@@ -284,7 +284,7 @@ func (ctx *Context) MenuQueryAll() (*ResMenuQueryAll, error) {
 	}
 	var res ResMenuQueryAll
 	wechat := wx.NewWechat()
-	if err := wechat.Get(wx.ApiMp + "/menu/get").
+	if err := wechat.Get(wx.ApiCgiBin + "/menu/get").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		BindJSON(&res).
 		Do(); err != nil {

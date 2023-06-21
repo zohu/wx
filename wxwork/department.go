@@ -24,7 +24,7 @@ func (ctx *Context) DepartmentCreat(p Department) (int64, error) {
 	}
 	wechat := wx.NewWechat()
 	var res ResponseDepartmentCreat
-	err := wechat.Post(wx.ApiWork + "/department/create").
+	err := wechat.Post(wx.ApiWorkCgiBin + "/department/create").
 		SetQuery(wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		SetJSON(p).
 		BindJSON(&res).
@@ -47,7 +47,7 @@ func (ctx *Context) DepartmentUpdate(p Department) error {
 	}
 	wechat := wx.NewWechat()
 	var res wx.Response
-	err := wechat.Post(wx.ApiWork + "/department/update").
+	err := wechat.Post(wx.ApiWorkCgiBin + "/department/update").
 		SetQuery(wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		SetJSON(p).
 		BindJSON(&res).
@@ -76,7 +76,7 @@ func (ctx *Context) DepartmentDelete(p ParamDepartmentDelete) error {
 	p.AccessToken = ctx.GetAccessToken()
 	wechat := wx.NewWechat()
 	var res wx.Response
-	err := wechat.Get(wx.ApiWork + "/department/delete").
+	err := wechat.Get(wx.ApiWorkCgiBin + "/department/delete").
 		SetQuery(p).
 		BindJSON(&res).
 		Do()
@@ -108,7 +108,7 @@ func (ctx *Context) DepartmentList(p ParamDepartmentList) ([]Department, error) 
 	p.AccessToken = ctx.GetAccessToken()
 	wechat := wx.NewWechat()
 	var res ResponseDepartmentList
-	err := wechat.Get(wx.ApiWork + "/department/list").
+	err := wechat.Get(wx.ApiWorkCgiBin + "/department/list").
 		SetQuery(p).
 		BindJSON(&res).
 		Do()

@@ -62,7 +62,7 @@ func (ctx *Context) ScheduleCreate(p ScheduleCreateInfo) (string, error) {
 	//response实体
 	var res ScheduleResponse
 
-	if err := wechat.Post(wx.ApiWork + "/oa/schedule/add").
+	if err := wechat.Post(wx.ApiWorkCgiBin + "/oa/schedule/add").
 		SetQuery(wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		SetJSON(p).
 		BindJSON(&res).
@@ -95,7 +95,7 @@ func (ctx *Context) ScheduleUpdate(p ScheduleUpdateInfo) (string, error) {
 	//response实体
 	var res ScheduleResponse
 
-	if err := wechat.Post(wx.ApiWork + "/oa/schedule/update").
+	if err := wechat.Post(wx.ApiWorkCgiBin + "/oa/schedule/update").
 		SetQuery(wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		SetJSON(p).
 		BindJSON(&res).
@@ -126,7 +126,7 @@ func (ctx *Context) ScheduleAttendeesUpdate(p AttendeesUpdateInfo, attendeesType
 	//response实体
 	var res wx.Response
 
-	if err := wechat.Post(wx.ApiWork + fmt.Sprintf("oa/schedule/%s", attendeesType)).
+	if err := wechat.Post(wx.ApiWorkCgiBin + fmt.Sprintf("oa/schedule/%s", attendeesType)).
 		SetQuery(wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		SetJSON(p).
 		BindJSON(&res).
@@ -197,7 +197,7 @@ func (ctx *Context) GetScheduleDetail(p GetScheduleRequest) (ScheduleDetailRespo
 	}
 	wechat := wx.NewWechat()
 
-	if err := wechat.Post(wx.ApiWork + "/oa/schedule/get").
+	if err := wechat.Post(wx.ApiWorkCgiBin + "/oa/schedule/get").
 		SetQuery(wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		SetJSON(p).
 		BindJSON(&res).
@@ -229,7 +229,7 @@ func (ctx *Context) CancelSchedule(p CancelSchedule) error {
 	//response实体
 	var res wx.Response
 
-	if err := wechat.Post(wx.ApiWork + "/oa/schedule/del").
+	if err := wechat.Post(wx.ApiWorkCgiBin + "/oa/schedule/del").
 		SetQuery(wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		SetJSON(p).
 		BindJSON(&res).

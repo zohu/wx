@@ -21,9 +21,16 @@ func (n *ParamNotify) IsSafeMode() bool {
 // CDATA  使用该类型,在序列化为 xml 文本时文本会被解析器忽略
 type CDATA string
 
-// MarshalXML 实现自己的序列化方法
 func (c CDATA) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	return e.EncodeElement(struct {
 		string `xml:",cdata"`
 	}{string(c)}, start)
+}
+
+type Err struct {
+	Errcode int64  `json:"errcode,omitempty"`
+	Errmsg  string `json:"errmsg,omitempty"`
+	Appid   string `json:"appid"`
+	Err     string `json:"err"`
+	Desc    string `json:"desc"`
 }

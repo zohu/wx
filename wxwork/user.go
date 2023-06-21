@@ -47,7 +47,7 @@ func (ctx *Context) UserList(p ParamUserList) ([]User, error) {
 	p.AccessToken = ctx.GetAccessToken()
 	wechat := wx.NewWechat()
 	var res ResponseUserList
-	err := wechat.Get(wx.ApiWork + "/user/list").
+	err := wechat.Get(wx.ApiWorkCgiBin + "/user/list").
 		SetQuery(p).
 		BindJSON(&res).
 		Do()

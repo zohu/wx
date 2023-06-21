@@ -62,7 +62,7 @@ func (ctx *Context) IssueList(noContent int, page int64, rows int64) (*ResIssueL
 	}
 	wechat := wx.NewWechat()
 	var wxr ResIssueListItem
-	if err := wechat.Post(wx.ApiMp + "/freepublish/batchget").
+	if err := wechat.Post(wx.ApiCgiBin + "/freepublish/batchget").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		SetJSON(&ParamIssueList{
 			Offset:    (page - 1) * rows,

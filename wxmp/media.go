@@ -53,7 +53,7 @@ func (ctx *Context) MediaTemporaryAdd(mediaType MediaType, file io.Reader, fileN
 	q.AccessToken = ctx.GetAccessToken()
 	q.Type = mediaType
 	wechat := wx.NewWechat()
-	if err := wechat.Post(wx.ApiMp + "/media/upload").
+	if err := wechat.Post(wx.ApiCgiBin + "/media/upload").
 		SetQuery(&q).
 		SetHeader(gout.H{"Content-Type": bw.FormDataContentType()}).
 		SetBody(pr).
@@ -123,7 +123,7 @@ func (ctx *Context) MediaList(mediaType MediaType, page int64, rows int64) (*Res
 	}
 	wechat := wx.NewWechat()
 	var wxr ResMediaListItem
-	if err := wechat.Post(wx.ApiMp + "/material/batchget_material").
+	if err := wechat.Post(wx.ApiCgiBin + "/material/batchget_material").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		SetJSON(&ParamMediaList{
 			Offset: (page - 1) * rows,

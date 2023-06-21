@@ -32,7 +32,15 @@
 
 ## 微信小程序
 ### 登录
+- [x] 小程序登录
+```
+err := app.Code2Session(code)
+```
 ### 用户信息
+- [x] 手机号快速验证
+```
+err := app.GetPhoneNumber(code)
+```
 ### 接口调用凭证
 ### 数据分析
 ### 客服消息

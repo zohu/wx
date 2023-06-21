@@ -31,7 +31,7 @@ func (ctx *Context) SubAddTemplate(p *ParamSubAddTemplate) (*ResSubAddTemplate, 
 	}
 	var res ResSubAddTemplate
 	wechat := wx.NewWechat()
-	if err := wechat.Post(wx.ApiWxa + "/newtmpl/addtemplate").
+	if err := wechat.Post(wx.ApiWxaapi + "/newtmpl/addtemplate").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		SetJSON(p).
 		BindJSON(&res).
@@ -63,7 +63,7 @@ func (ctx *Context) SubDelTemplate(priTmplId string) (*wx.Response, error) {
 	}
 	var res wx.Response
 	wechat := wx.NewWechat()
-	if err := wechat.Post(wx.ApiWxa + "/newtmpl/deltemplate").
+	if err := wechat.Post(wx.ApiWxaapi + "/newtmpl/deltemplate").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		SetJSON(&ParamSubDelTemplate{PriTmplId: priTmplId}).
 		BindJSON(&res).
@@ -98,7 +98,7 @@ func (ctx *Context) SubGetCategory() (*ResSubGetCategory, error) {
 	}
 	var res ResSubGetCategory
 	wechat := wx.NewWechat()
-	if err := wechat.Get(wx.ApiWxa + "/newtmpl/getcategory").
+	if err := wechat.Get(wx.ApiWxaapi + "/newtmpl/getcategory").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		BindJSON(&res).
 		Do(); err != nil {
@@ -142,7 +142,7 @@ func (ctx *Context) SubGetTemplateKeywords(tid string) (*ResSubGetTemplateKeywor
 	query.Tid = tid
 	var res ResSubGetTemplateKeywords
 	wechat := wx.NewWechat()
-	if err := wechat.Get(wx.ApiWxa + "/newtmpl/getpubtemplatekeywords").
+	if err := wechat.Get(wx.ApiWxaapi + "/newtmpl/getpubtemplatekeywords").
 		SetQuery(query).
 		BindJSON(&res).
 		Do(); err != nil {
@@ -192,7 +192,7 @@ func (ctx *Context) SubGetTemplateTitle(ids string, start int, limit int) (*ResS
 	query.Limit = limit
 	var res ResSubGetTemplateTitle
 	wechat := wx.NewWechat()
-	if err := wechat.Get(wx.ApiWxa + "/newtmpl/getpubtemplatetitles").
+	if err := wechat.Get(wx.ApiWxaapi + "/newtmpl/getpubtemplatetitles").
 		SetQuery(query).
 		BindJSON(&res).
 		Do(); err != nil {
@@ -229,7 +229,7 @@ func (ctx *Context) SubGetTemplates() (*ResSubGetTemplates, error) {
 	}
 	var res ResSubGetTemplates
 	wechat := wx.NewWechat()
-	if err := wechat.Get(wx.ApiWxa + "/newtmpl/gettemplate").
+	if err := wechat.Get(wx.ApiWxaapi + "/newtmpl/gettemplate").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		BindJSON(&res).
 		Do(); err != nil {
@@ -266,7 +266,7 @@ func (ctx *Context) SubBizSend(p *ParamSubBizSend) (*wx.Response, error) {
 	}
 	var res wx.Response
 	wechat := wx.NewWechat()
-	if err := wechat.Post(wx.ApiMp + "/message/subscribe/bizsend").
+	if err := wechat.Post(wx.ApiCgiBin + "/message/subscribe/bizsend").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		SetJSON(p).
 		BindJSON(&res).
