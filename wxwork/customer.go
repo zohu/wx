@@ -2,7 +2,6 @@ package wxwork
 
 import (
 	"encoding/xml"
-	"fmt"
 	"github.com/zohu/wx"
 	"time"
 )
@@ -68,9 +67,13 @@ type ResponseCustomerList struct {
 	ExternalUserid []string `json:"external_userid"`
 }
 
-func (ctx *Context) FindCustomerList(p ParamCustomerList) ([]string, error) {
+func (ctx *Context) FindCustomerList(p ParamCustomerList) ([]string, *wx.Err) {
 	if !ctx.IsWork() {
-		return nil, fmt.Errorf("企业微信：应用 %s 非企业号", ctx.Appid())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not work wechat",
+			Desc:  "非企业微信",
+		}
 	}
 	p.AccessToken = ctx.GetAccessToken()
 	wechat := wx.NewWechat()
@@ -80,13 +83,23 @@ func (ctx *Context) FindCustomerList(p ParamCustomerList) ([]string, error) {
 		BindJSON(&res).
 		Do()
 	if err != nil {
-		return nil, fmt.Errorf("企业微信：查询客户列表失败（%s）", err.Error())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.FindCustomerList(p)
 		}
-		return nil, fmt.Errorf("企业微信：查询客户列表失败（%d-%s）", res.Errcode, res.Errmsg)
+		return nil, &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failed to query customer list",
+			Desc:    "查询客户列表失败",
+		}
 	}
 	return res.ExternalUserid, nil
 }
@@ -161,10 +174,14 @@ type FollowUser struct {
 // @param p
 // @return Customer
 // @return error
-func (ctx *Context) FindCustomerDetailWithExternalUserid(p ParamCustomerDetailWithExternalUserid) (ResponseCustomerDetailWithExternalUserid, error) {
+func (ctx *Context) FindCustomerDetailWithExternalUserid(p ParamCustomerDetailWithExternalUserid) (ResponseCustomerDetailWithExternalUserid, *wx.Err) {
 	var cus ResponseCustomerDetailWithExternalUserid
 	if !ctx.IsWork() {
-		return cus, fmt.Errorf("企业微信：应用 %s 非企业号", ctx.App.Appid)
+		return cus, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "is not work wechat",
+			Desc:  "非企业微信",
+		}
 	}
 	p.AccessToken = ctx.GetAccessToken()
 	wechat := wx.NewWechat()
@@ -174,13 +191,23 @@ func (ctx *Context) FindCustomerDetailWithExternalUserid(p ParamCustomerDetailWi
 		BindJSON(&res).
 		Do()
 	if err != nil {
-		return cus, fmt.Errorf("企业微信：查询客户详情失败（%s）", err.Error())
+		return cus, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.FindCustomerDetailWithExternalUserid(p)
 		}
-		return cus, fmt.Errorf("企业微信：查询客户详情失败（%d-%s）", res.Errcode, res.Errmsg)
+		return cus, &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failure to check customer details",
+			Desc:    "查询客户详情失败",
+		}
 	}
 	return res, nil
 }
@@ -205,9 +232,13 @@ type ResponseCustomerDetail struct {
 // @param list
 // @return []Customer
 // @return error
-func (ctx *Context) FindCustomerDetail(p ParamCustomerDetail, list []Customer) ([]Customer, error) {
+func (ctx *Context) FindCustomerDetail(p ParamCustomerDetail, list []Customer) ([]Customer, *wx.Err) {
 	if !ctx.IsWork() {
-		return nil, fmt.Errorf("企业微信：应用 %s 非企业号", ctx.App.Appid)
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "is not work wechat",
+			Desc:  "非企业微信",
+		}
 	}
 	if list == nil {
 		list = []Customer{}
@@ -221,13 +252,23 @@ func (ctx *Context) FindCustomerDetail(p ParamCustomerDetail, list []Customer) (
 		BindJSON(&res).
 		Do()
 	if err != nil {
-		return list, fmt.Errorf("企业微信：查询客户详情失败（%s）", err.Error())
+		return list, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.FindCustomerDetail(p, list)
 		}
-		return list, fmt.Errorf("企业微信：查询客户详情失败（%d-%s）", res.Errcode, res.Errmsg)
+		return list, &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failure to check customer details",
+			Desc:    "查询客户详情失败",
+		}
 	}
 	for i := range res.ExternalContactList {
 		info := res.ExternalContactList[i]
