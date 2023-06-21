@@ -1,7 +1,6 @@
 package wxmp
 
 import (
-	"fmt"
 	"github.com/zohu/wx"
 )
 
@@ -41,9 +40,13 @@ type ResQrcode struct {
 // @param p
 // @return string
 // @return error
-func (ctx *Context) Qrcode(p *ParamNewQrcode) (*ResQrcode, error) {
+func (ctx *Context) Qrcode(p *ParamNewQrcode) (*ResQrcode, *wx.Err) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.Appid())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not public app",
+			Desc:  "非公众号应用",
+		}
 	}
 	var param ParamQrcode
 	param.ActionInfo.Scene.SceneStr = p.Scene
@@ -61,13 +64,23 @@ func (ctx *Context) Qrcode(p *ParamNewQrcode) (*ResQrcode, error) {
 		BindJSON(&res).
 		Do()
 	if err != nil {
-		return nil, fmt.Errorf("%s 获取二维码失败（%s）", ctx.App.Appid, err.Error())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.Qrcode(p)
 		}
-		return nil, fmt.Errorf("%s 获取二维码失败（%d-%s）", ctx.App.Appid, res.Errcode, res.Errmsg)
+		return nil, &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failed to get qrcode",
+			Desc:    "获取二维码失败",
+		}
 	}
 	return &res, nil
 }
@@ -88,9 +101,13 @@ type ResGenShorten struct {
 // @param ex
 // @return *ResShortKey
 // @return error
-func (ctx *Context) GenShorten(data string, ex ...int) (*ResGenShorten, error) {
+func (ctx *Context) GenShorten(data string, ex ...int) (*ResGenShorten, *wx.Err) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.App.Appid)
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not public app",
+			Desc:  "非公众号应用",
+		}
 	}
 	wechat := wx.NewWechat()
 	param := new(ParamGenShorten)
@@ -104,13 +121,23 @@ func (ctx *Context) GenShorten(data string, ex ...int) (*ResGenShorten, error) {
 		SetJSON(param).
 		BindJSON(&res).
 		Do(); err != nil {
-		return nil, fmt.Errorf("获取短KEY %s %s", ctx.App.Appid, err.Error())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.GenShorten(data, ex...)
 		}
-		return nil, fmt.Errorf("获取短KEY %s %d-%s", ctx.App.Appid, res.Errcode, res.Errmsg)
+		return nil, &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failed to get short key",
+			Desc:    "获取短key失败",
+		}
 	}
 	return &res, nil
 }
@@ -131,9 +158,13 @@ type ResFetchGenShorten struct {
 // @param shortKey
 // @return *ResFetchGenShorten
 // @return error
-func (ctx *Context) FetchGenShorten(shortKey string) (*ResFetchGenShorten, error) {
+func (ctx *Context) FetchGenShorten(shortKey string) (*ResFetchGenShorten, *wx.Err) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.App.Appid)
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not public app",
+			Desc:  "非公众号应用",
+		}
 	}
 	wechat := wx.NewWechat()
 	param := new(ParamFetchGenShorten)
@@ -144,13 +175,23 @@ func (ctx *Context) FetchGenShorten(shortKey string) (*ResFetchGenShorten, error
 		SetJSON(param).
 		BindJSON(&res).
 		Do(); err != nil {
-		return nil, fmt.Errorf("还原短key %s %s", ctx.App.Appid, err.Error())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.FetchGenShorten(shortKey)
 		}
-		return nil, fmt.Errorf("还原短key %s %d-%s", ctx.App.Appid, res.Errcode, res.Errmsg)
+		return nil, &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failed to fetch short key",
+			Desc:    "还原短key失败",
+		}
 	}
 	return &res, nil
 }

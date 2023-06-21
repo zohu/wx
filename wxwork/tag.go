@@ -1,7 +1,6 @@
 package wxwork
 
 import (
-	"fmt"
 	"github.com/zohu/wx"
 )
 
@@ -33,9 +32,13 @@ type ResponseTagListItem struct {
 	Order int `json:"order"`
 }
 
-func (ctx *Context) TagList(p ParamTagList) ([]ResponseTagListItem, error) {
+func (ctx *Context) TagList(p ParamTagList) ([]ResponseTagListItem, *wx.Err) {
 	if !ctx.IsWork() {
-		return nil, fmt.Errorf("企业微信：应用 %s 非企业号", ctx.Appid())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not work",
+			Desc:  "非企业微信应用",
+		}
 	}
 	wechat := wx.NewWechat()
 	var res ResponseTagList
@@ -45,13 +48,23 @@ func (ctx *Context) TagList(p ParamTagList) ([]ResponseTagListItem, error) {
 		BindJSON(&res).
 		Do()
 	if err != nil {
-		return nil, fmt.Errorf("企业微信：查询标签失败（%s）", err.Error())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.TagList(p)
 		}
-		return nil, fmt.Errorf("企业微信：查询标签失败（%d-%s）", res.Errcode, res.Errmsg)
+		return nil, &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failed to get tag list",
+			Desc:    "查询标签失败",
+		}
 	}
 	return res.TagGroup, nil
 }

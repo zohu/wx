@@ -1,7 +1,6 @@
 package wxmp
 
 import (
-	"fmt"
 	"github.com/zohu/wx"
 )
 
@@ -33,9 +32,13 @@ type ResUserFromOpenid struct {
 // @param openid
 // @return *Userinfo
 // @return error
-func (ctx *Context) UserFromOpenid(openid string) (*Userinfo, error) {
+func (ctx *Context) UserFromOpenid(openid string) (*Userinfo, *wx.Err) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.Appid())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not public app",
+			Desc:  "非公众号应用",
+		}
 	}
 	wechat := wx.NewWechat()
 	p := new(ParamUserFromOpenid)
@@ -46,13 +49,23 @@ func (ctx *Context) UserFromOpenid(openid string) (*Userinfo, error) {
 		SetQuery(&p).
 		BindJSON(&res).
 		Do(); err != nil {
-		return nil, fmt.Errorf("%s 查询用户信息失败，%s", ctx.App.Appid, err.Error())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.UserFromOpenid(openid)
 		}
-		return nil, fmt.Errorf("%s 查询用户信息失败，%s，%d-%s", ctx.App.Appid, openid, res.Errcode, res.Errmsg)
+		return nil, &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failed to get userinfo",
+			Desc:    "查询用户信息失败",
+		}
 	}
 	return &Userinfo{
 		Subscribe:      res.Subscribe,
@@ -89,9 +102,13 @@ type ResQueryUserList struct {
 // @param nextOpenID
 // @return *ResQueryUserList
 // @return error
-func (ctx *Context) UserList(nextOpenID string) (*ResQueryUserList, error) {
+func (ctx *Context) UserList(nextOpenID string) (*ResQueryUserList, *wx.Err) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.App.Appid)
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not public app",
+			Desc:  "非公众号应用",
+		}
 	}
 	var res ResQueryUserList
 	param := new(ParamQueryUserList)
@@ -104,13 +121,23 @@ func (ctx *Context) UserList(nextOpenID string) (*ResQueryUserList, error) {
 		SetQuery(&param).
 		BindJSON(&res).
 		Do(); err != nil {
-		return nil, fmt.Errorf("%s 查询用户列表失败 %s", ctx.App.Appid, err.Error())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.UserList(nextOpenID)
 		}
-		return nil, fmt.Errorf("%s 查询用户列表失败，%d-%s", ctx.App.Appid, res.Errcode, res.Errmsg)
+		return nil, &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failed to get user list",
+			Desc:    "查询用户列表失败",
+		}
 	}
 	return &res, nil
 }
@@ -133,9 +160,13 @@ type ResUserTagCreate struct {
 // @param name
 // @return *ResUserTagCreate
 // @return error
-func (ctx *Context) UserTagCreate(name string) (*ResUserTagCreate, error) {
+func (ctx *Context) UserTagCreate(name string) (*ResUserTagCreate, *wx.Err) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.App.Appid)
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not public app",
+			Desc:  "非公众号应用",
+		}
 	}
 	wechat := wx.NewWechat()
 	var res ResUserTagCreate
@@ -146,13 +177,23 @@ func (ctx *Context) UserTagCreate(name string) (*ResUserTagCreate, error) {
 		SetJSON(param).
 		BindJSON(&res).
 		Do(); err != nil {
-		return nil, fmt.Errorf("创建标签失败 %s %s", ctx.App.Appid, err.Error())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.UserTagCreate(name)
 		}
-		return nil, fmt.Errorf("创建标签失败 %s %d-%s", ctx.App.Appid, res.Errcode, res.Errmsg)
+		return nil, &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failed to create user tag",
+			Desc:    "创建标签失败",
+		}
 	}
 	return &res, nil
 }
@@ -171,9 +212,13 @@ type ResUserTagQuery struct {
 // @receiver ctx
 // @return *ResUserTagQuery
 // @return error
-func (ctx *Context) UserTagQuery() (*ResUserTagQuery, error) {
+func (ctx *Context) UserTagQuery() (*ResUserTagQuery, *wx.Err) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.App.Appid)
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not public app",
+			Desc:  "非公众号应用",
+		}
 	}
 	wechat := wx.NewWechat()
 	var res ResUserTagQuery
@@ -181,13 +226,23 @@ func (ctx *Context) UserTagQuery() (*ResUserTagQuery, error) {
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		BindJSON(&res).
 		Do(); err != nil {
-		return nil, fmt.Errorf("查询标签失败 %s %s", ctx.App.Appid, err.Error())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.UserTagQuery()
 		}
-		return nil, fmt.Errorf("查询标签失败 %s %d-%s", ctx.App.Appid, res.Errcode, res.Errmsg)
+		return nil, &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failed to get tags",
+			Desc:    "查询标签失败",
+		}
 	}
 	return &res, nil
 }
@@ -203,9 +258,13 @@ type ParamUserTagEdit struct {
 // @param name
 // @return *wx.Response
 // @return error
-func (ctx *Context) UserTagEdit(id int64, name string) (*wx.Response, error) {
+func (ctx *Context) UserTagEdit(id int64, name string) (*wx.Response, *wx.Err) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.App.Appid)
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not public app",
+			Desc:  "非公众号应用",
+		}
 	}
 	wechat := wx.NewWechat()
 	var res wx.Response
@@ -217,13 +276,23 @@ func (ctx *Context) UserTagEdit(id int64, name string) (*wx.Response, error) {
 		SetJSON(param).
 		BindJSON(&res).
 		Do(); err != nil {
-		return nil, fmt.Errorf("更新标签失败 %s %s", ctx.App.Appid, err.Error())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.UserTagEdit(id, name)
 		}
-		return nil, fmt.Errorf("更新标签失败 %s %d-%s", ctx.App.Appid, res.Errcode, res.Errmsg)
+		return nil, &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failed to update user tag",
+			Desc:    "更新标签失败",
+		}
 	}
 	return &res, nil
 }
@@ -238,9 +307,13 @@ type ParamUserTagDel struct {
 // @param id
 // @return *wx.Response
 // @return error
-func (ctx *Context) UserTagDel(id int64) (*wx.Response, error) {
+func (ctx *Context) UserTagDel(id int64) (*wx.Response, *wx.Err) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.App.Appid)
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not public app",
+			Desc:  "非公众号应用",
+		}
 	}
 	wechat := wx.NewWechat()
 	var res wx.Response
@@ -251,13 +324,23 @@ func (ctx *Context) UserTagDel(id int64) (*wx.Response, error) {
 		SetJSON(param).
 		BindJSON(&res).
 		Do(); err != nil {
-		return nil, fmt.Errorf("删除标签失败 %s %s", ctx.App.Appid, err.Error())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.UserTagDel(id)
 		}
-		return nil, fmt.Errorf("删除标签失败 %s %d-%s", ctx.App.Appid, res.Errcode, res.Errmsg)
+		return nil, &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failed to delete user tag",
+			Desc:    "删除标签失败",
+		}
 	}
 	return &res, nil
 }
@@ -282,9 +365,13 @@ type ResUserTagGetUser struct {
 // @param nextOpenid
 // @return *ResUserTagGetUser
 // @return error
-func (ctx *Context) UserTagGetUser(id int64, nextOpenid string) (*ResUserTagGetUser, error) {
+func (ctx *Context) UserTagGetUser(id int64, nextOpenid string) (*ResUserTagGetUser, *wx.Err) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.App.Appid)
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not public app",
+			Desc:  "非公众号应用",
+		}
 	}
 	wechat := wx.NewWechat()
 	var res ResUserTagGetUser
@@ -296,13 +383,23 @@ func (ctx *Context) UserTagGetUser(id int64, nextOpenid string) (*ResUserTagGetU
 		SetJSON(param).
 		BindJSON(&res).
 		Do(); err != nil {
-		return nil, fmt.Errorf("获取标签下粉丝列表 %s %s", ctx.App.Appid, err.Error())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.UserTagGetUser(id, nextOpenid)
 		}
-		return nil, fmt.Errorf("获取标签下粉丝列表 %s %d-%s", ctx.App.Appid, res.Errcode, res.Errmsg)
+		return nil, &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failed to get users by tag",
+			Desc:    "获取标签下的粉丝列表失败",
+		}
 	}
 	return &res, nil
 }
@@ -319,9 +416,13 @@ type ParamUserTagBatch struct {
 // @param tagid
 // @return *wx.Response
 // @return error
-func (ctx *Context) UserTagBatch(openid []string, tagid int64) (*wx.Response, error) {
+func (ctx *Context) UserTagBatch(openid []string, tagid int64) (*wx.Response, *wx.Err) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.App.Appid)
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not public app",
+			Desc:  "非公众号应用",
+		}
 	}
 	wechat := wx.NewWechat()
 	var res wx.Response
@@ -333,13 +434,23 @@ func (ctx *Context) UserTagBatch(openid []string, tagid int64) (*wx.Response, er
 		SetJSON(param).
 		BindJSON(&res).
 		Do(); err != nil {
-		return nil, fmt.Errorf("批量为用户打标签 %s %s", ctx.App.Appid, err.Error())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.UserTagBatch(openid, tagid)
 		}
-		return nil, fmt.Errorf("批量为用户打标签 %s %d-%s", ctx.App.Appid, res.Errcode, res.Errmsg)
+		return nil, &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failed to create user tag",
+			Desc:    "批量为用户打标签失败",
+		}
 	}
 	return &res, nil
 }
@@ -356,9 +467,13 @@ type ParamUserTagUnBatch struct {
 // @param tagid
 // @return *wx.Response
 // @return error
-func (ctx *Context) UserTagUnBatch(openid []string, tagid int64) (*wx.Response, error) {
+func (ctx *Context) UserTagUnBatch(openid []string, tagid int64) (*wx.Response, *wx.Err) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.App.Appid)
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not public app",
+			Desc:  "非公众号应用",
+		}
 	}
 	wechat := wx.NewWechat()
 	var res wx.Response
@@ -370,13 +485,23 @@ func (ctx *Context) UserTagUnBatch(openid []string, tagid int64) (*wx.Response, 
 		SetJSON(param).
 		BindJSON(&res).
 		Do(); err != nil {
-		return nil, fmt.Errorf("批量为用户取消标签 %s %s", ctx.App.Appid, err.Error())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.UserTagUnBatch(openid, tagid)
 		}
-		return nil, fmt.Errorf("批量为用户取消标签 %s %d-%s", ctx.App.Appid, res.Errcode, res.Errmsg)
+		return nil, &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failed to delete user tag",
+			Desc:    "批量为用户取消标签失败",
+		}
 	}
 	return &res, nil
 }
@@ -395,9 +520,13 @@ type ResUserTagGetFromUser struct {
 // @param openid
 // @return *ResUserTagGetFromUser
 // @return error
-func (ctx *Context) UserTagGetFromUser(openid string) (*ResUserTagGetFromUser, error) {
+func (ctx *Context) UserTagGetFromUser(openid string) (*ResUserTagGetFromUser, *wx.Err) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.App.Appid)
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not public app",
+			Desc:  "非公众号应用",
+		}
 	}
 	wechat := wx.NewWechat()
 	var res ResUserTagGetFromUser
@@ -408,13 +537,23 @@ func (ctx *Context) UserTagGetFromUser(openid string) (*ResUserTagGetFromUser, e
 		SetJSON(param).
 		BindJSON(&res).
 		Do(); err != nil {
-		return nil, fmt.Errorf("获取用户身上的标签列表 %s %s", ctx.App.Appid, err.Error())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.UserTagGetFromUser(openid)
 		}
-		return nil, fmt.Errorf("获取用户身上的标签列表 %s %d-%s", ctx.App.Appid, res.Errcode, res.Errmsg)
+		return nil, &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failed to get user tag",
+			Desc:    "获取用户身上的标签列表失败",
+		}
 	}
 	return &res, nil
 }
@@ -431,9 +570,13 @@ type ParamUserRemarkUpdate struct {
 // @param remark
 // @return *wx.Response
 // @return error
-func (ctx *Context) UserRemarkUpdate(openid string, remark string) (*wx.Response, error) {
+func (ctx *Context) UserRemarkUpdate(openid string, remark string) (*wx.Response, *wx.Err) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.App.Appid)
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not public app",
+			Desc:  "非公众号应用",
+		}
 	}
 	wechat := wx.NewWechat()
 	var res wx.Response
@@ -445,13 +588,23 @@ func (ctx *Context) UserRemarkUpdate(openid string, remark string) (*wx.Response
 		SetJSON(param).
 		BindJSON(&res).
 		Do(); err != nil {
-		return nil, fmt.Errorf("设置用户备注名 %s %s", ctx.App.Appid, err.Error())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.UserRemarkUpdate(openid, remark)
 		}
-		return nil, fmt.Errorf("设置用户备注名 %s %d-%s", ctx.App.Appid, res.Errcode, res.Errmsg)
+		return nil, &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failed to set user remark",
+			Desc:    "设置用户备注名失败",
+		}
 	}
 	return &res, nil
 }
@@ -475,9 +628,13 @@ type ResUserGetBlackList struct {
 // @param beginOpenid
 // @return *ResUserGetBlackList
 // @return error
-func (ctx *Context) UserGetBlackList(beginOpenid string) (*ResUserGetBlackList, error) {
+func (ctx *Context) UserGetBlackList(beginOpenid string) (*ResUserGetBlackList, *wx.Err) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.App.Appid)
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not public app",
+			Desc:  "非公众号应用",
+		}
 	}
 	wechat := wx.NewWechat()
 	param := new(ParamUserGetBlackList)
@@ -488,13 +645,23 @@ func (ctx *Context) UserGetBlackList(beginOpenid string) (*ResUserGetBlackList, 
 		SetJSON(param).
 		BindJSON(&res).
 		Do(); err != nil {
-		return nil, fmt.Errorf("获取公众号的黑名单列表 %s %s", ctx.App.Appid, err.Error())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.UserGetBlackList(beginOpenid)
 		}
-		return nil, fmt.Errorf("获取公众号的黑名单列表 %s %d-%s", ctx.App.Appid, res.Errcode, res.Errmsg)
+		return nil, &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failed to get black list",
+			Desc:    "获取公众号的黑名单列表失败",
+		}
 	}
 	return &res, nil
 }
@@ -509,9 +676,13 @@ type ParamUserBlackListPush struct {
 // @param openidList
 // @return *wx.Response
 // @return error
-func (ctx *Context) UserBlackListPush(openidList []string) (*wx.Response, error) {
+func (ctx *Context) UserBlackListPush(openidList []string) (*wx.Response, *wx.Err) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.App.Appid)
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not public app",
+			Desc:  "非公众号应用",
+		}
 	}
 	wechat := wx.NewWechat()
 	param := new(ParamUserBlackListPush)
@@ -522,13 +693,23 @@ func (ctx *Context) UserBlackListPush(openidList []string) (*wx.Response, error)
 		SetJSON(param).
 		BindJSON(&res).
 		Do(); err != nil {
-		return nil, fmt.Errorf("拉黑用户 %s %s", ctx.App.Appid, err.Error())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.UserBlackListPush(openidList)
 		}
-		return nil, fmt.Errorf("拉黑用户 %s %d-%s", ctx.App.Appid, res.Errcode, res.Errmsg)
+		return nil, &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failed to batch black list",
+			Desc:    "拉黑用户失败",
+		}
 	}
 	return &res, nil
 }
@@ -543,9 +724,13 @@ type ParamUserBlackListUnPush struct {
 // @param openidList
 // @return *wx.Response
 // @return error
-func (ctx *Context) UserBlackListUnPush(openidList []string) (*wx.Response, error) {
+func (ctx *Context) UserBlackListUnPush(openidList []string) (*wx.Response, *wx.Err) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.App.Appid)
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not public app",
+			Desc:  "非公众号应用",
+		}
 	}
 	wechat := wx.NewWechat()
 	param := new(ParamUserBlackListUnPush)
@@ -556,13 +741,23 @@ func (ctx *Context) UserBlackListUnPush(openidList []string) (*wx.Response, erro
 		SetJSON(param).
 		BindJSON(&res).
 		Do(); err != nil {
-		return nil, fmt.Errorf("取消拉黑 %s %s", ctx.App.Appid, err.Error())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.UserBlackListUnPush(openidList)
 		}
-		return nil, fmt.Errorf("取消拉黑 %s %d-%s", ctx.App.Appid, res.Errcode, res.Errmsg)
+		return nil, &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failed to batch unblack list",
+			Desc:    "取消拉黑失败",
+		}
 	}
 	return &res, nil
 }

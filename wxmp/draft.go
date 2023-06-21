@@ -1,7 +1,6 @@
 package wxmp
 
 import (
-	"fmt"
 	"github.com/zohu/wx"
 )
 
@@ -58,9 +57,13 @@ type ResDraftGetAllWxItem struct {
 // @param h
 // @return *wx.ReturnResponseDataList
 // @return error
-func (ctx *Context) DraftGetAll(h *ParamDraftGetAll) (*ResDraftGetAll, error) {
+func (ctx *Context) DraftGetAll(h *ParamDraftGetAll) (*ResDraftGetAll, *wx.Err) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.Appid())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not public app",
+			Desc:  "非公众号应用",
+		}
 	}
 	wechat := wx.NewWechat()
 	var wxr ResDraftGetAllWx
@@ -73,13 +76,23 @@ func (ctx *Context) DraftGetAll(h *ParamDraftGetAll) (*ResDraftGetAll, error) {
 		}).
 		BindJSON(&wxr).
 		Do(); err != nil {
-		return nil, fmt.Errorf("%s 查询草稿失败 %s", ctx.Appid(), err.Error())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if wxr.Errcode != 0 {
 		if ctx.RetryAccessToken(wxr.Errcode) {
 			return ctx.DraftGetAll(h)
 		}
-		return nil, fmt.Errorf("%s 查询草稿失败 %s", ctx.Appid(), wxr.Errmsg)
+		return nil, &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: wxr.Errcode,
+			Errmsg:  wxr.Errmsg,
+			Err:     "failed to get draft",
+			Desc:    "查询草稿失败",
+		}
 	}
 	res := new(ResDraftGetAll)
 	res.Page = h.Page

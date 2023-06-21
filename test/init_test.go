@@ -19,4 +19,23 @@ func init() {
 	})
 	mp, _ = wxmp.FindApp("wx8f4971af0e9f0c45")
 	work, _ = wxwork.FindApp("ww72ca60e7592549b5")
+	if mp == nil {
+		_ = wx.PutApp(wx.App{
+			Appid:     "wx8f4971af0e9f0c45",
+			AppSecret: "12c289dd81a8a31a7d6f16eb1bf18587",
+			AppType:   "1",
+		})
+		mp, _ = wxmp.FindApp("wx8f4971af0e9f0c45")
+	}
+	if work == nil {
+		_ = wx.PutApp(wx.App{
+			Appid:     "ww72ca60e7592549b5",
+			AppSecret: "qYpFkZI-p9_i_pWzqF0J5VoJJIxhyYySoW_MYrR6934",
+			AppType:   "3",
+		})
+		work, _ = wxwork.FindApp("ww72ca60e7592549b5")
+	}
+	if mp == nil || work == nil {
+		panic("init test fail")
+	}
 }

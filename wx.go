@@ -89,9 +89,9 @@ func NewWechat() *Wechat {
 // @param appid
 // @return *Context
 // @return error
-func FindApp(appid string) (*Context, error) {
+func FindApp(appid string) (*Context, *Err) {
 	if m := wechat.HGetAll(RdsAppPrefix + appid).Val(); len(m) == 0 {
-		return nil, fmt.Errorf("[wechat:FindApp] 应用不存在 %s", appid)
+		return nil, &Err{Appid: appid, Err: "not exits", Desc: "APP不存在"}
 	} else {
 		app := new(App)
 		d, _ := json.Marshal(m)
@@ -112,7 +112,7 @@ func PutApp(app App) error {
 		return fmt.Errorf("PutApp: %s", err.Error())
 	}
 	if ctx, err := FindApp(app.Appid); err != nil {
-		return fmt.Errorf("PutApp find: %s", err.Error())
+		return fmt.Errorf("PutApp find: %s", err.Desc)
 	} else {
 		ctx.NewAccessToken()
 	}

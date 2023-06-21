@@ -54,9 +54,13 @@ type ScheduleCreateInfo struct {
 }
 
 // ScheduleCreate 创建日程
-func (ctx *Context) ScheduleCreate(p ScheduleCreateInfo) (string, error) {
+func (ctx *Context) ScheduleCreate(p ScheduleCreateInfo) (string, *wx.Err) {
 	if !ctx.IsWork() {
-		return "", fmt.Errorf("企业微信：应用 %s 非企业号", ctx.Appid())
+		return "", &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not work",
+			Desc:  "非企业微信应用",
+		}
 	}
 	wechat := wx.NewWechat()
 	//response实体
@@ -67,13 +71,23 @@ func (ctx *Context) ScheduleCreate(p ScheduleCreateInfo) (string, error) {
 		SetJSON(p).
 		BindJSON(&res).
 		Do(); err != nil {
-		return "", fmt.Errorf("企业微信：创建日程失败（%s）", err.Error())
+		return "", &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.ScheduleCreate(p)
 		}
-		return "", fmt.Errorf("企业微信：创建日程失败（%d-%s）", res.Errcode, res.Errmsg)
+		return "", &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failed to add schedule",
+			Desc:    "创建日程失败",
+		}
 	}
 	return res.ScheduleID, nil
 }
@@ -87,9 +101,13 @@ type ScheduleUpdateInfo struct {
 }
 
 // ScheduleUpdate 日程更新
-func (ctx *Context) ScheduleUpdate(p ScheduleUpdateInfo) (string, error) {
+func (ctx *Context) ScheduleUpdate(p ScheduleUpdateInfo) (string, *wx.Err) {
 	if !ctx.IsWork() {
-		return "", fmt.Errorf("企业微信：应用 %s 非企业号", ctx.Appid())
+		return "", &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not work",
+			Desc:  "非企业微信应用",
+		}
 	}
 	wechat := wx.NewWechat()
 	//response实体
@@ -100,13 +118,23 @@ func (ctx *Context) ScheduleUpdate(p ScheduleUpdateInfo) (string, error) {
 		SetJSON(p).
 		BindJSON(&res).
 		Do(); err != nil {
-		return "", fmt.Errorf("企业微信：更新日程失败（%s）", err.Error())
+		return "", &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.ScheduleUpdate(p)
 		}
-		return "", fmt.Errorf("企业微信：更新日程失败（%d-%s）", res.Errcode, res.Errmsg)
+		return "", &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failed to update schedule",
+			Desc:    "更新日程失败",
+		}
 	}
 	return res.ScheduleID, nil
 }
@@ -118,9 +146,13 @@ type AttendeesUpdateInfo struct {
 }
 
 // ScheduleAttendeesUpdate 更新参与人
-func (ctx *Context) ScheduleAttendeesUpdate(p AttendeesUpdateInfo, attendeesType ScheduleAttendeesType) error {
+func (ctx *Context) ScheduleAttendeesUpdate(p AttendeesUpdateInfo, attendeesType ScheduleAttendeesType) *wx.Err {
 	if !ctx.IsWork() {
-		return fmt.Errorf("企业微信：应用 %s 非企业号", ctx.Appid())
+		return &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not work",
+			Desc:  "非企业微信应用",
+		}
 	}
 	wechat := wx.NewWechat()
 	//response实体
@@ -131,13 +163,23 @@ func (ctx *Context) ScheduleAttendeesUpdate(p AttendeesUpdateInfo, attendeesType
 		SetJSON(p).
 		BindJSON(&res).
 		Do(); err != nil {
-		return fmt.Errorf("企业微信：更新日程参与者失败（%s）", err.Error())
+		return &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.ScheduleAttendeesUpdate(p, attendeesType)
 		}
-		return fmt.Errorf("企业微信：更新日程参与者失败（%d-%s）", res.Errcode, res.Errmsg)
+		return &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failed to update schedule attendees",
+			Desc:    "更新日程参与者失败",
+		}
 	}
 	return nil
 }
@@ -189,11 +231,15 @@ type ScheduleList struct {
 }
 
 // GetScheduleDetail 获取日程详情
-func (ctx *Context) GetScheduleDetail(p GetScheduleRequest) (ScheduleDetailResponse, error) {
+func (ctx *Context) GetScheduleDetail(p GetScheduleRequest) (ScheduleDetailResponse, *wx.Err) {
 	//response实体
 	res := ScheduleDetailResponse{}
 	if !ctx.IsWork() {
-		return res, fmt.Errorf("企业微信：应用 %s 非企业号", ctx.Appid())
+		return res, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not work",
+			Desc:  "非企业微信应用",
+		}
 	}
 	wechat := wx.NewWechat()
 
@@ -202,13 +248,23 @@ func (ctx *Context) GetScheduleDetail(p GetScheduleRequest) (ScheduleDetailRespo
 		SetJSON(p).
 		BindJSON(&res).
 		Do(); err != nil {
-		return res, fmt.Errorf("企业微信：获取日程详情失败（%s）", err.Error())
+		return res, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.GetScheduleDetail(p)
 		}
-		return res, fmt.Errorf("企业微信：获取日程详情失败（%d-%s）", res.Errcode, res.Errmsg)
+		return res, &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failed to get schedule detail",
+			Desc:    "获取日程详情失败",
+		}
 	}
 	return res, nil
 }
@@ -221,9 +277,13 @@ type CancelSchedule struct {
 }
 
 // CancelSchedule 取消日程
-func (ctx *Context) CancelSchedule(p CancelSchedule) error {
+func (ctx *Context) CancelSchedule(p CancelSchedule) *wx.Err {
 	if !ctx.IsWork() {
-		return fmt.Errorf("企业微信：应用 %s 非企业号", ctx.Appid())
+		return &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not work",
+			Desc:  "非企业微信应用",
+		}
 	}
 	wechat := wx.NewWechat()
 	//response实体
@@ -234,13 +294,23 @@ func (ctx *Context) CancelSchedule(p CancelSchedule) error {
 		SetJSON(p).
 		BindJSON(&res).
 		Do(); err != nil {
-		return fmt.Errorf("企业微信：取消日程失败（%s）", err.Error())
+		return &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.CancelSchedule(p)
 		}
-		return fmt.Errorf("企业微信：取消日程失败（%d-%s）", res.Errcode, res.Errmsg)
+		return &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failed to delete schedule",
+			Desc:    "取消日程失败",
+		}
 	}
 	return nil
 }

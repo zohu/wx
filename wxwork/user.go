@@ -1,7 +1,6 @@
 package wxwork
 
 import (
-	"fmt"
 	"github.com/zohu/wx"
 )
 
@@ -40,9 +39,13 @@ type ResponseUserList struct {
 	Userlist []User `json:"userlist"`
 }
 
-func (ctx *Context) UserList(p ParamUserList) ([]User, error) {
+func (ctx *Context) UserList(p ParamUserList) ([]User, *wx.Err) {
 	if !ctx.IsWork() {
-		return nil, fmt.Errorf("企业微信：应用 %s 非企业号", ctx.Appid())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not work",
+			Desc:  "非企业微信应用",
+		}
 	}
 	p.AccessToken = ctx.GetAccessToken()
 	wechat := wx.NewWechat()
@@ -52,13 +55,23 @@ func (ctx *Context) UserList(p ParamUserList) ([]User, error) {
 		BindJSON(&res).
 		Do()
 	if err != nil {
-		return nil, fmt.Errorf("企业微信：查询用户列表失败（%s）", err.Error())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.UserList(p)
 		}
-		return nil, fmt.Errorf("企业微信：查询用户列表失败（%d-%s）", res.Errcode, res.Errmsg)
+		return nil, &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failed to get user list",
+			Desc:    "查询用户列表失败",
+		}
 	}
 	return res.Userlist, nil
 }

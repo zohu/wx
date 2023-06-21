@@ -1,7 +1,6 @@
 package wxmp
 
 import (
-	"fmt"
 	"github.com/zohu/wx"
 )
 
@@ -29,9 +28,13 @@ type ResKfList struct {
 // @param shortKey
 // @return *ResKfList
 // @return error
-func (ctx *Context) KfList() (*ResKfList, error) {
+func (ctx *Context) KfList() (*ResKfList, *wx.Err) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.Appid())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not public app",
+			Desc:  "非公众号应用",
+		}
 	}
 	wechat := wx.NewWechat()
 	var res ResKfList
@@ -39,13 +42,23 @@ func (ctx *Context) KfList() (*ResKfList, error) {
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		BindJSON(&res).
 		Do(); err != nil {
-		return nil, fmt.Errorf("获取客服基本信息 %s %s", ctx.Appid(), err.Error())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.KfList()
 		}
-		return nil, fmt.Errorf("获取客服基本信息 %s %d-%s", ctx.Appid(), res.Errcode, res.Errmsg)
+		return nil, &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failed to get kf list",
+			Desc:    "获取客服基本信息失败",
+		}
 	}
 	return &res, nil
 }
@@ -55,9 +68,13 @@ func (ctx *Context) KfList() (*ResKfList, error) {
 // @receiver ctx
 // @return *ResKfList
 // @return error
-func (ctx *Context) KfOnlineList() (*ResKfList, error) {
+func (ctx *Context) KfOnlineList() (*ResKfList, *wx.Err) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.Appid())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not public app",
+			Desc:  "非公众号应用",
+		}
 	}
 	wechat := wx.NewWechat()
 	var res ResKfList
@@ -65,13 +82,23 @@ func (ctx *Context) KfOnlineList() (*ResKfList, error) {
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		BindJSON(&res).
 		Do(); err != nil {
-		return nil, fmt.Errorf("查询在线客服基本信息 %s %s", ctx.Appid(), err.Error())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.KfOnlineList()
 		}
-		return nil, fmt.Errorf("查询在线客服基本信息 %s %d-%s", ctx.Appid(), res.Errcode, res.Errmsg)
+		return nil, &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failed to get online kf list",
+			Desc:    "查询在线客服基本信息失败",
+		}
 	}
 	return &res, nil
 }
@@ -88,9 +115,13 @@ type ParamKfAdd struct {
 // @param name
 // @return *wx.Response
 // @return error
-func (ctx *Context) KfAdd(account string, name string) (*wx.Response, error) {
+func (ctx *Context) KfAdd(account string, name string) (*wx.Response, *wx.Err) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.Appid())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not public app",
+			Desc:  "非公众号应用",
+		}
 	}
 	wechat := wx.NewWechat()
 	param := new(ParamKfAdd)
@@ -102,13 +133,23 @@ func (ctx *Context) KfAdd(account string, name string) (*wx.Response, error) {
 		SetJSON(param).
 		BindJSON(&res).
 		Do(); err != nil {
-		return nil, fmt.Errorf("添加客服帐号 %s %s", ctx.Appid(), err.Error())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.KfAdd(account, name)
 		}
-		return nil, fmt.Errorf("添加客服帐号 %s %d-%s", ctx.Appid(), res.Errcode, res.Errmsg)
+		return nil, &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failed to add kf account",
+			Desc:    "添加客服帐号失败",
+		}
 	}
 	return &res, nil
 }
@@ -125,9 +166,13 @@ type ParamKfInvite struct {
 // @param inviteWx
 // @return *wx.Response
 // @return error
-func (ctx *Context) KfInvite(account string, inviteWx string) (*wx.Response, error) {
+func (ctx *Context) KfInvite(account string, inviteWx string) (*wx.Response, *wx.Err) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.Appid())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not public app",
+			Desc:  "非公众号应用",
+		}
 	}
 	wechat := wx.NewWechat()
 	param := new(ParamKfInvite)
@@ -139,13 +184,23 @@ func (ctx *Context) KfInvite(account string, inviteWx string) (*wx.Response, err
 		SetJSON(param).
 		BindJSON(&res).
 		Do(); err != nil {
-		return nil, fmt.Errorf("邀请绑定客服帐号 %s %s", ctx.Appid(), err.Error())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.KfInvite(account, inviteWx)
 		}
-		return nil, fmt.Errorf("邀请绑定客服帐号 %s %d-%s", ctx.Appid(), res.Errcode, res.Errmsg)
+		return nil, &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failed to invite kf account",
+			Desc:    "邀请绑定客服账号失败",
+		}
 	}
 	return &res, nil
 }
@@ -162,9 +217,13 @@ type ParamKfUpdate struct {
 // @param name
 // @return *wx.Response
 // @return error
-func (ctx *Context) KfUpdate(account string, name string) (*wx.Response, error) {
+func (ctx *Context) KfUpdate(account string, name string) (*wx.Response, *wx.Err) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.Appid())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not public app",
+			Desc:  "非公众号应用",
+		}
 	}
 	wechat := wx.NewWechat()
 	param := new(ParamKfUpdate)
@@ -176,13 +235,23 @@ func (ctx *Context) KfUpdate(account string, name string) (*wx.Response, error) 
 		SetJSON(param).
 		BindJSON(&res).
 		Do(); err != nil {
-		return nil, fmt.Errorf("设置客服信息 %s %s", ctx.Appid(), err.Error())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.KfUpdate(account, name)
 		}
-		return nil, fmt.Errorf("设置客服信息 %s %d-%s", ctx.Appid(), res.Errcode, res.Errmsg)
+		return nil, &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failed to update kf account",
+			Desc:    "设置客服信息失败",
+		}
 	}
 	return &res, nil
 }

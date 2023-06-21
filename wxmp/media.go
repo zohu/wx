@@ -1,7 +1,6 @@
 package wxmp
 
 import (
-	"fmt"
 	"github.com/guonaihong/gout"
 	"github.com/zohu/wx"
 	"io"
@@ -33,9 +32,13 @@ type ResMediaTemporaryAdd struct {
 // @receiver ctx
 // @param mediaType
 // @param file
-func (ctx *Context) MediaTemporaryAdd(mediaType MediaType, file io.Reader, fileName string) (*ResMediaTemporaryAdd, error) {
+func (ctx *Context) MediaTemporaryAdd(mediaType MediaType, file io.Reader, fileName string) (*ResMediaTemporaryAdd, *wx.Err) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.Appid())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not public app",
+			Desc:  "非公众号应用",
+		}
 	}
 	pr, pw := io.Pipe()
 	bw := multipart.NewWriter(pw)
@@ -59,13 +62,23 @@ func (ctx *Context) MediaTemporaryAdd(mediaType MediaType, file io.Reader, fileN
 		SetBody(pr).
 		BindJSON(&res).
 		Do(); err != nil {
-		return nil, fmt.Errorf("%s 上传临时素材失败 %s", ctx.App.Appid, err.Error())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.MediaTemporaryAdd(mediaType, file, fileName)
 		}
-		return nil, fmt.Errorf("%s 上传临时素材失败 %s", ctx.App.Appid, res.Errmsg)
+		return nil, &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failed to upload temporary media",
+			Desc:    "上传临时素材失败",
+		}
 	}
 	return res, nil
 }
@@ -117,9 +130,13 @@ type ParamMediaList struct {
 // @param rows
 // @return *ResMediaList
 // @return error
-func (ctx *Context) MediaList(mediaType MediaType, page int64, rows int64) (*ResMediaList, error) {
+func (ctx *Context) MediaList(mediaType MediaType, page int64, rows int64) (*ResMediaList, *wx.Err) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.App.Appid)
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not public app",
+			Desc:  "非公众号应用",
+		}
 	}
 	wechat := wx.NewWechat()
 	var wxr ResMediaListItem
@@ -132,13 +149,23 @@ func (ctx *Context) MediaList(mediaType MediaType, page int64, rows int64) (*Res
 		}).
 		BindJSON(&wxr).
 		Do(); err != nil {
-		return nil, fmt.Errorf("%s 查询永久素材失败 %s", ctx.App.Appid, err.Error())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if wxr.Errcode != 0 {
 		if ctx.RetryAccessToken(wxr.Errcode) {
 			return ctx.MediaList(mediaType, page, rows)
 		}
-		return nil, fmt.Errorf("%s 查询永久素材失败 %s", ctx.App.Appid, wxr.Errmsg)
+		return nil, &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: wxr.Errcode,
+			Errmsg:  wxr.Errmsg,
+			Err:     "failed to get material",
+			Desc:    "查询永久素材失败",
+		}
 	}
 	res := new(ResMediaList)
 	res.Page = page

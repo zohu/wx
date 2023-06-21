@@ -5,7 +5,6 @@ package wxmp
 */
 
 import (
-	"fmt"
 	"github.com/zohu/wx"
 )
 
@@ -20,9 +19,13 @@ type ParamMsgSetIndustry struct {
 // @param p
 // @return *wx.Response
 // @return error
-func (ctx *Context) MsgSetIndustry(p *ParamMsgSetIndustry) (*wx.Response, error) {
+func (ctx *Context) MsgSetIndustry(p *ParamMsgSetIndustry) (*wx.Response, *wx.Err) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.Appid())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not public app",
+			Desc:  "非公众号应用",
+		}
 	}
 	var res wx.Response
 	wechat := wx.NewWechat()
@@ -31,13 +34,23 @@ func (ctx *Context) MsgSetIndustry(p *ParamMsgSetIndustry) (*wx.Response, error)
 		SetJSON(&p).
 		BindJSON(&res).
 		Do(); err != nil {
-		return nil, fmt.Errorf("设置行业失败 %s %s", ctx.Appid(), err.Error())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.MsgSetIndustry(p)
 		}
-		return nil, fmt.Errorf("设置行业失败 %s %d-%s", ctx.Appid(), res.Errcode, res.Errmsg)
+		return nil, &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failed to set industry",
+			Desc:    "设置所属行业失败",
+		}
 	}
 	return &res, nil
 }
@@ -59,9 +72,13 @@ type ResGetIndustry struct {
 // @receiver ctx
 // @return *ResGetIndustry
 // @return error
-func (ctx *Context) MsgGetIndustry() (*ResGetIndustry, error) {
+func (ctx *Context) MsgGetIndustry() (*ResGetIndustry, *wx.Err) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.Appid())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not public app",
+			Desc:  "非公众号应用",
+		}
 	}
 	var res ResGetIndustry
 	wechat := wx.NewWechat()
@@ -69,13 +86,23 @@ func (ctx *Context) MsgGetIndustry() (*ResGetIndustry, error) {
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		BindJSON(&res).
 		Do(); err != nil {
-		return nil, fmt.Errorf("获取行业失败 %s %s", ctx.Appid(), err.Error())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.MsgGetIndustry()
 		}
-		return nil, fmt.Errorf("获取行业失败 %s %d-%s", ctx.Appid(), res.Errcode, res.Errmsg)
+		return nil, &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failed to get industry",
+			Desc:    "获取行业失败",
+		}
 	}
 	return &res, nil
 }
@@ -94,9 +121,13 @@ type ResMsgGetTemplateId struct {
 // @param shortId
 // @return *ResMsgGetTemplateId
 // @return error
-func (ctx *Context) MsgGetTemplateId(shortId string) (*ResMsgGetTemplateId, error) {
+func (ctx *Context) MsgGetTemplateId(shortId string) (*ResMsgGetTemplateId, *wx.Err) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.Appid())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not public app",
+			Desc:  "非公众号应用",
+		}
 	}
 	var res ResMsgGetTemplateId
 	wechat := wx.NewWechat()
@@ -105,13 +136,23 @@ func (ctx *Context) MsgGetTemplateId(shortId string) (*ResMsgGetTemplateId, erro
 		SetJSON(&ParamMsgGetTemplateId{TemplateIdShort: shortId}).
 		BindJSON(&res).
 		Do(); err != nil {
-		return nil, fmt.Errorf("获得模板ID失败 %s %s", ctx.Appid(), err.Error())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.MsgGetTemplateId(shortId)
 		}
-		return nil, fmt.Errorf("获得模板ID失败 %s %d-%s", ctx.Appid(), res.Errcode, res.Errmsg)
+		return nil, &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failed to get template id",
+			Desc:    "查询模板ID失败",
+		}
 	}
 	return &res, nil
 }
@@ -133,9 +174,13 @@ type ResMsgGetTemplateList struct {
 // @receiver ctx
 // @return *ResMsgGetTemplateList
 // @return error
-func (ctx *Context) MsgGetTemplateList() (*ResMsgGetTemplateList, error) {
+func (ctx *Context) MsgGetTemplateList() (*ResMsgGetTemplateList, *wx.Err) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.Appid())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not public app",
+			Desc:  "非公众号应用",
+		}
 	}
 	var res ResMsgGetTemplateList
 	wechat := wx.NewWechat()
@@ -143,13 +188,23 @@ func (ctx *Context) MsgGetTemplateList() (*ResMsgGetTemplateList, error) {
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		BindJSON(&res).
 		Do(); err != nil {
-		return nil, fmt.Errorf("获得模板列表失败 %s %s", ctx.Appid(), err.Error())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.MsgGetTemplateList()
 		}
-		return nil, fmt.Errorf("获得模板列表失败 %s %d-%s", ctx.Appid(), res.Errcode, res.Errmsg)
+		return nil, &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failed to get template list",
+			Desc:    "查询模板列表失败",
+		}
 	}
 	return &res, nil
 }
@@ -164,9 +219,20 @@ type ParamMsgDelTemplate struct {
 // @param templateId
 // @return *wx.Response
 // @return error
-func (ctx *Context) MsgDelTemplate(templateId string) (*wx.Response, error) {
+func (ctx *Context) MsgDelTemplate(templateId string) (*wx.Response, *wx.Err) {
+	if templateId == "" {
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "template id is empty",
+			Desc:  "模板ID不能为空",
+		}
+	}
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.Appid())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not public app",
+			Desc:  "非公众号应用",
+		}
 	}
 	var res wx.Response
 	wechat := wx.NewWechat()
@@ -175,13 +241,23 @@ func (ctx *Context) MsgDelTemplate(templateId string) (*wx.Response, error) {
 		SetJSON(&ParamMsgDelTemplate{TemplateId: templateId}).
 		BindJSON(&res).
 		Do(); err != nil {
-		return nil, fmt.Errorf("删除模板失败 %s %s", ctx.Appid(), err.Error())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.MsgDelTemplate(templateId)
 		}
-		return nil, fmt.Errorf("删除模板失败 %s %d-%s", ctx.Appid(), res.Errcode, res.Errmsg)
+		return nil, &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failed to delete template",
+			Desc:    "删除模板失败",
+		}
 	}
 	return &res, nil
 }
@@ -207,9 +283,13 @@ type Miniprogram struct {
 // @param p
 // @return *wx.Response
 // @return error
-func (ctx *Context) MsgSendTemplate(p *ParamMsgSendTemplate) (*wx.Response, error) {
+func (ctx *Context) MsgSendTemplate(p *ParamMsgSendTemplate) (*wx.Response, *wx.Err) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.Appid())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not public app",
+			Desc:  "非公众号应用",
+		}
 	}
 	var res wx.Response
 	wechat := wx.NewWechat()
@@ -218,13 +298,23 @@ func (ctx *Context) MsgSendTemplate(p *ParamMsgSendTemplate) (*wx.Response, erro
 		SetJSON(p).
 		BindJSON(&res).
 		Do(); err != nil {
-		return nil, fmt.Errorf("发送模板消息失败 %s %s", ctx.Appid(), err.Error())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.MsgSendTemplate(p)
 		}
-		return nil, fmt.Errorf("发送模板消息失败 %s %d-%s", ctx.Appid(), res.Errcode, res.Errmsg)
+		return nil, &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failed to send template message",
+			Desc:    "发送模板消息失败",
+		}
 	}
 	return &res, nil
 }
@@ -250,9 +340,13 @@ type ParamMsgSubscribe struct {
 // @param p
 // @return *wx.Response
 // @return error
-func (ctx *Context) MsgSubscribe(p *ParamMsgSubscribe) (*wx.Response, error) {
+func (ctx *Context) MsgSubscribe(p *ParamMsgSubscribe) (*wx.Response, *wx.Err) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.Appid())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not public app",
+			Desc:  "非公众号应用",
+		}
 	}
 	var res wx.Response
 	wechat := wx.NewWechat()
@@ -261,13 +355,23 @@ func (ctx *Context) MsgSubscribe(p *ParamMsgSubscribe) (*wx.Response, error) {
 		SetJSON(p).
 		BindJSON(&res).
 		Do(); err != nil {
-		return nil, fmt.Errorf("订阅模板消息失败 %s %s", ctx.Appid(), err.Error())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.MsgSubscribe(p)
 		}
-		return nil, fmt.Errorf("订阅模板消息失败 %s %d-%s", ctx.Appid(), res.Errcode, res.Errmsg)
+		return nil, &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failed to subscribe template message",
+			Desc:    "订阅模板消息失败",
+		}
 	}
 	return &res, nil
 }
@@ -318,9 +422,13 @@ type ResMsgGetAutoReply struct {
 // @receiver ctx
 // @return *ResMsgGetAutoReply
 // @return error
-func (ctx *Context) MsgGetAutoReply() (*ResMsgGetAutoReply, error) {
+func (ctx *Context) MsgGetAutoReply() (*ResMsgGetAutoReply, *wx.Err) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.Appid())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not public app",
+			Desc:  "非公众号应用",
+		}
 	}
 	var res ResMsgGetAutoReply
 	wechat := wx.NewWechat()
@@ -328,13 +436,23 @@ func (ctx *Context) MsgGetAutoReply() (*ResMsgGetAutoReply, error) {
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		BindJSON(&res).
 		Do(); err != nil {
-		return nil, fmt.Errorf("获取自动回复信息失败 %s %s", ctx.Appid(), err.Error())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.MsgGetAutoReply()
 		}
-		return nil, fmt.Errorf("获取自动回复信息失败 %s %d-%s", ctx.Appid(), res.Errcode, res.Errmsg)
+		return nil, &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failed to get auto reply",
+			Desc:    "获取自动回复信息失败",
+		}
 	}
 	return &res, nil
 }

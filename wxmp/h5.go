@@ -66,20 +66,31 @@ type ResH5GetUserinfo struct {
 // @param openid
 // @return *ResH5GetUserinfo
 // @return error
-func (ctx *Context) H5GetUserinfo(code string, scope H5ScopeType) (*ResH5GetUserinfo, error) {
+func (ctx *Context) H5GetUserinfo(code string, scope H5ScopeType) (*ResH5GetUserinfo, *wx.Err) {
 	var token H5Token
 	wechat := wx.NewWechat()
 	if err := wechat.Get(fmt.Sprintf(
-		"https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code",
+		"%s/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code",
+		wx.ApiSns,
 		ctx.AppidMain(),
 		ctx.App.AppSecret,
 		code,
 	)).BindJSON(&token).
 		Do(); err != nil {
-		return nil, fmt.Errorf("获取token失败，%s", err.Error())
+		return nil, &wx.Err{
+			Appid: ctx.AppidMain(),
+			Err:   err.Error(),
+			Desc:  "获取token请求失败",
+		}
 	}
 	if token.Errcode != 0 {
-		return nil, fmt.Errorf("获取token失败，%d-%s", token.Errcode, token.Errmsg)
+		return nil, &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: token.Errcode,
+			Errmsg:  token.Errmsg,
+			Err:     "failed to get token",
+			Desc:    "获取token失败",
+		}
 	}
 	var userinfo ResH5GetUserinfo
 	if scope == H5ScopeTypeBase {
@@ -87,15 +98,26 @@ func (ctx *Context) H5GetUserinfo(code string, scope H5ScopeType) (*ResH5GetUser
 		return &userinfo, nil
 	}
 	if err := wechat.Get(fmt.Sprintf(
-		"https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s&lang=zh_CN",
+		"%s/userinfo?access_token=%s&openid=%s&lang=zh_CN",
+		wx.ApiSns,
 		token.AccessToken,
 		token.Openid,
 	)).BindJSON(&userinfo).
 		Do(); err != nil {
-		return nil, fmt.Errorf("获取用户信息失败，%s", err.Error())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "获取用户信息请求失败",
+		}
 	}
 	if userinfo.Errcode != 0 {
-		return nil, fmt.Errorf("获取用户信息失败，%d-%s", userinfo.Errcode, userinfo.Errmsg)
+		return nil, &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: userinfo.Errcode,
+			Errmsg:  userinfo.Errmsg,
+			Err:     "failed to get userinfo",
+			Desc:    "获取用户信息失败",
+		}
 	}
 	return &userinfo, nil
 }
@@ -106,13 +128,17 @@ type H5JsSdkConfig struct {
 	Signature string `json:"signature"`
 }
 
-func (ctx *Context) H5GetJsSdkConfig(uri string) (*H5JsSdkConfig, error) {
+func (ctx *Context) H5GetJsSdkConfig(uri string) (*H5JsSdkConfig, *wx.Err) {
 	jssdk := new(H5JsSdkConfig)
 	jssdk.Timestamp = time.Now().Unix()
 	jssdk.NonceStr = utils.RandomStr(16)
 	tk := ctx.GetTicket()
 	if tk == "" {
-		return jssdk, fmt.Errorf("获取ticket失败")
+		return jssdk, &wx.Err{
+			Appid: ctx.AppidMain(),
+			Err:   "ticket is empty",
+			Desc:  "获取ticket失败",
+		}
 	}
 	query := fmt.Sprintf(
 		"jsapi_ticket=%s&noncestr=%s&timestamp=%d&url=%s",

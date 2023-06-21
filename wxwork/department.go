@@ -1,7 +1,6 @@
 package wxwork
 
 import (
-	"fmt"
 	"github.com/zohu/wx"
 )
 
@@ -18,9 +17,13 @@ type ResponseDepartmentCreat struct {
 	Id int64 `json:"id" desc:"创建的部门ID"`
 }
 
-func (ctx *Context) DepartmentCreat(p Department) (int64, error) {
+func (ctx *Context) DepartmentCreat(p Department) (int64, *wx.Err) {
 	if !ctx.IsWork() {
-		return -1, fmt.Errorf("企业微信：应用 %s 非企业号", ctx.Appid())
+		return -1, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not work",
+			Desc:  "非企业微信应用",
+		}
 	}
 	wechat := wx.NewWechat()
 	var res ResponseDepartmentCreat
@@ -30,20 +33,34 @@ func (ctx *Context) DepartmentCreat(p Department) (int64, error) {
 		BindJSON(&res).
 		Do()
 	if err != nil {
-		return -1, fmt.Errorf("企业微信：创建部门失败（%s）", err.Error())
+		return -1, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.DepartmentCreat(p)
 		}
-		return -1, fmt.Errorf("企业微信：创建部门失败（%d-%s）", res.Errcode, res.Errmsg)
+		return -1, &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failed to create department",
+			Desc:    "创建部门失败",
+		}
 	}
 	return res.Id, nil
 }
 
-func (ctx *Context) DepartmentUpdate(p Department) error {
+func (ctx *Context) DepartmentUpdate(p Department) *wx.Err {
 	if !ctx.IsWork() {
-		return fmt.Errorf("企业微信：应用 %s 非企业号", ctx.Appid())
+		return &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not work",
+			Desc:  "非企业微信应用",
+		}
 	}
 	wechat := wx.NewWechat()
 	var res wx.Response
@@ -53,13 +70,23 @@ func (ctx *Context) DepartmentUpdate(p Department) error {
 		BindJSON(&res).
 		Do()
 	if err != nil {
-		return fmt.Errorf("企业微信：更新部门失败（%s）", err.Error())
+		return &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.DepartmentUpdate(p)
 		}
-		return fmt.Errorf("企业微信：更新部门失败（%d-%s）", res.Errcode, res.Errmsg)
+		return &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failed to update department",
+			Desc:    "更新部门失败",
+		}
 	}
 	return nil
 }
@@ -69,9 +96,13 @@ type ParamDepartmentDelete struct {
 	Id int64 `json:"id" query:"id"`
 }
 
-func (ctx *Context) DepartmentDelete(p ParamDepartmentDelete) error {
+func (ctx *Context) DepartmentDelete(p ParamDepartmentDelete) *wx.Err {
 	if !ctx.IsWork() {
-		return fmt.Errorf("企业微信：应用 %s 非企业号", ctx.Appid())
+		return &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not work",
+			Desc:  "非企业微信应用",
+		}
 	}
 	p.AccessToken = ctx.GetAccessToken()
 	wechat := wx.NewWechat()
@@ -81,13 +112,23 @@ func (ctx *Context) DepartmentDelete(p ParamDepartmentDelete) error {
 		BindJSON(&res).
 		Do()
 	if err != nil {
-		return fmt.Errorf("企业微信：删除部门失败（%s）", err.Error())
+		return &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.DepartmentDelete(p)
 		}
-		return fmt.Errorf("企业微信：删除部门失败（%d-%s）", res.Errcode, res.Errmsg)
+		return &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failed to delete department",
+			Desc:    "删除部门失败",
+		}
 	}
 	return nil
 }
@@ -101,9 +142,13 @@ type ResponseDepartmentList struct {
 	Department []Department `json:"department"`
 }
 
-func (ctx *Context) DepartmentList(p ParamDepartmentList) ([]Department, error) {
+func (ctx *Context) DepartmentList(p ParamDepartmentList) ([]Department, *wx.Err) {
 	if !ctx.IsWork() {
-		return nil, fmt.Errorf("企业微信：应用 %s 非企业号", ctx.Appid())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not work",
+			Desc:  "非企业微信应用",
+		}
 	}
 	p.AccessToken = ctx.GetAccessToken()
 	wechat := wx.NewWechat()
@@ -113,13 +158,23 @@ func (ctx *Context) DepartmentList(p ParamDepartmentList) ([]Department, error) 
 		BindJSON(&res).
 		Do()
 	if err != nil {
-		return nil, fmt.Errorf("企业微信：查询部门失败（%s）", err.Error())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if res.Errcode != 0 {
 		if ctx.RetryAccessToken(res.Errcode) {
 			return ctx.DepartmentList(p)
 		}
-		return nil, fmt.Errorf("企业微信：查询部门失败（%d-%s）", res.Errcode, res.Errmsg)
+		return nil, &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: res.Errcode,
+			Errmsg:  res.Errmsg,
+			Err:     "failed to query department list",
+			Desc:    "查询部门失败",
+		}
 	}
 	return res.Department, nil
 }

@@ -1,7 +1,6 @@
 package wxmp
 
 import (
-	"fmt"
 	"github.com/zohu/wx"
 )
 
@@ -56,9 +55,13 @@ type ParamIssueList struct {
 // @param rows
 // @return *ResIssueList
 // @return error
-func (ctx *Context) IssueList(noContent int, page int64, rows int64) (*ResIssueList, error) {
+func (ctx *Context) IssueList(noContent int, page int64, rows int64) (*ResIssueList, *wx.Err) {
 	if !ctx.IsMpServe() && !ctx.IsMpSubscribe() {
-		return nil, fmt.Errorf("%s 非公众号", ctx.Appid())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   "not public app",
+			Desc:  "非公众号应用",
+		}
 	}
 	wechat := wx.NewWechat()
 	var wxr ResIssueListItem
@@ -71,13 +74,23 @@ func (ctx *Context) IssueList(noContent int, page int64, rows int64) (*ResIssueL
 		}).
 		BindJSON(&wxr).
 		Do(); err != nil {
-		return nil, fmt.Errorf("%s 查询发布记录失败 %s", ctx.Appid(), err.Error())
+		return nil, &wx.Err{
+			Appid: ctx.Appid(),
+			Err:   err.Error(),
+			Desc:  "请求失败",
+		}
 	}
 	if wxr.Errcode != 0 {
 		if ctx.RetryAccessToken(wxr.Errcode) {
 			return ctx.IssueList(noContent, page, rows)
 		}
-		return nil, fmt.Errorf("%s 查询发布记录失败 %s", ctx.Appid(), wxr.Errmsg)
+		return nil, &wx.Err{
+			Appid:   ctx.Appid(),
+			Errcode: wxr.Errcode,
+			Errmsg:  wxr.Errmsg,
+			Err:     "failed to get publish list",
+			Desc:    "查询发布记录失败",
+		}
 	}
 	res := new(ResIssueList)
 	res.Page = page
