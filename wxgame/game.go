@@ -2,7 +2,6 @@ package wxgame
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/zohu/wx"
 )
 
@@ -23,10 +22,14 @@ type Response struct {
 // @Description: 返回小游戏实体
 // @param appid
 // @return *Context
-func FindApp(appid string) (*Context, error) {
+func FindApp(appid string) (*Context, *wx.Err) {
 	wechat := wx.NewWechat()
 	if m := wechat.HGetAll(wx.RdsAppPrefix + appid).Val(); len(m) == 0 {
-		return nil, fmt.Errorf("FindApp 小游戏不存在：%s", appid)
+		return nil, &wx.Err{
+			Appid: appid,
+			Err:   "not exist",
+			Desc:  "小游戏不存在",
+		}
 	} else {
 		app := new(wx.App)
 		d, _ := json.Marshal(m)
