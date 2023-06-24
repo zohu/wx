@@ -15,6 +15,7 @@ wx.Init(&wx.Option{
     Host:     Config.Redis.Host,// []string, 一个host列表，支持Client和Cluster；
     Password: Config.Redis.Password,
     Mode:     gin.Mode(), // 非必选，如果非gin框架，可以直接给字符串"debug"/"prod"
+	Prefix: "wx" // 缓存的key前缀，非必选
 })
 ```
 ### 多账号管理
