@@ -12,7 +12,7 @@ import (
 
 const (
 	RdsAppPrefix      = "wx:01:"
-	RdsAppListPrefix  = "wx:02:"
+	RdsAppListPrefix  = "wx:02:list"
 	RdsAppRetryPrefix = "wx:03:"
 )
 

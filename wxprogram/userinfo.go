@@ -34,7 +34,7 @@ func (ctx *Context) GetPhoneNumber(code string) (*ResGetPhoneNumber, *wx.Err) {
 	}
 	wechat := wx.NewWechat()
 	var res ResGetPhoneNumber
-	if err := wechat.Get(wx.ApiWxa + "/business/getuserphonenumber").
+	if err := wechat.Post(wx.ApiWxa + "/business/getuserphonenumber").
 		SetQuery(&wx.ParamAccessToken{AccessToken: ctx.GetAccessToken()}).
 		SetJSON(&ParamGetPhoneNumber{Code: code}).
 		BindJSON(&res).
