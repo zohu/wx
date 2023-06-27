@@ -34,10 +34,10 @@ func FindApp(appid string) (*Context, *wx.Err) {
 }
 
 type ParamCode2Session struct {
-	Appid     string `json:"appid"`
-	Secret    string `json:"secret"`
-	JsCode    string `json:"js_code"`
-	GrantType string `json:"grant_type"`
+	Appid     string `json:"appid" query:"appid"`
+	Secret    string `json:"secret" query:"secret"`
+	JsCode    string `json:"js_code" query:"js_code"`
+	GrantType string `json:"grant_type" query:"grant_type"`
 }
 type ResCode2Session struct {
 	wx.Response

@@ -72,8 +72,8 @@ func (c *Context) newAccessTokenForMp() (string, string) {
 */
 
 type ParamWorkAccessToken struct {
-	Corpid     string `json:"corpid"`
-	Corpsecret string `json:"corpsecret"`
+	Corpid     string `json:"corpid" query:"corpid"`
+	Corpsecret string `json:"corpsecret" query:"corpsecret"`
 }
 
 // newAccessTokenForWork
