@@ -20,6 +20,8 @@ const (
 	ApiSns    = "https://api.weixin.qq.com/sns"
 )
 
+var g = gout.NewWithOpt(gout.WithInsecureSkipVerify())
+
 // HTTP CLIENT
 func debug() gout.DebugFunc {
 	return func(o *gout.DebugOption) {
@@ -29,13 +31,13 @@ func debug() gout.DebugFunc {
 }
 func (w *Wechat) Post(url string) *dataflow.DataFlow {
 	if w.debug {
-		return gout.POST(url).Debug(debug())
+		return g.POST(url).Debug(debug())
 	}
-	return gout.POST(url)
+	return g.POST(url)
 }
 func (w *Wechat) Get(url string) *dataflow.DataFlow {
 	if w.debug {
-		return gout.GET(url).Debug(debug())
+		return g.GET(url).Debug(debug())
 	}
-	return gout.GET(url)
+	return g.GET(url)
 }
