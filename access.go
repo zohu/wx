@@ -119,18 +119,23 @@ func (w *Wechat) refreshAccessToken() {
 			w.refreshAccessToken()
 		}
 	}()
+	w.refreshAccessTokenByMember()
 	expTicker := time.NewTicker(time.Minute * 55)
 	for {
 		select {
 		case <-expTicker.C:
-			apps := wechat.SMembers(RdsAppListPrefix).Val()
-			zlog.Info("刷新token", zap.Strings("apps", apps))
-			for i := range apps {
-				appid := apps[i]
-				if ctx, err := FindApp(appid); err == nil {
-					ctx.NewAccessToken()
-				}
-			}
+			w.refreshAccessTokenByMember()
+		}
+	}
+}
+
+func (w *Wechat) refreshAccessTokenByMember() {
+	apps := wechat.SMembers(RdsAppListPrefix).Val()
+	zlog.Info("刷新token", zap.Strings("apps", apps))
+	for i := range apps {
+		appid := apps[i]
+		if ctx, err := FindApp(appid); err == nil {
+			ctx.NewAccessToken()
 		}
 	}
 }
